@@ -1,0 +1,19 @@
+---
+title: "WDPA Metadata"
+author: "Kelly Claborn"
+date: "August 14, 2018"
+output: html_document
+---
+
+### Title
+### Description
+### Date Accessed
+### Publisher
+### File Format
+### Access URL
+### Temporal Range & Frequency
+### Spatial Range & Resolution
+### Contact Name and Email (of Publisher)
+### Contact Name and Email (within WWF)
+### Data Permissions (License & Rights)
+
