@@ -1,9 +1,6 @@
----
-title: "WDPA Metadata"
-author: "Kelly Claborn"
-date: "August 14, 2018"
-output: html_document
----
+# WDPA Metadata
+## _Last updated: 14 Aug 2018_
+___
 
 ### Title
 ### Description
