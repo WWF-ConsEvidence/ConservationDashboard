@@ -3,5 +3,8 @@ ___
 
 ## Global Context
 
+# State
+# Threat
+# Response
 
 ## Global 2030 Outcomes

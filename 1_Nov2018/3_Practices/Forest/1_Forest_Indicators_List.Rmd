@@ -1,0 +1,38 @@
+# Forest Practice Indicators List
+___
+
+## Global Context 
+<br>
+
+#### FOREST EXTENT _(State)_
+  * Tree Cover
+
+<br>
+
+#### FOREST LOSS _(Threat)_
+  * Tree Cover Loss
+  * Forest Fragmentation
+
+<br>
+
+#### FOREST PROTECTION _(Response)_
+  * Protected Areas
+  * FSC Coverage
+  
+<br>
+
+## Global 2030 Outcomes
+<br>
+
+#### RESILIENT FORESTS
+  * 
+
+<br>
+
+#### HALT DEFORESTATION
+  * 
+
+<br> 
+
+#### FOREST RESTORATION
+  * 
