@@ -330,16 +330,6 @@ rm(FW_Afrotropical_Mammal_infile,FW_Afrotropical_Aves_infile,FW_Afrotropical_Her
    FW_Palearctic_Mammal_infile,FW_Palearctic_Aves_infile,FW_Palearctic_Herps_infile,FW_Palearctic_Fish_infile,
    FW_IndoPacific_Mammal_infile,FW_IndoPacific_Aves_infile,FW_IndoPacific_Herps_infile,FW_IndoPacific_Fish_infile)
 
-
-FW_data <- RawLPI_data[RawLPI_data$System=="Freshwater",]
-
-# WRITE TO FILE
-FW_LPI_output <- 
-  data.frame(Year=as.numeric(row.names(FW_LPI)), FW_LPI) %>%
-  subset(.,Year<2015)
-
-write.csv(FW_LPI_output,'1_Nov2018/2_FlatDataFiles/ConsDB_Input/FW_LPI_output_2018_0910.csv',row.names=F)
-
 #
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #

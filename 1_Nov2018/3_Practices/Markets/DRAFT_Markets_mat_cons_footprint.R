@@ -161,7 +161,7 @@ consump.pergdp.plots <-
                              keyheight=unit(0.5,"cm"))) +
   plot.theme 
 
-consump.pergdp.plots <-
+footprint.pergdp.plots <-
   ggplot(mat.footprint.pergdp) +
   geom_line(aes(x=Year,y=Value,colour=Geography),
             size=1) +
@@ -196,7 +196,7 @@ global.consump.plots <-
                                "Per GDP")) +
   scale_x_continuous(expand=c(0,0))+
   labs(x="Year",
-       title="SDG 12.2, Global Material Consumption and Footprint") +
+       title="SDG 12.2, Global Material Consumption") +
   guides(colour=guide_legend(label.vjust=0.5,
                              label.theme=element_text(size=rel(9),
                                                       angle=0,

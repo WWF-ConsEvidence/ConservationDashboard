@@ -12,6 +12,9 @@
 #  4) 2_Tables_for_Back-end_FreshwaterR
 #  5) 2_Tables_for_Back-end_Oceans.R
 #  6) 2_Tables_for_Back-end_Wildlife.R
+#  7) 2_Tables_for_Back-end_Finance.R
+#  8) 2_Tables_for_Back-end_Governance.R
+#  9) 2_Tables_for_Back-end_Markets.R
 # 
 # ---- outputs ----
 #  1) Consolidated back-end tables -- ready to go into back-end:
@@ -48,7 +51,10 @@ Dim_Context_Indicator_Type <-
                    Dim_Context_Forest,
                    Dim_Context_FW,
                    Dim_Context_Oceans,
-                   Dim_Context_Wildlife)
+                   Dim_Context_Wildlife,
+                   Dim_Context_Finance,
+                   Dim_Context_Governance,
+                   Dim_Context_Markets)
 
 
 # ---- 1.2 Fact_Global_Context_Indicators ----
@@ -59,15 +65,18 @@ Fact_Global_Context_Indicators <-
                    Fact_Context_Forest,
                    Fact_Context_FW,
                    Fact_Context_Oceans,
-                   Fact_Context_Wildlife)
+                   Fact_Context_Wildlife,
+                   Fact_Context_Finance,
+                   Fact_Context_Governance,
+                   Fact_Context_Markets)
 
 
 # ---- 1.3 Export Global Context Files ----
 
 file.name <- paste("1_Nov2018/2_FlatDataFiles/ConsDB_Output/Tables_Back-end_produced_", format(Sys.Date(),format="%Y_%m%d"), ".xlsx",sep="")
 
-write.xlsx(Dim_Context_Indicator_Type,file.name,sheetName="Dim_Context_Indicator_Type", row.names=F)
-write.xlsx(Fact_Global_Context_Indicators,file.name,sheetName="Fact_Global_Context_Indicators", append=T, row.names=F)
+write.xlsx(Dim_Context_Indicator_Type,file.name,sheetName="Dim_Context_Indicator_Type", row.names=F, showNA=F)
+write.xlsx(Fact_Global_Context_Indicators,file.name,sheetName="Fact_Global_Context_Indicators", append=T, row.names=F, showNA=F)
 
 
 #
@@ -102,8 +111,8 @@ Fact_Global_2030_Outcomes <-
 
 # ---- 2.3 Export Global 2030 Outcomes Files ----
 
-write.xlsx(Dim_Global_WWF_2030_Indicator_Type,file.name,sheetName="Dim_Global_WWF_2030_Indicator_Type", append=T, row.names=F)
-write.xlsx(Fact_Global_2030_Outcomes,file.name,sheetName="Fact_Global_2030_Outcomes", append=T, row.names=F)
+write.xlsx(Dim_Global_WWF_2030_Indicator_Type,file.name,sheetName="Dim_Global_WWF_2030_Indicator_Type", append=T, row.names=F, showNA=F)
+write.xlsx(Fact_Global_2030_Outcomes,file.name,sheetName="Fact_Global_2030_Outcomes", append=T, row.names=F, showNA=F)
 
 
 #
@@ -122,7 +131,10 @@ Dim_Initiative <-
                    Dim_Initiative_Forest,
                    Dim_Initiative_FW,
                    Dim_Initiative_Oceans,
-                   Dim_Initiative_Wildlife)
+                   Dim_Initiative_Wildlife,
+                   Dim_Initiative_Finance,
+                   Dim_Initiative_Governance,
+                   Dim_Initiative_Markets)
 
 
 # ---- 3.2 Dim_Initiative_Indicator_Type ----
@@ -133,7 +145,10 @@ Dim_Initiative_Indicator_Type <-
                    Dim_Initiative_Indicator_Forest,
                    Dim_Initiative_Indicator_FW,
                    Dim_Initiative_Indicator_Oceans,
-                   Dim_Initiative_Indicator_Wildlife)
+                   Dim_Initiative_Indicator_Wildlife,
+                   Dim_Initiative_Indicator_Finance,
+                   Dim_Initiative_Indicator_Governance,
+                   Dim_Initiative_Indicator_Markets)
 
 
 # ---- 3.3 Fact_Initiative_Indicators ----
@@ -144,7 +159,10 @@ Fact_Initiative_Indicators <-
                    Fact_Initiative_Indicator_Forest,
                    Fact_Initiative_Indicator_FW,
                    Fact_Initiative_Indicator_Oceans,
-                   Fact_Initiative_Indicator_Wildlife)
+                   Fact_Initiative_Indicator_Wildlife,
+                   Fact_Initiative_Indicator_Finance,
+                   Fact_Initiative_Indicator_Governance,
+                   Fact_Initiative_Indicator_Markets)
 
 
 # ---- 3.4 Fact_Initiative_Financials ----
@@ -155,7 +173,10 @@ Fact_Initiative_Financials <-
                    Fact_Initiative_Financials_Forest,
                    Fact_Initiative_Financials_FW,
                    Fact_Initiative_Financials_Oceans,
-                   Fact_Initiative_Financials_Wildlife)
+                   Fact_Initiative_Financials_Wildlife,
+                   Fact_Initiative_Financials_Finance,
+                   Fact_Initiative_Financials_Governance,
+                   Fact_Initiative_Financials_Markets)
 
 
 # ---- 3.5 Milestone_Group_Bridge ----
@@ -174,9 +195,9 @@ Dim_Milestone <-
 
 # ---- 3.7 Export Initiative Files ----
 
-write.xlsx(Dim_Initiative,file.name,sheetName="Dim_Initiative", append=T, row.names=F)
-write.xlsx(Dim_Initiative_Indicator_Type,file.name,sheetName="Dim_Initiative_Indicator_Type", append=T, row.names=F)
-write.xlsx(Fact_Initiative_Indicators,file.name,sheetName="Fact_Initiative_Indicators", append=T, row.names=F)
-write.xlsx(Fact_Initiative_Financials,file.name,sheetName="Fact_Initiative_Financials", append=T, row.names=F)
-write.xlsx(Milestone_Group_Bridge,file.name,sheetName="Milestone_Group_Bridge", append=T, row.names=F)
-write.xlsx(Dim_Milestone,file.name,sheetName="Dim_Milestone", append=T, row.names=F)
+write.xlsx(Dim_Initiative,file.name,sheetName="Dim_Initiative", append=T, row.names=F, showNA=F)
+write.xlsx(Dim_Initiative_Indicator_Type,file.name,sheetName="Dim_Initiative_Indicator_Type", append=T, row.names=F, showNA=F)
+write.xlsx(Fact_Initiative_Indicators,file.name,sheetName="Fact_Initiative_Indicators", append=T, row.names=F, showNA=F)
+write.xlsx(Fact_Initiative_Financials,file.name,sheetName="Fact_Initiative_Financials", append=T, row.names=F, showNA=F)
+write.xlsx(Milestone_Group_Bridge,file.name,sheetName="Milestone_Group_Bridge", append=T, row.names=F, showNA=F)
+write.xlsx(Dim_Milestone,file.name,sheetName="Dim_Milestone", append=T, row.names=F, showNA=F)

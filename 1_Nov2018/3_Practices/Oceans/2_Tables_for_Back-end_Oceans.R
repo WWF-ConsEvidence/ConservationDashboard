@@ -1,5 +1,5 @@
 # 
-# code: Oceans Practice Indicator and Initiative Tables
+# code: Oceans Practice Global Context and Global 2030 Outcome Indicator Tables
 # 
 # author: Kelly Claborn, clabornkelly@gmail.com
 # created: August 2018
@@ -14,18 +14,11 @@
 #     - Fact_Global_Context_Indicators
 #     - Dim_Global_WWF_2030_Indicator_Type
 #     - Fact_Global_2030_Outcomes
-#     - Dim_Initiative
-#     - Fact_Initiative_Financials
-#     - Dim_Initiative_Indicator_Type
-#     - Fact_Initiative_Indicators
-#     - Milestone_Group_Bridge
-#     - Dim_Milestone
 # 
 # ---- code sections ----
 #  1) Load libraries, add reference tables
 #  2) Global Context
 #  3) Global 2030 Outcomes
-#  4) Initiatives
 # 
 #
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -41,8 +34,6 @@ pacman::p_load(dplyr, xlsx)
 practice_key_ref <- read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/cons_dashboard_dim_tables_20180828.xlsx',
                               sheetName='Dim_Practice')
 
-practice_outcome_key_ref <- read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/cons_dashboard_dim_tables_20180828.xlsx',
-                                      sheetName='Dim_Practice_Outcome')
 
 #
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -56,129 +47,77 @@ practice_outcome_key_ref <- read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/co
 # ---- 2.1 Context - State ----
 
 
-# -- COASTAL ECOSYSTEM EXTENT
+# -- INDICATOR NAME
 
-Dim_Context_State_Oceans_A <- 
+Dim_Context_State_Oceans <- 
   data.frame(Indicator_Type_Key="GCS_OC_A",
-             Indicator_Name="Global Mangrove coverage (M ha)",
-             Indicator_Label="Total Mangrove Area",
-             Panel_Label="Coastal Ecosystem Extent",
+             Indicator_Name="",
+             Indicator_Label="",
+             Panel_Label="",
              Panel="State",
-             Indicator_Subcategory="A",
-             Indicator_Unit="M ha",
-             Data_Source="Global Mangrove Alliance")
+             Indicator_Subcategory=NA,
+             Indicator_Unit="",
+             Data_Source="")
 
-Fact_Context_State_Oceans_A <-
-  read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/GlobalMangroveWatch_fromDom_2018_0827.csv') %>%
-  transmute(Year_Key=Year,
-            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Oceans"],length(Year_Key)),
-            Indicator_Type_Key=rep(Dim_Context_State_Oceans_A$Indicator_Type_Key,length(Year_Key)),
-            Indicator_Value=Area,
+Fact_Context_State_Oceans <-
+  read.csv() %>%
+  transmute(Year_Key=NA,
+            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Oceans"],length(NA)),
+            Indicator_Type_Key=rep(Dim_Context_State_Oceans$Indicator_Type_Key,length(NA)),
+            Indicator_Value=NA,
             Indicator_Upper_Value=NA,
             Indicator_Lower_Value=NA)
 
 
 # ---- 2.2 Context - Threat ----
 
-# -- THREATS TO BIODIVERSITY - OVERFISHING
+# -- INDICATOR NAME
 
-Dim_Context_Threat_Oceans_A <- 
+Dim_Context_Threat_Oceans <- 
   data.frame(Indicator_Type_Key="GCT_OC_A",
-             Indicator_Name="Percent of fish stocks overfished",
-             Indicator_Label="Overfishing",
-             Panel_Label="Threats to Biodiversity",
+             Indicator_Name="",
+             Indicator_Label="",
+             Panel_Label="",
              Panel="Threat",
-             Indicator_Subcategory="A",
-             Indicator_Unit="% stocks",
-             Data_Source="FAO Fish Stock Assessment; FAO 2018 state of the world fisheries and aquaculture")
+             Indicator_Subcategory=NA,
+             Indicator_Unit="",
+             Data_Source="")
 
-Fact_Context_Threat_Oceans_A <-
-  read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/FAO_percent_overfished_2018_0827.csv') %>%
-  transmute(Year_Key=Year,
-            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Oceans"],length(Year)),
-            Indicator_Type_Key=rep(Dim_Context_Threat_Oceans_A$Indicator_Type_Key,length(Year)),
-            Indicator_Value=Percent.overfished,
-            Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)
-
-# -- THREATS TO BIODIVERSITY - CORAL REEF LOSS
-
-Dim_Context_Threat_Oceans_B <- 
-  data.frame(Indicator_Type_Key="GCT_OC_B",
-             Indicator_Name="FORTHCOMING: Coral reefs lost to bleaching",
-             Indicator_Label="Coral Reef Loss",
-             Panel_Label="Threats to Biodiversity",
-             Panel="Threat",
-             Indicator_Subcategory="B",
-             Indicator_Unit="M ha per year",
-             Data_Source="FORTHCOMING: internal (WWF) estimates of annual bleaching and habitat loss -- details being worked out")
-
-Fact_Context_Threat_Oceans_B <-
-  data.frame(Year_Key=NA,
-            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Oceans"],length(1)),
-            Indicator_Type_Key=rep(Dim_Context_Threat_Oceans_B$Indicator_Type_Key,length(1)),
+Fact_Context_Threat_Oceans <-
+  read.csv() %>%
+  transmute(Year_Key=NA,
+            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Oceans"],length(NA)),
+            Indicator_Type_Key=rep(Dim_Context_Threat_Oceans$Indicator_Type_Key,length(NA)),
             Indicator_Value=NA,
             Indicator_Upper_Value=NA,
             Indicator_Lower_Value=NA)
+
 
 # ---- 2.3 Context - Response ----
 
-# -- MARINE PROTECTION - GLOBAL MPA COVERAGE
+# -- INDICATOR NAME
 
-Dim_Context_Response_Oceans_A <- 
+Dim_Context_Response_Oceans <- 
   data.frame(Indicator_Type_Key="GCR_OC_A",
-             Indicator_Name="Global Marine Protected Area coverage (M ha)",
-             Indicator_Label="Protected",
-             Panel_Label="Marine Protection",
+             Indicator_Name="",
+             Indicator_Label="",
+             Panel_Label="",
              Panel="Response",
-             Indicator_Subcategory="A",
-             Indicator_Unit="M ha",
-             Data_Source="WDPA")
+             Indicator_Subcategory=NA,
+             Indicator_Unit="",
+             Data_Source="")
 
-Fact_Context_Response_Oceans_A <-
-  data.frame(Year_Key=NA,
-            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Oceans"],length(1)),
-            Indicator_Type_Key=rep(Dim_Context_Response_Oceans_A$Indicator_Type_Key,length(1)),
-            Indicator_Value=NA,
-            Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)
-
-# -- MARINE PROTECTION - AREA COMMITTED
-
-Dim_Context_Response_Oceans_B <- 
-  data.frame(Indicator_Type_Key="GCR_OC_B",
-             Indicator_Name="Marine area committed to being protected (M ha)",
-             Indicator_Label="Committed",
-             Panel_Label="Marine Protection",
-             Panel="Response",
-             Indicator_Subcategory="B",
-             Indicator_Unit="M ha",
-             Data_Source="UNEP-WCMC, PAME")
-
-Fact_Context_Response_Oceans_B <-
-  data.frame(Year_Key=NA,
-            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Oceans"],length(1)),
-            Indicator_Type_Key=rep(Dim_Context_Response_Oceans_B$Indicator_Type_Key,length(1)),
+Fact_Context_Response_Oceans <-
+  read.csv() %>%
+  transmute(Year_Key=NA,
+            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Oceans"],length(NA)),
+            Indicator_Type_Key=rep(Dim_Context_Response_Oceans$Indicator_Type_Key,length(NA)),
             Indicator_Value=NA,
             Indicator_Upper_Value=NA,
             Indicator_Lower_Value=NA)
 
 
 # ---- 2.4 Consolidated Oceans-specific Global Context tables ----
-
-Dim_Context_Oceans <- 
-  rbind.data.frame(Dim_Context_State_Oceans_A,
-                   Dim_Context_Threat_Oceans_A,
-                   Dim_Context_Threat_Oceans_B,
-                   Dim_Context_Response_Oceans_A,
-                   Dim_Context_Response_Oceans_B)
-
-Fact_Context_Oceans <-
-  rbind.data.frame(Fact_Context_State_Oceans_A,
-                   Fact_Context_Threat_Oceans_A,
-                   Fact_Context_Threat_Oceans_B,
-                   Fact_Context_Response_Oceans_A,
-                   Fact_Context_Response_Oceans_B)
 
 
 #
@@ -190,26 +129,25 @@ Fact_Context_Oceans <-
 #
 
 
-# ---- 3.1 Oceans Outcome 1 - HEALTHY & PRODUCTIVE ECOSYSTEMS ----
+# ---- 3.1 Oceans Outcome 1 - RESILIENT AND PRODUCTIVE ECOSYSTEMS ----
 
-Dim_Global_2030_Outcome1_Oceans_A <- 
+Dim_Global_WWF_2030_Outcome1_Oceans <- 
   data.frame(Indicator_Type_Key="OUT1_OC_A",
-             Indicator_Name="IUCN Green Listed Area, as proportion of total MPA area",
-             Indicator_Label="Strongly Managed: Green Listed Area",
-             Indicator_Subcategory="A",
-             Indicator_Unit="% of total MPA area",
-             Data_source="IUCN, WDPA",
+             Indicator_Name="",
+             Indicator_Label="",
+             Indicator_Subcategory=NA,
+             Indicator_Unit="",
+             Data_source="",
              Indicator_Target=NA,
-             Indicator_Type="Outcome",
-             Panel_Label="Healthy & Productive Ecosystems",
+             Indicator_Type="",
+             Panel_Label="",
              Display_Order=1)
 
-Fact_Global_2030_Outcome1_Oceans_A <-
-  data.frame(Year_Key=NA,
-            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Oceans"],length(1)),
-            Indicator_Type_Key=rep(Dim_Global_2030_Outcome1_Oceans_A$Indicator_Type_Key, length(1)),
-            Practice_Outcome_Key=rep(practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Oceans" &
-                                                                   grepl("Ecosystems",practice_outcome_key_ref$practice_outcome)], length(1)),
+Fact_Global_2030_Outcome1_Oceans <-
+  read.csv() %>%
+  transmute(Year_Key=NA,
+            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Oceans"],length(NA)),
+            Indicator_Type_Key=rep(Dim_Global_WWF_2030_Outcome1_Oceans$Indicator_Type_Key, length(NA)),
             Indicator_Value=NA,
             Indicator_Upper_Value=NA,
             Indicator_Lower_Value=NA)
@@ -217,24 +155,23 @@ Fact_Global_2030_Outcome1_Oceans_A <-
 
 # ---- 3.2 Oceans Outcome 2 - SUSTAINABLE FISHERIES ----
 
-Dim_Global_2030_Outcome2_Oceans_A <- 
+Dim_Global_WWF_2030_Outcome2_Oceans <- 
   data.frame(Indicator_Type_Key="OUT2_OC_A",
-             Indicator_Name="FORTHCOMING",
-             Indicator_Label=NA,
-             Indicator_Subcategory="A",
-             Indicator_Unit=NA,
+             Indicator_Name="",
+             Indicator_Label="",
+             Indicator_Subcategory=NA,
+             Indicator_Unit="",
              Data_source="",
              Indicator_Target=NA,
-             Indicator_Type="Outcome",
-             Panel_Label="Sustainable Fisheries",
+             Indicator_Type="",
+             Panel_Label="",
              Display_Order=2)
 
-Fact_Global_2030_Outcome2_Oceans_A <-
-  data.frame(Year_Key=NA,
-            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Oceans"],length(1)),
-            Indicator_Type_Key=rep(Dim_Global_2030_Outcome2_Oceans_A$Indicator_Type_Key, length(1)),
-            Practice_Outcome_Key=rep(practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Oceans" &
-                                                                   grepl("Fisheries",practice_outcome_key_ref$practice_outcome)], length(1)),
+Fact_Global_2030_Outcome2_Oceans <-
+  read.csv() %>%
+  transmute(Year_Key=NA,
+            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Oceans"],length(NA)),
+            Indicator_Type_Key=rep(Dim_Global_WWF_2030_Outcome2_Oceans$Indicator_Type_Key, length(NA)),
             Indicator_Value=NA,
             Indicator_Upper_Value=NA,
             Indicator_Lower_Value=NA)
@@ -242,100 +179,3 @@ Fact_Global_2030_Outcome2_Oceans_A <-
 
 # ---- 3.3 Consolidated Oceans-specific Global 2030 Outcome tables ----
 
-Dim_Global_2030_Outcome_Oceans <-
-  rbind.data.frame(Dim_Global_2030_Outcome1_Oceans_A,
-                   Dim_Global_2030_Outcome2_Oceans_A)
-
-Fact_Global_2030_Outcome_Oceans <-
-  rbind.data.frame(Fact_Global_2030_Outcome1_Oceans_A,
-                   Fact_Global_2030_Outcome2_Oceans_A)
-
-
-#
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-#
-# ---- SECTION 4: Initiatives ----
-#
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-#
-
-# ---- 4.1 Load data ----
-
-dim.initiatives.oceans <- 
-  read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/fy18_initiative_reporting_dim_2018_0908.xlsx',sheetName="Sheet1") %>%
-  subset(.,Practice=="Oceans") 
-
-dim.initiative.indicators.oceans <-
-  read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/fy18_initiative_indicators_fact_2018_0908.xlsx',sheetName="Sheet1") %>%
-  subset(.,Practice=="Oceans")
-
-
-# ---- 4.2 Oceans-specific Dim_Initiative ----
-
-Dim_Initiative_Oceans <-
-  dim.initiatives.oceans %>%
-  transmute(Initiative_Key=Initiative.key,
-            Initiative_Name=Initiative,
-            Initiative_Status=Overall.status,
-            Initiative_Status_Justification=Overall.just,
-            Initiative_Goal=Initiative.statement)
-
-
-# ---- 4.3 Oceans-specific Dim_Initiative_Indicator_Type ----
-
-Dim_Initiative_Indicator_Oceans <-
-  dim.initiative.indicators.oceans %>%
-  transmute(Indicator_Type_Key=Initiative.indicator.key,
-            Indicator_Type=Indicator.type,
-            Indicator_Name=ifelse(!is.na(Indicator.name),as.character(Indicator.name),"FORTHCOMING"),
-            Indicator_Label=Indicator.label,
-            Indicator_Subcategory=Subcategory,
-            Indicator_Target=Target.value,
-            Indicator_Unit=Units,
-            Data_Source=Source)
-
-
-# ---- 4.4 Oceans-specific Fact_Initiative_Indicators ----
-
-Fact_Initiative_Indicator_Oceans <-
-  left_join(dim.initiative.indicators.oceans,dim.initiatives.oceans,by="Initiative") %>%
-  transmute(Year_Key=NA,
-            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Oceans"],length(Year_Key)),
-            Initiative_Key=Initiative.key,
-            Indicator_Type_Key=Initiative.indicator.key,
-            Practice_Outcome_Key=Practice.outcome.key,
-            Indicator_Value=NA,
-            Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)
-
-
-# ---- 4.5 Oceans-specific Fact_Initiative_Financials ----
-
-Fact_Initiative_Financials_Oceans <-
-  dim.initiatives.oceans %>%
-  transmute(Date_Key=Date,
-            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Oceans"],length(Date_Key)),
-            Initiative_Key=Initiative.key,
-            Amount_needed=Funds.needed,
-            Amount_secured=Funds.secured)
-
-
-
-# ---- REMOVE CLUTTER ----
-
-rm(Dim_Context_State_Oceans_A,
-   Dim_Context_Threat_Oceans_A,
-   Dim_Context_Threat_Oceans_B,
-   Dim_Context_Response_Oceans_A,
-   Dim_Context_Response_Oceans_B,
-   Fact_Context_State_Oceans_A,
-   Fact_Context_Threat_Oceans_A,
-   Fact_Context_Threat_Oceans_B,
-   Fact_Context_Response_Oceans_A,
-   Fact_Context_Response_Oceans_B,
-   Dim_Global_2030_Outcome1_Oceans_A,
-   Dim_Global_2030_Outcome2_Oceans_A,
-   Fact_Global_2030_Outcome1_Oceans_A,
-   Fact_Global_2030_Outcome2_Oceans_A,
-   dim.initiatives.oceans,
-   dim.initiative.indicators.oceans)
