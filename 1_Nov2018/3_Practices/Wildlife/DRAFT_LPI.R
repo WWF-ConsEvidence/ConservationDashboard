@@ -13,11 +13,8 @@ pacman::p_load(devtools)
 install_github("Zoological-Society-of-London/rlpi", dependencies = T)
 library(rlpi)
 
-RawLPI_data <- read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/LPI_LPR2016data_public.csv', na.strings = "NULL")
+RawLPI_data <- read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/LPI_data_August2018.csv', na.strings = "NULL")
 
-
-file.copy(from=system.file("extdata", "example_data.zip", package = "rlpi"), 
-          to=paste(getwd(),"/1_Nov2018/2_FlatDataFiles/ConsDB_Input",sep=""))
 
 
 # Reference tables below pulled from supplemental materials (S10-S13 Tables) of McRae et al's (2017) 
@@ -329,6 +326,15 @@ rm(FW_Afrotropical_Mammal_infile,FW_Afrotropical_Aves_infile,FW_Afrotropical_Her
    FW_Neotropical_Mammal_infile,FW_Neotropical_Aves_infile,FW_Neotropical_Herps_infile,FW_Neotropical_Fish_infile,
    FW_Palearctic_Mammal_infile,FW_Palearctic_Aves_infile,FW_Palearctic_Herps_infile,FW_Palearctic_Fish_infile,
    FW_IndoPacific_Mammal_infile,FW_IndoPacific_Aves_infile,FW_IndoPacific_Herps_infile,FW_IndoPacific_Fish_infile)
+
+
+FW_data <- RawLPI_data[RawLPI_data$System=="Freshwater",]
+
+# WRITE TO FILE
+FW_LPI_output <- 
+  data.frame(Year=as.numeric(row.names(FW_LPI)), FW_LPI)
+
+write.csv(FW_LPI_output,'1_Nov2018/2_FlatDataFiles/ConsDB_Input/FW_LPI_output_2018_0910.csv',row.names=F)
 
 #
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
