@@ -65,7 +65,7 @@ Dim_Context_State_Governance_A <-
              Data_Source="WDPA; IUCN (for estimate of total community conserved lands)")
 
 Fact_Context_State_Governance_A <-read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/ICCA_timeseries.csv')%>%
-  data.frame(Year_Key=STATUS_YR,
+  transmute(Year_Key=STATUS_YR,
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Governance"],length(STATUS_YR)),
             Indicator_Type_Key=rep(Dim_Context_State_Governance_A$Indicator_Type_Key,length(STATUS_YR)),
             Indicator_Value=AREA_PERCENT_EST,
