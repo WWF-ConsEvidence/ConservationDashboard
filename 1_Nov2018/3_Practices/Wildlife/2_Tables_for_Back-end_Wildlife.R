@@ -128,7 +128,7 @@ Fact_Context_Threat_Wildlife_A <-
 
 # ---- 2.3 Context - Response ----
 
-# -- HABITAT PROTECTION - PROTECETD
+# -- HABITAT PROTECTION - PROTECTED
 
 Dim_Context_Response_Wildlife_A <- 
   data.frame(Indicator_Type_Key="GCR_WL_A",
@@ -140,11 +140,11 @@ Dim_Context_Response_Wildlife_A <-
              Indicator_Unit="M ha",
              Data_Source="WDPA")
 
-Fact_Context_Response_Wildlife_A <-
-  data.frame(Year_Key=9999,
-            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],length(1)),
-            Indicator_Type_Key=rep(Dim_Context_Response_Wildlife_A$Indicator_Type_Key,length(1)),
-            Indicator_Value=NA,
+Fact_Context_Response_Wildlife_A <-read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/WDPA_timeseries.csv')%>%
+  transmute(Year_Key=year,
+            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],length(year)),
+            Indicator_Type_Key=rep(Dim_Context_Response_Wildlife_A$Indicator_Type_Key,length(year)),
+            Indicator_Value=Total_PA_Mha,
             Indicator_Upper_Value=NA,
             Indicator_Lower_Value=NA)
 
@@ -160,11 +160,11 @@ Dim_Context_Response_Wildlife_B <-
              Indicator_Unit="M ha",
              Data_Source="WDPA")
 
-Fact_Context_Response_Wildlife_B <-
-  data.frame(Year_Key=9999,
-            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],length(1)),
-            Indicator_Type_Key=rep(Dim_Context_Response_Wildlife_B$Indicator_Type_Key,length(1)),
-            Indicator_Value=NA,
+Fact_Context_Response_Wildlife_B <- read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/ICCA_timeseries.csv')%>%
+  transmute(Year_Key=STATUS_YR,
+            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],length(STATUS_YR)),
+            Indicator_Type_Key=rep(Dim_Context_Response_Wildlife_B$Indicator_Type_Key,length(STATUS_YR)),
+            Indicator_Value=AREA_CUM_MHA,
             Indicator_Upper_Value=NA,
             Indicator_Lower_Value=NA)
 
