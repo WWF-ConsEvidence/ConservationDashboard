@@ -211,7 +211,7 @@ Dim_Global_2030_Outcome1_Wildlife_A <-
              Panel_Label="Vital Habitats Conserved",
              Display_Order=1)
 
-Fact_Global_2030_Outcome1_Wildlife_A <-
+Fact_Global_2030_Outcome1_Wildlife_A <- 
   data.frame(Year_Key=c(1995,2030),
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],2),
             Indicator_Type_Key=rep(Dim_Global_2030_Outcome1_Wildlife_A$Indicator_Type_Key, 2),
@@ -235,13 +235,13 @@ Dim_Global_2030_Outcome1_Wildlife_B <-
              Panel_Label="Vital Habitats Conserved",
              Display_Order=1)
 
-Fact_Global_2030_Outcome1_Wildlife_B <-
-  data.frame(Year_Key=9999,
+Fact_Global_2030_Outcome1_Wildlife_B <-read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/METT_area.csv')%>%
+  transmute(Year_Key=9999,
              Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],length(1)),
              Indicator_Type_Key=rep(Dim_Global_2030_Outcome1_Wildlife_B$Indicator_Type_Key, length(1)),
              Practice_Outcome_Key=rep(practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Wildlife" &
                                                                     grepl("Habitats",practice_outcome_key_ref$practice_outcome)], length(1)),
-             Indicator_Value=NA,
+             Indicator_Value=100*(METT_meetsthreshold_Mha/3566.386),
              Indicator_Upper_Value=NA,
              Indicator_Lower_Value=NA)
 
@@ -259,13 +259,13 @@ Dim_Global_2030_Outcome1_Wildlife_C <-
              Panel_Label="Vital Habitats Conserved",
              Display_Order=1)
 
-Fact_Global_2030_Outcome1_Wildlife_C <-
-  data.frame(Year_Key=9999,
+Fact_Global_2030_Outcome1_Wildlife_C <-read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/METT_area.csv')%>%
+  transmute(Year_Key=9999,
              Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],length(1)),
              Indicator_Type_Key=rep(Dim_Global_2030_Outcome1_Wildlife_C$Indicator_Type_Key, length(1)),
              Practice_Outcome_Key=rep(practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Wildlife" &
                                                                     grepl("Habitats",practice_outcome_key_ref$practice_outcome)], length(1)),
-             Indicator_Value=NA,
+             Indicator_Value=METT_mettsthreshold_percent,
              Indicator_Upper_Value=NA,
              Indicator_Lower_Value=NA)
 
