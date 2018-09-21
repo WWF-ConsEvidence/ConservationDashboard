@@ -62,7 +62,7 @@ practice_outcome_key_ref <- read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/co
 Dim_Context_State_FW_A <- 
   data.frame(Indicator_Type_Key="GCS_FW_A",
              Indicator_Name="Freshwater Living Planet Index",
-             Indicator_Label="Freshwater Living Planet Index",
+             Indicator_Label="Freshwater Living Planet Index (LPI)",
              Panel_Label="Freshwater Biodiversity",
              Panel="State",
              Indicator_Subcategory=NA,
@@ -86,7 +86,7 @@ Fact_Context_State_FW_A <-
 Dim_Context_Threat_FW_A <- 
   data.frame(Indicator_Type_Key="GCT_FW_A",
              Indicator_Name="Connectivity Status Index (% of total watersheds that reach 95% connectivity threshold)",
-             Indicator_Label="Length of Free-Flowing Rivers (Connectivity Status Index > 95%, source to outlet)",
+             Indicator_Label="Length of Free-Flowing Rivers (Connectivity Status Index)",
              Panel_Label="Water Infrastructure Development",
              Panel="Threat",
              Indicator_Subcategory="Free-Flowing",
@@ -106,7 +106,7 @@ Fact_Context_Threat_FW_A <-
 Dim_Context_Threat_FW_B <- 
   data.frame(Indicator_Type_Key="GCT_FW_B",
              Indicator_Name="Connectivity Status Index (% of total watersheds that reach 95% connectivity threshold)",
-             Indicator_Label="Length of Free-Flowing River (Connectivity Status Index > 95%, source to outlet)",
+             Indicator_Label="Length of Free-Flowing Rivers (Connectivity Status Index)",
              Panel_Label="Water Infrastructure Development",
              Panel="Threat",
              Indicator_Subcategory="Total",
@@ -132,7 +132,7 @@ Dim_Context_Response_FW_A <-
              Panel_Label="Water Stewardship & Governance",
              Panel="Response",
              Indicator_Subcategory=NA,
-             Indicator_Unit="% of countries with high degree of implementation",
+             Indicator_Unit="% of countries with high implementation",
              Data_Source="UN SDG Indicator bank - SDG 6.5.1 - UNEP")
 
 Fact_Context_Response_FW_A <-
@@ -177,10 +177,10 @@ Fact_Context_FW <-
 
 Dim_Global_2030_Outcome1_FW_A <- 
   data.frame(Indicator_Type_Key="OUT1_FW_A",
-             Indicator_Name="Proportion of freshwater species with stablized or increasing populations (of those species represented in LPI database)",
+             Indicator_Name="Trend of freshwater LPI since baseline of 2015",
              Indicator_Label="Species Recovery & Habitat Protection",
              Indicator_Subcategory="Stable or Increasing Populations",
-             Indicator_Unit="% freshwater species",
+             Indicator_Unit="Change in FW LPI since 2015",
              Data_source="Zoological Society of London, Living Planet Index Database",
              Indicator_Target=NA,
              Indicator_Type="Outcome",
@@ -197,10 +197,34 @@ Fact_Global_2030_Outcome1_FW_A <-
             Indicator_Upper_Value=NA,
             Indicator_Lower_Value=NA)
 
-# -- RAMSAR-PROTECTED HABITAT
+# - RIVER PROTECTION
 
 Dim_Global_2030_Outcome1_FW_B <- 
   data.frame(Indicator_Type_Key="OUT1_FW_B",
+             Indicator_Name="Length of river brought under protection (i.e., all river length within PAs)",
+             Indicator_Label="Species Recovery & Habitat Protection",
+             Indicator_Subcategory="River Protection",
+             Indicator_Unit="% of global river length",
+             Data_source="WWF/McGill - Abell et al (2017) Looking Beyond the Fenceline - Assessing Protection Gaps for the World's Rivers",
+             Indicator_Target=32,
+             Indicator_Type="Outcome",
+             Panel_Label="Healthy Habitats & Species",
+             Display_Order=1)
+
+Fact_Global_2030_Outcome1_FW_B <-
+  data.frame(Year_Key=2017,
+             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Freshwater"],length(1)),
+             Indicator_Type_Key=rep(Dim_Global_2030_Outcome1_FW_B$Indicator_Type_Key, length(1)),
+             Practice_Outcome_Key=rep(practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Freshwater" &
+                                                                    grepl("Habitats",practice_outcome_key_ref$practice_outcome)], length(1)),
+             Indicator_Value=16.0,
+             Indicator_Upper_Value=NA,
+             Indicator_Lower_Value=NA)
+
+# -- RAMSAR-PROTECTED HABITAT
+
+Dim_Global_2030_Outcome1_FW_C <- 
+  data.frame(Indicator_Type_Key="OUT1_FW_C",
              Indicator_Name="Area under Ramsar designation (M ha)",
              Indicator_Label="Species Recovery & Habitat Protection",
              Indicator_Subcategory="Ramsar Site Area",
@@ -211,7 +235,7 @@ Dim_Global_2030_Outcome1_FW_B <-
              Panel_Label="Healthy Habitats & Species",
              Display_Order=1)
 
-Fact_Global_2030_Outcome1_FW_B <-
+Fact_Global_2030_Outcome1_FW_C <-
   read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/Ramsar_sitedata_dl_2018_0905.csv') %>%
   select(.,c("Designation.date","Area..ha.")) %>%
   mutate(Date=as.character(Designation.date),
@@ -220,7 +244,7 @@ Fact_Global_2030_Outcome1_FW_B <-
   summarise(Area=sum(Area..ha.)) %>%
   transmute(Year_Key=Year,
              Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Freshwater"],length(Year_Key)),
-             Indicator_Type_Key=rep(Dim_Global_2030_Outcome1_FW_B$Indicator_Type_Key, length(Year_Key)),
+             Indicator_Type_Key=rep(Dim_Global_2030_Outcome1_FW_C$Indicator_Type_Key, length(Year_Key)),
              Practice_Outcome_Key=rep(practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Freshwater" &
                                                                     grepl("Habitats",practice_outcome_key_ref$practice_outcome)], length(Year_Key)),
              Indicator_Value=cumsum(Area)/1000000,
@@ -230,70 +254,71 @@ Fact_Global_2030_Outcome1_FW_B <-
 # Target value for this indicator is "double protected habitat from 2017 baseline", so we will calculate the target and 
 # append the Dim table, using the Ramsar data source imported for the Fact table
 
-Dim_Global_2030_Outcome1_FW_B$Indicator_Target <- 
-  2*Fact_Global_2030_Outcome1_FW_B$Indicator_Value[Fact_Global_2030_Outcome1_FW_B$Year_Key==2017]
+Dim_Global_2030_Outcome1_FW_C$Indicator_Target <- 
+  2*Fact_Global_2030_Outcome1_FW_C$Indicator_Value[Fact_Global_2030_Outcome1_FW_C$Year_Key==2017]
 
 # Add target value to Fact table
 
-Fact_Global_2030_Outcome1_FW_B <-
-  rbind.data.frame(Fact_Global_2030_Outcome1_FW_B,
+Fact_Global_2030_Outcome1_FW_C <-
+  rbind.data.frame(Fact_Global_2030_Outcome1_FW_C,
                    data.frame(Year_Key=2030,
                               Practice_Key=practice_key_ref$id[practice_key_ref$practice_name=="Freshwater"],
-                              Indicator_Type_Key=Dim_Global_2030_Outcome1_FW_B$Indicator_Type_Key,
+                              Indicator_Type_Key=Dim_Global_2030_Outcome1_FW_C$Indicator_Type_Key,
                               Practice_Outcome_Key=practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Freshwater" &
                                                                                  grepl("Habitats",practice_outcome_key_ref$practice_outcome)],
-                              Indicator_Value=Dim_Global_2030_Outcome1_FW_B$Indicator_Target,
+                              Indicator_Value=Dim_Global_2030_Outcome1_FW_C$Indicator_Target,
                               Indicator_Upper_Value=NA,
                               Indicator_Lower_Value=NA))
 
 
 # ---- 3.2 Freshwater Outcome 2 - CLEAN FLOWING RIVERS ----
 
-# -- LOCAL PROTECTION 
+# -- INTEGRITY
 
 Dim_Global_2030_Outcome2_FW_A <- 
   data.frame(Indicator_Type_Key="OUT2_FW_A",
-             Indicator_Name="Length of free flowing river brought under local protection (i.e., all river length within PAs)",
-             Indicator_Label="Protected & Restored Rivers",
-             Indicator_Subcategory="Local Protection",
-             Indicator_Unit="% of global river length",
-             Data_source="WWF/McGill - Abell et al (2017) Looking Beyond the Fenceline - Assessing Protectiong Gaps for the World's Rivers",
-             Indicator_Target=17,
+             Indicator_Name="Connectivity Status Index (% of total watersheds that reach 95% connectivity threshold)",
+             Indicator_Label="Improved Integrity & Quality",
+             Indicator_Subcategory="Hydrological Integrity",
+             Indicator_Unit="Kilometers free-flowing river",
+             Data_source="WWF/McGill -- value provided by Michele Thieme, WWF-US",
+             Indicator_Target=NA,
              Indicator_Type="Outcome",
              Panel_Label="Clean Flowing Rivers",
              Display_Order=2)
 
 Fact_Global_2030_Outcome2_FW_A <-
-  data.frame(Year_Key=2017,
+  data.frame(Year_Key=2018,
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Freshwater"],length(1)),
             Indicator_Type_Key=rep(Dim_Global_2030_Outcome2_FW_A$Indicator_Type_Key, length(1)),
             Practice_Outcome_Key=rep(practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Freshwater" &
                                                                    grepl("Rivers",practice_outcome_key_ref$practice_outcome)], length(1)),
-            Indicator_Value=16.0,
+            Indicator_Value=9971600,
             Indicator_Upper_Value=NA,
             Indicator_Lower_Value=NA)
 
-# -- INTEGRATED PROTECTION
+
+# -- QUALITY
 
 Dim_Global_2030_Outcome2_FW_B <- 
   data.frame(Indicator_Type_Key="OUT2_FW_B",
-             Indicator_Name="Length of free flowing river brought under local protection (i.e., all river length within PAs)",
-             Indicator_Label="Protected & Restored Rivers",
-             Indicator_Subcategory="Integrated Protection",
-             Indicator_Unit="% of global river length",
-             Data_source="WWF/McGill - Abell et al (2017) Looking Beyond the Fenceline - Assessing Protectiong Gaps for the World's Rivers",
+             Indicator_Name="Ambient water quality of ",
+             Indicator_Label="Improved Integrity & Quality",
+             Indicator_Subcategory="Ambient Water Quality",
+             Indicator_Unit="% river water bodies with good quality",
+             Data_source="UN - SDG Indicator Bank (SDG 6.3.2)",
              Indicator_Target=17,
              Indicator_Type="Outcome",
              Panel_Label="Clean Flowing Rivers",
              Display_Order=2)
 
 Fact_Global_2030_Outcome2_FW_B <-
-  data.frame(Year_Key=2017,
+  data.frame(Year_Key=9999,
              Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Freshwater"],length(1)),
              Indicator_Type_Key=rep(Dim_Global_2030_Outcome2_FW_B$Indicator_Type_Key, length(1)),
              Practice_Outcome_Key=rep(practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Freshwater" &
                                                                     grepl("Rivers",practice_outcome_key_ref$practice_outcome)], length(1)),
-             Indicator_Value=11.1,
+             Indicator_Value=NA,
              Indicator_Upper_Value=NA,
              Indicator_Lower_Value=NA)
 
@@ -303,12 +328,14 @@ Fact_Global_2030_Outcome2_FW_B <-
 Dim_Global_2030_Outcome_FW <-
   rbind.data.frame(Dim_Global_2030_Outcome1_FW_A,
                    Dim_Global_2030_Outcome1_FW_B,
+                   Dim_Global_2030_Outcome1_FW_C,
                    Dim_Global_2030_Outcome2_FW_A,
                    Dim_Global_2030_Outcome2_FW_B)
 
 Fact_Global_2030_Outcome_FW <-
   rbind.data.frame(Fact_Global_2030_Outcome1_FW_A,
                    Fact_Global_2030_Outcome1_FW_B,
+                   Fact_Global_2030_Outcome1_FW_C,
                    Fact_Global_2030_Outcome2_FW_A,
                    Fact_Global_2030_Outcome2_FW_B)
 
@@ -417,15 +444,21 @@ Fact_Initiative_Financials_FW <-
 
 rm(Dim_Context_State_FW_A,
    Dim_Context_Threat_FW_A,
+   Dim_Context_Threat_FW_B,
    Dim_Context_Response_FW_A,
    Fact_Context_State_FW_A,
    Fact_Context_Threat_FW_A,
+   Fact_Context_Threat_FW_B,
    Fact_Context_Response_FW_A,
    Dim_Global_2030_Outcome1_FW_A,
    Dim_Global_2030_Outcome1_FW_B,
+   Dim_Global_2030_Outcome1_FW_C,
    Dim_Global_2030_Outcome2_FW_A,
+   Dim_Global_2030_Outcome2_FW_B,
    Fact_Global_2030_Outcome1_FW_A,
    Fact_Global_2030_Outcome1_FW_B,
+   Fact_Global_2030_Outcome1_FW_C,
    Fact_Global_2030_Outcome2_FW_A,
+   Fact_Global_2030_Outcome2_FW_B,
    dim.initiatives.fw,
    dim.initiative.indicators.fw)

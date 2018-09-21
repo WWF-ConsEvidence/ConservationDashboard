@@ -85,7 +85,7 @@ Fact_Context_State_Oceans_A <-
 Dim_Context_Threat_Oceans_A <- 
   data.frame(Indicator_Type_Key="GCT_OC_A",
              Indicator_Name="Percent of fish stocks overfished",
-             Indicator_Label="Overfishing & Coral Reef Loss",
+             Indicator_Label="Overfishing & Coral Reef Loss*",
              Panel_Label="Threats to Marine Life",
              Panel="Threat",
              Indicator_Subcategory="Overfished Stocks",
@@ -106,10 +106,10 @@ Fact_Context_Threat_Oceans_A <-
 Dim_Context_Threat_Oceans_B <- 
   data.frame(Indicator_Type_Key="GCT_OC_B",
              Indicator_Name="FORTHCOMING: Coral reefs lost to bleaching",
-             Indicator_Label="Overfishing & Coral Reef Loss",
+             Indicator_Label="Overfishing & Coral Reef Loss*",
              Panel_Label="Threats to Marine Life",
              Panel="Threat",
-             Indicator_Subcategory="Bleached Reefs*",
+             Indicator_Subcategory="Bleached Reefs",
              Indicator_Unit="M ha per year",
              Data_Source="FORTHCOMING: internal (WWF) estimates of annual bleaching and habitat loss -- details being worked out")
 
@@ -128,7 +128,7 @@ Fact_Context_Threat_Oceans_B <-
 Dim_Context_Response_Oceans_A <- 
   data.frame(Indicator_Type_Key="GCR_OC_A",
              Indicator_Name="Global Marine Protected Area coverage (M ha)",
-             Indicator_Label="Protected & Pledged",
+             Indicator_Label="Protected & Pledged*",
              Panel_Label="Marine Protection",
              Panel="Response",
              Indicator_Subcategory="Protected",
@@ -148,7 +148,7 @@ Fact_Context_Response_Oceans_A <-
 Dim_Context_Response_Oceans_B <- 
   data.frame(Indicator_Type_Key="GCR_OC_B",
              Indicator_Name="Marine area committed to being protected (M ha)",
-             Indicator_Label="Protected & Pledged",
+             Indicator_Label="Protected & Pledged*",
              Panel_Label="Marine Protection",
              Panel="Response",
              Indicator_Subcategory="Pledged",
@@ -200,7 +200,7 @@ Dim_Global_2030_Outcome1_Oceans_A <-
              Indicator_Subcategory=NA,
              Indicator_Unit="% of total MPA area",
              Data_source="METT & WDPA",
-             Indicator_Target=NA,
+             Indicator_Target=100,
              Indicator_Type="Outcome",
              Panel_Label="Healthy & Productive Ecosystems",
              Display_Order=1)
@@ -224,7 +224,7 @@ Dim_Global_2030_Outcome1_Oceans_B <-
              Indicator_Subcategory=NA,
              Indicator_Unit="% of assessed area",
              Data_source="METT & WDPA",
-             Indicator_Target=NA,
+             Indicator_Target=100,
              Indicator_Type="Outcome",
              Panel_Label="Healthy & Productive Ecosystems",
              Display_Order=1)

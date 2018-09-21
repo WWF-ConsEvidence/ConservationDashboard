@@ -108,7 +108,7 @@ Dim_Context_Threat_Markets_A <-
              Indicator_Name="FORTHCOMING: CITES Illegal Trade & Exploitation Index",
              Indicator_Label="Illegal Trade and Exploitation Index*",
              Panel_Label="Demand & Trade of Illegal Wildlife",
-             Panel="State",
+             Panel="Threat",
              Indicator_Subcategory="(under development by WWF & TRAFFIC)",
              Indicator_Unit="",
              Data_Source="CITES, processed by WWF/TRAFFIC")
@@ -124,29 +124,21 @@ Fact_Context_Threat_Markets_A <-
 
 # ---- 2.3 Context - Response ----
 
-# !!!! CONSIDER CHANGING THIS INDICATOR BASED ON forest-trends SUPPLY CHANGE REPORT !!!!
-# https://www.forest-trends.org/wp-content/uploads/2018/04/2017SupplyChange_Trackin-Committments.pdf
-
-OECDStat_LandUse <- read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/LandUse_OECDStat_dl_2018_0816.csv')
-
-# -- LAND USE - CROPLAND 
+# -- LAND CONVERSION - COMMODITY DRIVEN DEFORESTATION
 
 Dim_Context_Response_Markets_A <- 
   data.frame(Indicator_Type_Key="GCR_MK_A",
-             Indicator_Name="Land use type (percentage of total land area)",
-             Indicator_Label="Type of Use*",
-             Panel_Label="Land Use",
-             Panel="Threat",
-             Indicator_Subcategory="Arable and Cropland",
-             Indicator_Unit="% of total land",
-             Data_Source="OECDStat, from FAO")
+             Indicator_Name="Commodity Driven Deforestation (M ha per year)",
+             Indicator_Label="Deforestation & D-Free Commitments",
+             Panel_Label="Land Conversion",
+             Panel="Response",
+             Indicator_Subcategory="Commodity Driven Deforestation",
+             Indicator_Unit="M ha per year",
+             Data_Source="Global Forest Watch - Curtis et al (2018) Classifying global drivers of forest loss")
 
 Fact_Context_Response_Markets_A <-
-  OECDStat_LandUse %>%
-  subset(.,Country=="World" & 
-           Year>1989 & 
-           grepl("arable", Variable, ignore.case=T) &
-           Unit=="Percentage") %>%
+  read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/GFW_treeloss_bydriver_2018_0919.xlsx', sheetName="Sheet1") %>%
+  subset(.,Loss_type=="Commodity Driven Deforestation") %>%
   transmute(Year_Key=Year,
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Markets"],length(Year_Key)),
             Indicator_Type_Key=rep(Dim_Context_Response_Markets_A$Indicator_Type_Key,length(Year_Key)),
@@ -154,77 +146,23 @@ Fact_Context_Response_Markets_A <-
             Indicator_Upper_Value=NA,
             Indicator_Lower_Value=NA)
 
-# -- LAND USE - MEADOWS & PASTURE
+# -- LAND CONVERSION - DEFORESTATION-FREE COMMITMENTS
 
 Dim_Context_Response_Markets_B <- 
   data.frame(Indicator_Type_Key="GCR_MK_B",
-             Indicator_Name="Land use (percentage of total land area)",
-             Indicator_Label="Type of Use*",
-             Panel_Label="Land Use",
-             Panel="Threat",
-             Indicator_Subcategory="Meadows and Pastures",
-             Indicator_Unit="% of total land",
-             Data_Source="OECDStat, from FAO")
+             Indicator_Name="Deforestation-Free Commitments (# companies with commitments)",
+             Indicator_Label="Deforestation & D-Free Commitments",
+             Panel_Label="Land Conversion",
+             Panel="Response",
+             Indicator_Subcategory="Deforestation-Free Commitments",
+             Indicator_Unit="# companies",
+             Data_Source="Supply Change 2017 Report -- forest-trends.org")
 
 Fact_Context_Response_Markets_B <-
-  OECDStat_LandUse %>%
-  subset(.,Country=="World" & 
-           Year>1989 & 
-           grepl("meadow", Variable, ignore.case=T) &
-           Unit=="Percentage") %>%
+  read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/')
   transmute(Year_Key=Year,
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Markets"],length(Year_Key)),
             Indicator_Type_Key=rep(Dim_Context_Response_Markets_B$Indicator_Type_Key,length(Year_Key)),
-            Indicator_Value=Value,
-            Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)
-
-# -- LAND USE - FOREST
-
-Dim_Context_Response_Markets_C <- 
-  data.frame(Indicator_Type_Key="GCR_MK_C",
-             Indicator_Name="Land use (percentage of total land area)",
-             Indicator_Label="Type of Use*",
-             Panel_Label="Land Use",
-             Panel="Threat",
-             Indicator_Subcategory="Forest",
-             Indicator_Unit="% of total land",
-             Data_Source="OECDStat, from FAO")
-
-Fact_Context_Response_Markets_C <-
-  OECDStat_LandUse %>%
-  subset(.,Country=="World" & 
-           Year>1989 & 
-           grepl("forest", Variable, ignore.case=T) &
-           Unit=="Percentage") %>%
-  transmute(Year_Key=Year,
-            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Markets"],length(Year_Key)),
-            Indicator_Type_Key=rep(Dim_Context_Response_Markets_C$Indicator_Type_Key,length(Year_Key)),
-            Indicator_Value=Value,
-            Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)
-
-# -- LAND USE - OTHER
-
-Dim_Context_Response_Markets_D <- 
-  data.frame(Indicator_Type_Key="GCR_MK_D",
-             Indicator_Name="Land use (percentage of total land area)",
-             Indicator_Label="Type of Use*",
-             Panel_Label="Land Use",
-             Panel="Threat",
-             Indicator_Subcategory="Other",
-             Indicator_Unit="% of total land",
-             Data_Source="OECDStat, from FAO")
-
-Fact_Context_Response_Markets_D <-
-  OECDStat_LandUse %>%
-  subset(.,Country=="World" & 
-           Year>1989 & 
-           grepl("other", Variable, ignore.case=T) &
-           Unit=="Percentage") %>%
-  transmute(Year_Key=Year,
-            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Markets"],length(Year_Key)),
-            Indicator_Type_Key=rep(Dim_Context_Response_Markets_D$Indicator_Type_Key,length(Year_Key)),
             Indicator_Value=Value,
             Indicator_Upper_Value=NA,
             Indicator_Lower_Value=NA)
@@ -355,7 +293,6 @@ Fact_Initiative_Financials_Markets <-
 # ---- REMOVE CLUTTER ----
 
 rm(sdg.12.2,
-   OECDStat_LandUse,
    Dim_Context_State_Markets_A,
    Dim_Context_State_Markets_B,
    Dim_Context_Threat_Markets_A,

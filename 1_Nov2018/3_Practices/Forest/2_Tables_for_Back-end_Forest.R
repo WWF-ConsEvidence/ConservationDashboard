@@ -56,9 +56,7 @@ practice_outcome_key_ref <- read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/co
 
 # ---- 2.1 Context - State ----
 
-# -- FOREST EXTENT
-
-# !!!! BREAK DOWN BY FOREST TYPE? !!!!
+# -- FOREST EXTENT - BOREAL
 
 Dim_Context_State_Forest_A <- 
   data.frame(Indicator_Type_Key="GCS_FR_A",
@@ -66,15 +64,62 @@ Dim_Context_State_Forest_A <-
              Indicator_Label="Total Area of Tree Cover",
              Panel_Label="Forest Extent",
              Panel="State",
-             Indicator_Subcategory=NA,
+             Indicator_Subcategory="Boreal",
              Indicator_Unit="M ha",
              Data_Source="FAO, Global Forest Resources Assessment")
 
 Fact_Context_State_Forest_A <-
-  read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/SDG_15.1.1_forest_area_dl_2018_0828.csv') %>%
-  transmute(Year_Key=TimePeriod,
+  read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/FRA2015_data.csv') %>%
+  subset(.,Geography=="Bor") %>%
+  transmute(Year_Key=Year,
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Forests"],length(Year_Key)),
             Indicator_Type_Key=rep(Dim_Context_State_Forest_A$Indicator_Type_Key,length(Year_Key)),
+            Indicator_Value=Value/1000,
+            Indicator_Upper_Value=NA,
+            Indicator_Lower_Value=NA)
+
+# -- FOREST EXTENT - TEMPERATE
+
+Dim_Context_State_Forest_B <- 
+  data.frame(Indicator_Type_Key="GCS_FR_B",
+             Indicator_Name="Forest area (millions of hectares)",
+             Indicator_Label="Total Area of Tree Cover",
+             Panel_Label="Forest Extent",
+             Panel="State",
+             Indicator_Subcategory="Temperate",
+             Indicator_Unit="M ha",
+             Data_Source="FAO, Global Forest Resources Assessment")
+
+Fact_Context_State_Forest_B <-
+  read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/FRA2015_data.csv') %>%
+  subset(.,Geography=="Temp") %>%
+  transmute(Year_Key=Year,
+            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Forests"],length(Year_Key)),
+            Indicator_Type_Key=rep(Dim_Context_State_Forest_B$Indicator_Type_Key,length(Year_Key)),
+            Indicator_Value=Value/1000,
+            Indicator_Upper_Value=NA,
+            Indicator_Lower_Value=NA)
+
+# -- FOREST EXTENT - TROPICAL/SUB-TROPICAL
+
+Dim_Context_State_Forest_C <- 
+  data.frame(Indicator_Type_Key="GCS_FR_C",
+             Indicator_Name="Forest area (millions of hectares)",
+             Indicator_Label="Total Area of Tree Cover",
+             Panel_Label="Forest Extent",
+             Panel="State",
+             Indicator_Subcategory="Tropical & Sub-Tropical",
+             Indicator_Unit="M ha",
+             Data_Source="FAO, Global Forest Resources Assessment")
+
+Fact_Context_State_Forest_C <-
+  read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/FRA2015_data.csv') %>%
+  subset(.,Geography=="Trp" | Geography=="SubTrp") %>%
+  group_by(Year) %>%
+  summarise(Value=sum(Value)) %>%
+  transmute(Year_Key=Year,
+            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Forests"],length(Year_Key)),
+            Indicator_Type_Key=rep(Dim_Context_State_Forest_C$Indicator_Type_Key,length(Year_Key)),
             Indicator_Value=Value/1000,
             Indicator_Upper_Value=NA,
             Indicator_Lower_Value=NA)
@@ -117,8 +162,7 @@ Dim_Context_Threat_Forest_B <-
              Data_Source="Aurelie Shapiro, WWF-DE")
 
 Fact_Context_Threat_Forest_B <-
-  read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/GFW_ForestLoss_2018_0821.xlsx', sheetName="Sheet1") %>%
-  subset(.,Geography=="World") %>%
+  read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/Shapiro_fragmentation_data_2018_0901.csv') %>%
   transmute(Year_Key=Year,
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Forests"],length(Year_Key)),
             Indicator_Type_Key=rep(Dim_Context_Threat_Forest_B$Indicator_Type_Key,length(Year_Key)),
@@ -175,6 +219,8 @@ Fact_Context_Response_Forest_B <-
 
 Dim_Context_Forest <- 
   rbind.data.frame(Dim_Context_State_Forest_A,
+                   Dim_Context_State_Forest_B,
+                   Dim_Context_State_Forest_C,
                    Dim_Context_Threat_Forest_A,
                    Dim_Context_Threat_Forest_B,
                    Dim_Context_Response_Forest_A,
@@ -182,6 +228,8 @@ Dim_Context_Forest <-
 
 Fact_Context_Forest <-
   rbind.data.frame(Fact_Context_State_Forest_A,
+                   Fact_Context_State_Forest_B,
+                   Fact_Context_State_Forest_C,
                    Fact_Context_Threat_Forest_A,
                    Fact_Context_Threat_Forest_B,
                    Fact_Context_Response_Forest_A,
@@ -205,10 +253,10 @@ Dim_Global_2030_Outcome1_Forest_A <-
   data.frame(Indicator_Type_Key="OUT1_FR_A",
              Indicator_Name="Effectively managed and protected forests",
              Indicator_Label="Effective Protection & Management",
-             Indicator_Subcategory="Protection: Reduced Degradation within Protected Areas*",
-             Indicator_Unit="",
-             Data_source="",
-             Indicator_Target=NA,
+             Indicator_Subcategory="Reduced Degradation in Protected Areas* & FSC Certification in Managed Forests",
+             Indicator_Unit="% of total forest area",
+             Data_source="FSC for Effective Management; FORTHCOMING for Effective Protection (either fragmentation data (WWF-DE) or global drivers of loss & WDPA data)",
+             Indicator_Target=50,
              Indicator_Type="Outcome",
              Panel_Label="Resilient Forests",
              Display_Order=1)
@@ -223,30 +271,6 @@ Fact_Global_2030_Outcome1_Forest_A <-
             Indicator_Upper_Value=NA,
             Indicator_Lower_Value=NA)
 
-# -- EFFECTIVE MANAGEMENT (FSC)
-
-Dim_Global_2030_Outcome1_Forest_B <- 
-  data.frame(Indicator_Type_Key="OUT1_FR_B",
-             Indicator_Name="FSC coverage",
-             Indicator_Label="Effective Protection & Management",
-             Indicator_Subcategory="Management: FSC Certified Area",
-             Indicator_Unit="M ha",
-             Data_source="FSC",
-             Indicator_Target=NA,
-             Indicator_Type="Outcome",
-             Panel_Label="Resilient Forests",
-             Display_Order=1)
-
-Fact_Global_2030_Outcome1_Forest_B <-
-  read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/FSC_area_2017_0915.csv') %>%
-  transmute(Year_Key=Year,
-            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Forests"],length(Year_Key)),
-            Indicator_Type_Key=rep(Dim_Global_2030_Outcome1_Forest_B$Indicator_Type_Key,length(Year_Key)),
-            Practice_Outcome_Key=rep(practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Forests" &
-                                                                   grepl("Manage",practice_outcome_key_ref$practice_outcome)], length(Year_Key)),
-            Indicator_Value=Value,
-            Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)
 
 
 # ---- 3.2 Forest Outcome 2 - HALT DEFORESTATION ----
@@ -367,7 +391,6 @@ Fact_Global_2030_Outcome3_Forest_C <-
 
 Dim_Global_2030_Outcome_Forest <- 
   rbind.data.frame(Dim_Global_2030_Outcome1_Forest_A,
-                   Dim_Global_2030_Outcome1_Forest_B,
                    Dim_Global_2030_Outcome2_Forest_A,
                    Dim_Global_2030_Outcome3_Forest_A,
                    Dim_Global_2030_Outcome3_Forest_B,
@@ -375,7 +398,6 @@ Dim_Global_2030_Outcome_Forest <-
 
 Fact_Global_2030_Outcome_Forest <-
   rbind.data.frame(Fact_Global_2030_Outcome1_Forest_A,
-                   Fact_Global_2030_Outcome1_Forest_B,
                    Fact_Global_2030_Outcome2_Forest_A,
                    Fact_Global_2030_Outcome3_Forest_A,
                    Fact_Global_2030_Outcome3_Forest_B,
@@ -508,23 +530,29 @@ Dim_Milestone_Forest <-
 # ---- REMOVE CLUTTER ----
 
 rm(Dim_Context_State_Forest_A,
+   Dim_Context_State_Forest_B,
+   Dim_Context_State_Forest_C,
    Dim_Context_Threat_Forest_A,
    Dim_Context_Threat_Forest_B,
    Dim_Context_Response_Forest_A,
    Dim_Context_Response_Forest_B,
    Fact_Context_State_Forest_A,
+   Fact_Context_State_Forest_B,
+   Fact_Context_State_Forest_C,
    Fact_Context_Threat_Forest_A,
    Fact_Context_Threat_Forest_B,
    Fact_Context_Response_Forest_A,
    Fact_Context_Response_Forest_B,
    Dim_Global_2030_Outcome1_Forest_A,
-   Dim_Global_2030_Outcome1_Forest_B,
    Dim_Global_2030_Outcome2_Forest_A,
    Dim_Global_2030_Outcome3_Forest_A,
+   Dim_Global_2030_Outcome3_Forest_B,
+   Dim_Global_2030_Outcome3_Forest_C,
    Fact_Global_2030_Outcome1_Forest_A,
-   Fact_Global_2030_Outcome1_Forest_B,
    Fact_Global_2030_Outcome2_Forest_A,
    Fact_Global_2030_Outcome3_Forest_A,
+   Fact_Global_2030_Outcome3_Forest_B,
+   Fact_Global_2030_Outcome3_Forest_C,
    dim.initiatives.forests,
    dim.initiative.indicators.forests,
    dim.initiative.milestones.forests)

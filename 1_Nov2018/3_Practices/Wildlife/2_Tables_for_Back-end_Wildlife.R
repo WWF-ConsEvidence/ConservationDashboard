@@ -92,7 +92,7 @@ Dim_Context_State_Wildlife_B <-
 
 Fact_Context_State_Wildlife_B <-
   read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/Global_RLI_fromflatfile_2017_0912.xlsx', sheetName="Sheet1") %>%
-  subset(.,Year>1994 & Year<2013) %>%
+  subset(.,Year>1994) %>%
   transmute(Year_Key=Year,
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],length(Year_Key)),
             Indicator_Type_Key=rep(Dim_Context_State_Wildlife_B$Indicator_Type_Key,length(Year_Key)),
