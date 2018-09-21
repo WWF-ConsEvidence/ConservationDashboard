@@ -141,11 +141,11 @@ Dim_Context_Response_Forest_A <-
              Indicator_Unit="M ha",
              Data_Source="WDPA")
 
-Fact_Context_Response_Forest_A <-
-  data.frame(Year_Key=9999,
-            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Forests"],length(1)),
-            Indicator_Type_Key=rep(Dim_Context_Response_Forest_A$Indicator_Type_Key,length(1)),
-            Indicator_Value=NA,
+Fact_Context_Response_Forest_A <-read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/WDPA_timeseries.csv')%>%
+  transmute(Year_Key=9999,
+            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Forests"],length(year)),
+            Indicator_Type_Key=rep(Dim_Context_Response_Forest_A$Indicator_Type_Key,length(year)),
+            Indicator_Value=Land_Mha_time,
             Indicator_Upper_Value=NA,
             Indicator_Lower_Value=NA)
 
