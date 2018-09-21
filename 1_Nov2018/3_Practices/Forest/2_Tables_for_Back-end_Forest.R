@@ -86,17 +86,17 @@ Fact_Context_State_Forest_A <-
 
 Dim_Context_Threat_Forest_A <- 
   data.frame(Indicator_Type_Key="GCT_FR_A",
-             Indicator_Name="Forest cover loss (millions of hectares per year)",
-             Indicator_Label="Forest Loss & Forest Fragmentation",
+             Indicator_Name="Tree cover loss (millions of hectares per year)",
+             Indicator_Label="Tree Cover Loss & Forest Fragmentation",
              Panel_Label="Forest Loss",
              Panel="Threat",
              Indicator_Subcategory="Loss",
              Indicator_Unit="M ha per year",
-             Data_Source="Global Forest Watch")
+             Data_Source="Global Forest Watch - Curtis et al (2018) Global drivers of forest loss")
 
 Fact_Context_Threat_Forest_A <-
-  read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/GFW_ForestLoss_2018_0821.xlsx', sheetName="Sheet1") %>%
-  subset(.,Geography=="World") %>%
+  read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/GFW_treeloss_bydriver_2018_0919.xlsx', sheetName="Sheet1") %>%
+  subset(.,Geography=="World" & Loss_type=="Total Loss") %>%
   transmute(Year_Key=Year,
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Forests"],length(Year_Key)),
             Indicator_Type_Key=rep(Dim_Context_Threat_Forest_A$Indicator_Type_Key,length(Year_Key)),
@@ -109,7 +109,7 @@ Fact_Context_Threat_Forest_A <-
 Dim_Context_Threat_Forest_B <- 
   data.frame(Indicator_Type_Key="GCT_FR_B",
              Indicator_Name="Forest fragmentation (non-core:core ratio)",
-             Indicator_Label="Forest Loss & Forest Fragmentation",
+             Indicator_Label="Tree Cover Loss & Forest Fragmentation",
              Panel_Label="Forest Loss",
              Panel="Threat",
              Indicator_Subcategory="Fragmentation",
@@ -253,19 +253,19 @@ Fact_Global_2030_Outcome1_Forest_B <-
 
 Dim_Global_2030_Outcome2_Forest_A <- 
   data.frame(Indicator_Type_Key="OUT2_FR_A",
-             Indicator_Name="Global tree cover loss (M ha per year)",
-             Indicator_Label="Forest Cover Loss*",
+             Indicator_Name="Commodity Driven Deforestation (M ha per year)",
+             Indicator_Label="Commodity Driven Deforestation",
              Indicator_Subcategory=NA,
              Indicator_Unit="M ha per year",
-             Data_source="Global Forest Watch",
-             Indicator_Target=NA,
+             Data_source="Global Forest Watch - Curtis et al (2018) Global drivers of forest loss",
+             Indicator_Target=0,
              Indicator_Type="Outcome",
              Panel_Label="Halt Deforestation",
              Display_Order=2)
 
 Fact_Global_2030_Outcome2_Forest_A <-
-  read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/GFW_ForestLoss_2018_0821.xlsx', sheetName="Sheet1") %>%
-  subset(.,Geography=="World") %>%
+  read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/GFW_treeloss_bydriver_2018_0919.xlsx', sheetName="Sheet1") %>%
+  subset(.,Loss_type=="Commodity Driven Deforestation") %>%
   transmute(Year_Key=Year,
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Forests"],length(Year_Key)),
             Indicator_Type_Key=rep(Dim_Global_2030_Outcome2_Forest_A$Indicator_Type_Key, length(Year_Key)),
