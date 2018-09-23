@@ -205,13 +205,13 @@ Dim_Global_2030_Outcome1_Oceans_A <-
              Panel_Label="Healthy & Productive Ecosystems",
              Display_Order=1)
 
-Fact_Global_2030_Outcome1_Oceans_A <-
-  data.frame(Year_Key=9999,
+Fact_Global_2030_Outcome1_Oceans_A <-read.csv('METT_MPA.csv')%>%
+  transmute(Year_Key=9999,
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Oceans"],length(1)),
             Indicator_Type_Key=rep(Dim_Global_2030_Outcome1_Oceans_A$Indicator_Type_Key, length(1)),
             Practice_Outcome_Key=rep(practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Oceans" &
                                                                    grepl("Ecosystems",practice_outcome_key_ref$practice_outcome)], length(1)),
-            Indicator_Value=NA,
+            Indicator_Value=MPA_METT_percent,
             Indicator_Upper_Value=NA,
             Indicator_Lower_Value=NA)
 
@@ -229,13 +229,13 @@ Dim_Global_2030_Outcome1_Oceans_B <-
              Panel_Label="Healthy & Productive Ecosystems",
              Display_Order=1)
 
-Fact_Global_2030_Outcome1_Oceans_B <-
-  data.frame(Year_Key=9999,
+Fact_Global_2030_Outcome1_Oceans_B <-read.csv('METT_MPA.csv')%>%
+  transmute(Year_Key=9999,
              Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Oceans"],length(1)),
              Indicator_Type_Key=rep(Dim_Global_2030_Outcome1_Oceans_B$Indicator_Type_Key, length(1)),
              Practice_Outcome_Key=rep(practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Oceans" &
                                                                     grepl("Ecosystems",practice_outcome_key_ref$practice_outcome)], length(1)),
-             Indicator_Value=NA,
+             Indicator_Value=MPA_threshold_percent,
              Indicator_Upper_Value=NA,
              Indicator_Lower_Value=NA)
 
