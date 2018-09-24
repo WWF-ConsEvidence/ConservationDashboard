@@ -71,6 +71,7 @@ Dim_Context_State_FW_A <-
 
 Fact_Context_State_FW_A <-
   read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/FW_LPI_output_2018_0910.csv') %>%
+  subset(.,Year<2016) %>%
   transmute(Year_Key=Year,
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Freshwater"],length(Year_Key)),
             Indicator_Type_Key=rep(Dim_Context_State_FW_A$Indicator_Type_Key,length(Year_Key)),
@@ -188,12 +189,12 @@ Dim_Global_2030_Outcome1_FW_A <-
              Display_Order=1)
 
 Fact_Global_2030_Outcome1_FW_A <-
-  data.frame(Year_Key=9999,
+  data.frame(Year_Key=2015,
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Freshwater"],length(1)),
             Indicator_Type_Key=rep(Dim_Global_2030_Outcome1_FW_A$Indicator_Type_Key, length(1)),
             Practice_Outcome_Key=rep(practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Freshwater" &
                                                                    grepl("Habitats",practice_outcome_key_ref$practice_outcome)], length(1)),
-            Indicator_Value=NA,
+            Indicator_Value=0,
             Indicator_Upper_Value=NA,
             Indicator_Lower_Value=NA)
 

@@ -8,9 +8,10 @@
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #
 
-pacman::p_load(devtools)
+# pacman::p_load(devtools)
+# 
+# install_github("Zoological-Society-of-London/rlpi", dependencies = T)
 
-install_github("Zoological-Society-of-London/rlpi", dependencies = T)
 library(rlpi)
 
 RawLPI_data <- read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/LPI_data_August2018.csv', na.strings = "NULL")
@@ -54,6 +55,7 @@ Realm_weights_reftable_M <-
              PacificNorthTemp=0.068026,
              TropSubTropIndoPac=0.456553,
              SouthTempAntarctic=0.099685)
+
 
 #
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -314,24 +316,35 @@ FW_infile_table <-
 
 FW_LPI <- LPIMain(paste(FW_filepath, 'FW_infile.txt', sep = "/"), use_weightings = 1, use_weightings_B = 1)
 
-# -- REMOVE CLUTTER (index vectors, infile names)
-rm(FW_Afrotropical_Mammal,FW_Afrotropical_Aves,FW_Afrotropical_Herps,FW_Afrotropical_Fish,
-   FW_Nearctic_Mammal,FW_Nearctic_Aves,FW_Nearctic_Herps,FW_Nearctic_Fish,
-   FW_Neotropical_Mammal,FW_Neotropical_Aves,FW_Neotropical_Herps,FW_Neotropical_Fish,
-   FW_Palearctic_Mammal,FW_Palearctic_Aves,FW_Palearctic_Herps,FW_Palearctic_Fish,
-   FW_IndoPacific_Mammal,FW_IndoPacific_Aves,FW_IndoPacific_Herps,FW_IndoPacific_Fish)
-
-rm(FW_Afrotropical_Mammal_infile,FW_Afrotropical_Aves_infile,FW_Afrotropical_Herps_infile,FW_Afrotropical_Fish_infile,
-   FW_Nearctic_Mammal_infile,FW_Nearctic_Aves_infile,FW_Nearctic_Herps_infile,FW_Nearctic_Fish_infile,
-   FW_Neotropical_Mammal_infile,FW_Neotropical_Aves_infile,FW_Neotropical_Herps_infile,FW_Neotropical_Fish_infile,
-   FW_Palearctic_Mammal_infile,FW_Palearctic_Aves_infile,FW_Palearctic_Herps_infile,FW_Palearctic_Fish_infile,
-   FW_IndoPacific_Mammal_infile,FW_IndoPacific_Aves_infile,FW_IndoPacific_Herps_infile,FW_IndoPacific_Fish_infile)
+# 
+# 
+# FW_family_filepath <- "1_Nov2018/2_FlatDataFiles/ConsDB_Input/LPI/FW/Family_specific"
+# unique.FW.family <- as.character(unique(RawLPI_data$Family[RawLPI_data$System=="Freshwater"]))  
+# 
+# FW_family_infile <- data.frame(Filename=NULL, Group=NULL, Weighting=NULL, WeightingB=NULL)
+# 
+# for(i in 1:length(unique.FW.family)) {
+#   create_infile(RawLPI_data,
+#                 index_vector = (RawLPI_data$System == "Freshwater" & RawLPI_data$Family==unique.FW.family[i]),
+#                 name = paste(FW_family_filepath, unique.FW.family[i], sep="/"))
+#   
+#   FW_family_infile[i,"Filename"] <- paste(paste(FW_family_filepath, unique.FW.family[i], sep="/"), "pops.txt", sep="_")
+#   FW_family_infile[i,"Group"] <- i
+#   FW_family_infile[i,"Weighting"] <- 1
+#   FW_family_infile[i,"WeightingB"] <- 1
+# }
+# 
+# write.table(FW_family_infile, file=paste(FW_family_filepath, "FW_family_infile.txt", sep="/"), row.names=FALSE)
+#   
+# FW_family_LPI_noweight <- LPIMain(paste(FW_family_filepath, "FW_family_infile.txt", sep="/"))  
 
 
 FW_data <- RawLPI_data[RawLPI_data$System=="Freshwater",]
 
+
+
 # WRITE TO FILE
-FW_LPI_output <- 
+FW_LPI_output <-
   data.frame(Year=as.numeric(row.names(FW_LPI)), FW_LPI)
 
 write.csv(FW_LPI_output,'1_Nov2018/2_FlatDataFiles/ConsDB_Input/FW_LPI_output_2018_0910.csv',row.names=F)
@@ -464,9 +477,9 @@ M_SouthTempAntarctic_Aves_infile <-
 
 # -- Marine reptiles
 # INDEX VECTORS
-M_Arctic_Reptiles <- 
-  RawLPI_data$Class == "Reptilia" & 
-  RawLPI_data$M_realm == "Arctic"
+# M_Arctic_Reptiles <- 
+#   RawLPI_data$Class == "Reptilia" & 
+#   RawLPI_data$M_realm == "Arctic"
 
 M_AtlanticNorthTemp_Reptiles <- 
   RawLPI_data$Class == "Reptilia" & 
@@ -489,10 +502,10 @@ M_SouthTempAntarctic_Reptiles <-
   RawLPI_data$M_realm == "South temperate and Antarctic"
 
 # INFILES
-M_Arctic_Reptiles_infile <- 
-  create_infile(RawLPI_data, 
-                index_vector = M_Arctic_Reptiles,
-                name = paste(M_filepath, "M_Arctic_Reptiles", sep = "/"))
+# M_Arctic_Reptiles_infile <- 
+#   create_infile(RawLPI_data, 
+#                 index_vector = M_Arctic_Reptiles,
+#                 name = paste(M_filepath, "M_Arctic_Reptiles", sep = "/"))
 
 M_AtlanticNorthTemp_Reptiles_infile <- 
   create_infile(RawLPI_data, 
@@ -593,8 +606,7 @@ M_SouthTempAntarctic_Fish_infile <-
 # ---- 3.2 Overall Marine infile ----
 
 M_infile <-
-  data.frame(FileName=c(paste(M_filepath, "M_Arctic_Reptiles_pops.txt", sep = "/"),
-                        paste(M_filepath, "M_Arctic_Aves_pops.txt", sep = "/"),
+  data.frame(FileName=c(paste(M_filepath, "M_Arctic_Aves_pops.txt", sep = "/"),
                         paste(M_filepath, "M_Arctic_Mammal_pops.txt", sep = "/"),
                         paste(M_filepath, "M_Arctic_Fish_pops.txt", sep = "/"),
                         paste(M_filepath, "M_AtlanticNorthTemp_Reptiles_pops.txt", sep = "/"),
@@ -617,14 +629,14 @@ M_infile <-
                         paste(M_filepath, "M_SouthTempAntarctic_Aves_pops.txt", sep = "/"),
                         paste(M_filepath, "M_SouthTempAntarctic_Mammal_pops.txt", sep = "/"),
                         paste(M_filepath, "M_SouthTempAntarctic_Fish_pops.txt", sep = "/")),
-             Group=c(rep(1,4),rep(2,4),rep(3,4),rep(4,4),rep(5,4),rep(6,4)),
-             Weighting=c(Class_weights_reftable_M$Arctic,
+             Group=c(rep(1,3),rep(2,4),rep(3,4),rep(4,4),rep(5,4),rep(6,4)),
+             Weighting=c(Class_weights_reftable_M$Arctic[Class_weights_reftable_M$Class!="Reptiles"],
                          Class_weights_reftable_M$AtlanticNorthTemp,
                          Class_weights_reftable_M$AtlanticTropSubTrop,
                          Class_weights_reftable_M$PacificNorthTemp,
                          Class_weights_reftable_M$TropSubTropIndoPac,
                          Class_weights_reftable_M$SouthTempAntarctic),
-             WeightingB=c(rep(Realm_weights_reftable_M$Arctic,4),
+             WeightingB=c(rep(Realm_weights_reftable_M$Arctic,3),
                           rep(Realm_weights_reftable_M$AtlanticNorthTemp,4),
                           rep(Realm_weights_reftable_M$AtlanticTropSubTrop,4),
                           rep(Realm_weights_reftable_M$PacificNorthTemp,4),
@@ -637,22 +649,6 @@ M_infile_table <-
 M_LPI <- LPIMain(paste(M_filepath, 'M_infile.txt', sep = "/"), use_weightings = 1, use_weightings_B = 1)
 
 
-# -- REMOVE CLUTTER (index vectors, infile names)
-rm(M_Arctic_Mammal,M_Arctic_Aves,M_Arctic_Reptiles,M_Arctic_Fish,
-   M_AtlanticNorthTemp_Mammal,M_AtlanticNorthTemp_Aves,M_AtlanticNorthTemp_Reptiles,M_AtlanticNorthTemp_Fish,
-   M_AtlanticTropSubTrop_Mammal,M_AtlanticTropSubTrop_Aves,M_AtlanticTropSubTrop_Reptiles,M_AtlanticTropSubTrop_Fish,
-   M_PacificNorthTemp_Mammal,M_PacificNorthTemp_Aves,M_PacificNorthTemp_Reptiles,M_PacificNorthTemp_Fish,
-   M_TropSubTropIndoPac_Mammal,M_TropSubTropIndoPac_Aves,M_TropSubTropIndoPac_Reptiles,M_TropSubTropIndoPac_Fish,
-   M_SouthTempAntarctic_Mammal,M_SouthTempAntarctic_Aves,M_SouthTempAntarctic_Reptiles,M_SouthTempAntarctic_Fish)
-
-rm(M_Arctic_Mammal_infile,M_Arctic_Aves_infile,M_Arctic_Reptiles_infile,M_Arctic_Fish_infile,
-   M_AtlanticNorthTemp_Mammal_infile,M_AtlanticNorthTemp_Aves_infile,M_AtlanticNorthTemp_Reptiles_infile,M_AtlanticNorthTemp_Fish_infile,
-   M_AtlanticTropSubTrop_Mammal_infile,M_AtlanticTropSubTrop_Aves_infile,M_AtlanticTropSubTrop_Reptiles_infile,M_AtlanticTropSubTrop_Fish_infile,
-   M_PacificNorthTemp_Mammal_infile,M_PacificNorthTemp_Aves_infile,M_PacificNorthTemp_Reptiles_infile,M_PacificNorthTemp_Fish_infile,
-   M_TropSubTropIndoPac_Mammal_infile,M_TropSubTropIndoPac_Aves_infile,M_TropSubTropIndoPac_Reptiles_infile,M_TropSubTropIndoPac_Fish_infile,
-   M_SouthTempAntarctic_Mammal_infile,M_SouthTempAntarctic_Aves_infile,M_SouthTempAntarctic_Reptiles_infile,M_SouthTempAntarctic_Fish_infile)
-
-
 #
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #
@@ -662,7 +658,7 @@ rm(M_Arctic_Mammal_infile,M_Arctic_Aves_infile,M_Arctic_Reptiles_infile,M_Arctic
 #
 
 
-# ---- 2.1 Terrestrial LPI infiles ----
+# ---- 4.1 Terrestrial LPI infiles ----
 
 T_filepath <- "1_Nov2018/2_FlatDataFiles/ConsDB_Input/LPI/Terr"
 
@@ -813,7 +809,7 @@ T_IndoPacific_Herps_infile <-
                 name = paste(T_filepath, "T_IndoPacific_Herps", sep = "/"))
 
 
-# ---- 2.2 Overall Terr infile ----
+# ---- 4.2 Overall Terr infile ----
 
 T_infile <-
   data.frame(FileName=c(paste(T_filepath, "T_Afrotropical_Aves_pops.txt", sep = "/"),
@@ -847,6 +843,59 @@ T_infile_table <-
   write.table(T_infile, file = paste(T_filepath, "T_infile.txt", sep = "/"), row.names=FALSE)
 
 T_LPI <- LPIMain(paste(T_filepath, 'T_infile.txt', sep = "/"), use_weightings = 1, use_weightings_B = 1)
+
+
+#
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#
+# ---- SECTION 5: Global LPI ----
+#
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#
+
+Global_LPI <-
+  rbind.data.frame(data.frame(Year=as.numeric(row.names(FW_LPI)),
+                              FW_LPI),
+                   data.frame(Year=as.numeric(row.names(M_LPI)),
+                              M_LPI),
+                   data.frame(Year=as.numeric(row.names(T_LPI)),
+                              T_LPI)) %>%
+  group_by(Year) %>%
+  summarise(Value=mean(LPI_final),
+            Upper=mean(CI_high),
+            Lower=mean(CI_low))
+
+
+write.csv(Global_LPI,'1_Nov2018/2_FlatDataFiles/ConsDB_Input/Global_LPI_calc_2018_0921.csv',row.names=F)
+
+# -- REMOVE CLUTTER (index vectors, infile names)
+rm(FW_Afrotropical_Mammal,FW_Afrotropical_Aves,FW_Afrotropical_Herps,FW_Afrotropical_Fish,
+   FW_Nearctic_Mammal,FW_Nearctic_Aves,FW_Nearctic_Herps,FW_Nearctic_Fish,
+   FW_Neotropical_Mammal,FW_Neotropical_Aves,FW_Neotropical_Herps,FW_Neotropical_Fish,
+   FW_Palearctic_Mammal,FW_Palearctic_Aves,FW_Palearctic_Herps,FW_Palearctic_Fish,
+   FW_IndoPacific_Mammal,FW_IndoPacific_Aves,FW_IndoPacific_Herps,FW_IndoPacific_Fish)
+
+rm(FW_Afrotropical_Mammal_infile,FW_Afrotropical_Aves_infile,FW_Afrotropical_Herps_infile,FW_Afrotropical_Fish_infile,
+   FW_Nearctic_Mammal_infile,FW_Nearctic_Aves_infile,FW_Nearctic_Herps_infile,FW_Nearctic_Fish_infile,
+   FW_Neotropical_Mammal_infile,FW_Neotropical_Aves_infile,FW_Neotropical_Herps_infile,FW_Neotropical_Fish_infile,
+   FW_Palearctic_Mammal_infile,FW_Palearctic_Aves_infile,FW_Palearctic_Herps_infile,FW_Palearctic_Fish_infile,
+   FW_IndoPacific_Mammal_infile,FW_IndoPacific_Aves_infile,FW_IndoPacific_Herps_infile,FW_IndoPacific_Fish_infile)
+
+
+# -- REMOVE CLUTTER (index vectors, infile names)
+rm(M_Arctic_Mammal,M_Arctic_Aves,M_Arctic_Reptiles,M_Arctic_Fish,
+   M_AtlanticNorthTemp_Mammal,M_AtlanticNorthTemp_Aves,M_AtlanticNorthTemp_Reptiles,M_AtlanticNorthTemp_Fish,
+   M_AtlanticTropSubTrop_Mammal,M_AtlanticTropSubTrop_Aves,M_AtlanticTropSubTrop_Reptiles,M_AtlanticTropSubTrop_Fish,
+   M_PacificNorthTemp_Mammal,M_PacificNorthTemp_Aves,M_PacificNorthTemp_Reptiles,M_PacificNorthTemp_Fish,
+   M_TropSubTropIndoPac_Mammal,M_TropSubTropIndoPac_Aves,M_TropSubTropIndoPac_Reptiles,M_TropSubTropIndoPac_Fish,
+   M_SouthTempAntarctic_Mammal,M_SouthTempAntarctic_Aves,M_SouthTempAntarctic_Reptiles,M_SouthTempAntarctic_Fish)
+
+rm(M_Arctic_Mammal_infile,M_Arctic_Aves_infile,M_Arctic_Reptiles_infile,M_Arctic_Fish_infile,
+   M_AtlanticNorthTemp_Mammal_infile,M_AtlanticNorthTemp_Aves_infile,M_AtlanticNorthTemp_Reptiles_infile,M_AtlanticNorthTemp_Fish_infile,
+   M_AtlanticTropSubTrop_Mammal_infile,M_AtlanticTropSubTrop_Aves_infile,M_AtlanticTropSubTrop_Reptiles_infile,M_AtlanticTropSubTrop_Fish_infile,
+   M_PacificNorthTemp_Mammal_infile,M_PacificNorthTemp_Aves_infile,M_PacificNorthTemp_Reptiles_infile,M_PacificNorthTemp_Fish_infile,
+   M_TropSubTropIndoPac_Mammal_infile,M_TropSubTropIndoPac_Aves_infile,M_TropSubTropIndoPac_Reptiles_infile,M_TropSubTropIndoPac_Fish_infile,
+   M_SouthTempAntarctic_Mammal_infile,M_SouthTempAntarctic_Aves_infile,M_SouthTempAntarctic_Reptiles_infile,M_SouthTempAntarctic_Fish_infile)
 
 
 # -- REMOVE CLUTTER (index vectors, infile names)

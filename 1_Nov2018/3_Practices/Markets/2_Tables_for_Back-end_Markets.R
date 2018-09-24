@@ -129,7 +129,7 @@ Fact_Context_Threat_Markets_A <-
 Dim_Context_Response_Markets_A <- 
   data.frame(Indicator_Type_Key="GCR_MK_A",
              Indicator_Name="Commodity Driven Deforestation (M ha per year)",
-             Indicator_Label="Deforestation & D-Free Commitments",
+             Indicator_Label="Deforestation & Deforestation-Free Commitments",
              Panel_Label="Land Conversion",
              Panel="Response",
              Indicator_Subcategory="Commodity Driven Deforestation",
@@ -151,19 +151,20 @@ Fact_Context_Response_Markets_A <-
 Dim_Context_Response_Markets_B <- 
   data.frame(Indicator_Type_Key="GCR_MK_B",
              Indicator_Name="Deforestation-Free Commitments (# companies with commitments)",
-             Indicator_Label="Deforestation & D-Free Commitments",
+             Indicator_Label="Deforestation & Deforestation-Free Commitments",
              Panel_Label="Land Conversion",
              Panel="Response",
-             Indicator_Subcategory="Deforestation-Free Commitments",
-             Indicator_Unit="# companies",
+             Indicator_Subcategory="D-Free Commitments",
+             Indicator_Unit="% 'exposed' companies with commitments", 
+             # an 'exposed' company is one that produces, procures, or uses soy, palm, timber & pulp, or cattle products as part of core business
              Data_Source="Supply Change 2017 Report -- forest-trends.org")
 
 Fact_Context_Response_Markets_B <-
-  read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/')
-  transmute(Year_Key=Year,
-            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Markets"],length(Year_Key)),
-            Indicator_Type_Key=rep(Dim_Context_Response_Markets_B$Indicator_Type_Key,length(Year_Key)),
-            Indicator_Value=Value,
+  data.frame(Year_Key=c(2016,2017),
+            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Markets"],2),
+            Indicator_Type_Key=rep(Dim_Context_Response_Markets_B$Indicator_Type_Key,2),
+            Indicator_Value=c((366/566)*100,(447/718)*100), 
+            # proportion has gone down between years, largely because there was a concerted effort to get more cattle-related companies, who have fewer commitments in general
             Indicator_Upper_Value=NA,
             Indicator_Lower_Value=NA)
 
@@ -175,18 +176,14 @@ Dim_Context_Markets <-
                    Dim_Context_State_Markets_B,
                    Dim_Context_Threat_Markets_A,
                    Dim_Context_Response_Markets_A,
-                   Dim_Context_Response_Markets_B,
-                   Dim_Context_Response_Markets_C,
-                   Dim_Context_Response_Markets_D)
+                   Dim_Context_Response_Markets_B)
 
 Fact_Context_Markets <-
   rbind.data.frame(Fact_Context_State_Markets_A,
                    Fact_Context_State_Markets_B,
                    Fact_Context_Threat_Markets_A,
                    Fact_Context_Response_Markets_A,
-                   Fact_Context_Response_Markets_B,
-                   Fact_Context_Response_Markets_C,
-                   Fact_Context_Response_Markets_D)
+                   Fact_Context_Response_Markets_B)
 
 
 #
@@ -298,14 +295,10 @@ rm(sdg.12.2,
    Dim_Context_Threat_Markets_A,
    Dim_Context_Response_Markets_A,
    Dim_Context_Response_Markets_B,
-   Dim_Context_Response_Markets_C,
-   Dim_Context_Response_Markets_D,
    Fact_Context_State_Markets_A,
    Fact_Context_State_Markets_B,
    Fact_Context_Threat_Markets_A,
    Fact_Context_Response_Markets_A,
    Fact_Context_Response_Markets_B,
-   Fact_Context_Response_Markets_C,
-   Fact_Context_Response_Markets_D,
    dim.initiatives.markets,
    dim.initiative.indicators.markets)

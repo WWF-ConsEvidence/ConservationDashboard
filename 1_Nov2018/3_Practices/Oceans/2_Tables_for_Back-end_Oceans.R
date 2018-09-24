@@ -135,10 +135,11 @@ Dim_Context_Response_Oceans_A <-
              Indicator_Unit="M ha",
              Data_Source="WDPA")
 
-Fact_Context_Response_Oceans_A <- read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/WDPA_timeseries.csv')%>%
+Fact_Context_Response_Oceans_A <- 
+  read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/WDPA_timeseries.csv') %>%
   transmute(Year_Key=year,
-            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Oceans"],length(year)),
-            Indicator_Type_Key=rep(Dim_Context_Response_Oceans_A$Indicator_Type_Key,length(year)),
+            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Oceans"],length(Year_Key)),
+            Indicator_Type_Key=rep(Dim_Context_Response_Oceans_A$Indicator_Type_Key,length(Year_Key)),
             Indicator_Value=EEZ_Mha_time,
             Indicator_Upper_Value=NA,
             Indicator_Lower_Value=NA)
@@ -148,12 +149,12 @@ Fact_Context_Response_Oceans_A <- read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Inp
 Dim_Context_Response_Oceans_B <- 
   data.frame(Indicator_Type_Key="GCR_OC_B",
              Indicator_Name="Marine area committed to being protected (M ha)",
-             Indicator_Label="Protected & Pledged*",
+             Indicator_Label="Protected & Pledged",
              Panel_Label="Marine Protection",
              Panel="Response",
              Indicator_Subcategory="Pledged",
              Indicator_Unit="M ha",
-             Data_Source="UNEP-WCMC, PAME")
+             Data_Source="MPAtlas")
 
 Fact_Context_Response_Oceans_B <-
   data.frame(Year_Key=9999,
@@ -392,8 +393,10 @@ rm(Dim_Context_State_Oceans_A,
    Fact_Context_Response_Oceans_A,
    Fact_Context_Response_Oceans_B,
    Dim_Global_2030_Outcome1_Oceans_A,
+   Dim_Global_2030_Outcome1_Oceans_B,
    Dim_Global_2030_Outcome2_Oceans_A,
    Fact_Global_2030_Outcome1_Oceans_A,
+   Fact_Global_2030_Outcome1_Oceans_B,
    Fact_Global_2030_Outcome2_Oceans_A,
    dim.initiatives.oceans,
    dim.initiative.indicators.oceans)

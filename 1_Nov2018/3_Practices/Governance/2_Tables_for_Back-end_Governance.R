@@ -61,39 +61,65 @@ Dim_Context_State_Governance_A <-
              Panel_Label="Indigenous and Community Land Rights",
              Panel="State",
              Indicator_Subcategory=NA,
-             Indicator_Unit="% of all community conserved lands",
+             Indicator_Unit="% of total estimated community conserved lands",
              Data_Source="WDPA; IUCN (for estimate of total community conserved lands)")
 
-Fact_Context_State_Governance_A <-read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/ICCA_timeseries.csv')%>%
+Fact_Context_State_Governance_A <-
+  read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/ICCA_timeseries.csv') %>%
+  subset(.,STATUS_YR>1994) %>%
   transmute(Year_Key=STATUS_YR,
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Governance"],length(STATUS_YR)),
             Indicator_Type_Key=rep(Dim_Context_State_Governance_A$Indicator_Type_Key,length(STATUS_YR)),
-            Indicator_Value=AREA_PERCENT_EST,
-            Indicator_Upper_Value=AREA_PERCENT_HI,
-            Indicator_Lower_Value=AREA_PERCENT_LOW)
+            Indicator_Value=AREA_PERCENT_EST*100,
+            Indicator_Upper_Value=AREA_PERCENT_HI*100,
+            Indicator_Lower_Value=AREA_PERCENT_LOW*100)
 
 
 # ---- 2.2 Context - Threat ----
 
-# -- UNSUSTAINABLE DEVELOPMENT
+# -- UNSUSTAINABLE DEVELOPMENT - TOTAL LOSS
 
 Dim_Context_Threat_Governance_A <- 
   data.frame(Indicator_Type_Key="GCT_GV_A",
              Indicator_Name="Intact ecosystems lost to unsustainable development",
-             Indicator_Label="Global Forest Loss*",
+             Indicator_Label="Global Tree Cover Loss & Deforestation",
              Panel_Label="Unsustainable Development",
-             Panel="State",
-             Indicator_Subcategory=NA,
+             Panel="Threat",
+             Indicator_Subcategory="Total Loss",
              Indicator_Unit="M ha",
              Data_Source="Global Forest Watch")
 
 Fact_Context_Threat_Governance_A <-
-  data.frame(Year_Key=9999,
-             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Governance"],length(1)),
-             Indicator_Type_Key=rep(Dim_Context_Threat_Governance_A$Indicator_Type_Key,length(1)),
-             Indicator_Value=NA,
+  read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/GFW_treeloss_bydriver_2018_0919.xlsx', sheetName="Sheet1") %>%
+  subset(.,Geography=="World" & Loss_type=="Total Loss") %>%
+  transmute(Year_Key=Year,
+             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Governance"],length(Year_Key)),
+             Indicator_Type_Key=rep(Dim_Context_Threat_Governance_A$Indicator_Type_Key,length(Year_Key)),
+             Indicator_Value=Value,
              Indicator_Upper_Value=NA,
              Indicator_Lower_Value=NA)
+
+# -- UNSUSTAINABLE DEVELOPMENT - COMMODITY DRIVEN DEFORESTATION
+
+Dim_Context_Threat_Governance_B <- 
+  data.frame(Indicator_Type_Key="GCT_GV_B",
+             Indicator_Name="Intact ecosystems lost to unsustainable development",
+             Indicator_Label="Global Tree Cover Loss & Deforestation",
+             Panel_Label="Unsustainable Development",
+             Panel="Threat",
+             Indicator_Subcategory="Commodity Driven Deforestation",
+             Indicator_Unit="M ha",
+             Data_Source="Global Forest Watch; Curtis et al (2018) Global drivers of forest loss")
+
+Fact_Context_Threat_Governance_B <-
+  read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/GFW_treeloss_bydriver_2018_0919.xlsx', sheetName="Sheet1") %>%
+  subset(.,Geography=="World" & Loss_type=="Commodity Driven Deforestation") %>%
+  transmute(Year_Key=Year,
+            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Governance"],length(Year_Key)),
+            Indicator_Type_Key=rep(Dim_Context_Threat_Governance_B$Indicator_Type_Key,length(Year_Key)),
+            Indicator_Value=Value,
+            Indicator_Upper_Value=NA,
+            Indicator_Lower_Value=NA)
 
 
 # ---- 2.3 Context - Response ----
@@ -105,12 +131,14 @@ Dim_Context_Response_Governance_A <-
              Indicator_Name="ICCA coverage (of formally recognized Indigenous and Community Conserved Areas)",
              Indicator_Label="Indigenous and Community Conserved Areas (ICCAs)*",
              Panel_Label="Community Conserved Land",
-             Panel="State",
+             Panel="Response",
              Indicator_Subcategory="Coverage",
              Indicator_Unit="M ha",
              Data_Source="WDPA")
 
-Fact_Context_Response_Governance_A <-read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/ICCA_timeseries.csv')%>%
+Fact_Context_Response_Governance_A <-
+  read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/ICCA_timeseries.csv') %>%
+  subset(.,STATUS_YR>1994) %>%
   transmute(Year_Key=STATUS_YR,
              Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Governance"],length(STATUS_YR)),
              Indicator_Type_Key=rep(Dim_Context_Response_Governance_A$Indicator_Type_Key,length(STATUS_YR)),
@@ -125,10 +153,10 @@ Dim_Context_Response_Governance_B <-
              Indicator_Name="Effective guardianship of community conserved lands",
              Indicator_Label="Indigenous and Community Conserved Areas (ICCAs)*",
              Panel_Label="Community Conserved Land",
-             Panel="State",
-             Indicator_Subcategory="Effective Guardianship",
+             Panel="Response",
+             Indicator_Subcategory="Effective Guardianship*",
              Indicator_Unit="",
-             Data_Source="WDPA")
+             Data_Source="")
 
 Fact_Context_Response_Governance_B <-
   data.frame(Year_Key=9999,
@@ -144,12 +172,14 @@ Fact_Context_Response_Governance_B <-
 Dim_Context_Governance <- 
   rbind.data.frame(Dim_Context_State_Governance_A,
                    Dim_Context_Threat_Governance_A,
+                   Dim_Context_Threat_Governance_B,
                    Dim_Context_Response_Governance_A,
                    Dim_Context_Response_Governance_B)
 
 Fact_Context_Governance <-
   rbind.data.frame(Fact_Context_State_Governance_A,
                    Fact_Context_Threat_Governance_A,
+                   Fact_Context_Threat_Governance_B,
                    Fact_Context_Response_Governance_A,
                    Fact_Context_Response_Governance_B)
 
@@ -258,10 +288,12 @@ Fact_Initiative_Financials_Governance <-
 
 rm(Dim_Context_State_Governance_A,
    Dim_Context_Threat_Governance_A,
+   Dim_Context_Threat_Governance_B,
    Dim_Context_Response_Governance_A,
    Dim_Context_Response_Governance_B,
    Fact_Context_State_Governance_A,
    Fact_Context_Threat_Governance_A,
+   Fact_Context_Threat_Governance_B,
    Fact_Context_Response_Governance_A,
    Fact_Context_Response_Governance_B,
    dim.initiatives.governance,

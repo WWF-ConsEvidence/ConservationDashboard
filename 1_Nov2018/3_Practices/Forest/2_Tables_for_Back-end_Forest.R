@@ -137,7 +137,7 @@ Dim_Context_Threat_Forest_A <-
              Panel="Threat",
              Indicator_Subcategory="Loss",
              Indicator_Unit="M ha per year",
-             Data_Source="Global Forest Watch - Curtis et al (2018) Global drivers of forest loss")
+             Data_Source="Global Forest Watch")
 
 Fact_Context_Threat_Forest_A <-
   read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/GFW_treeloss_bydriver_2018_0919.xlsx', sheetName="Sheet1") %>%
@@ -185,10 +185,11 @@ Dim_Context_Response_Forest_A <-
              Indicator_Unit="M ha",
              Data_Source="WDPA")
 
-Fact_Context_Response_Forest_A <-read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/WDPA_timeseries.csv')%>%
-  transmute(Year_Key=9999,
-            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Forests"],length(year)),
-            Indicator_Type_Key=rep(Dim_Context_Response_Forest_A$Indicator_Type_Key,length(year)),
+Fact_Context_Response_Forest_A <-
+  read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/WDPA_timeseries.csv') %>%
+  transmute(Year_Key=year,
+            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Forests"],length(Year_Key)),
+            Indicator_Type_Key=rep(Dim_Context_Response_Forest_A$Indicator_Type_Key,length(Year_Key)),
             Indicator_Value=Land_Mha_time,
             Indicator_Upper_Value=NA,
             Indicator_Lower_Value=NA)

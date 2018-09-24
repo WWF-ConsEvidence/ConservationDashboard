@@ -65,11 +65,11 @@ Dim_Context_State_Wildlife_A <-
              Panel="State",
              Indicator_Subcategory="Living Planet Index",
              Indicator_Unit="Index",
-             Data_Source="Zoological Society of London; 2016 Living Planet Index database")
+             Data_Source="Zoological Society of London; August 2018 Living Planet Index database")
 
 Fact_Context_State_Wildlife_A <-
-  read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/Global_LPI_fromflatfile_2017_0912.xlsx', sheetName="Sheet1") %>%
-  subset(.,Year>1994) %>%
+  read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/Global_LPI_calc_2018_0921.csv') %>%
+  subset(.,Year>1994 & Year<2016) %>%
   transmute(Year_Key=Year,
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],length(Year_Key)),
             Indicator_Type_Key=rep(Dim_Context_State_Wildlife_A$Indicator_Type_Key,length(Year_Key)),
@@ -91,12 +91,15 @@ Dim_Context_State_Wildlife_B <-
              Data_Source="SDG Indicator Bank -- IUCN")
 
 Fact_Context_State_Wildlife_B <-
-  read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/Global_RLI_fromflatfile_2017_0912.xlsx', sheetName="Sheet1") %>%
-  subset(.,Year>1994) %>%
-  transmute(Year_Key=Year,
+  read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/SDG_15.5.1_RLI_dl_2018_0921.csv') %>%
+  group_by(TimePeriod) %>%
+  summarise(Est=Value[which(X.Bounds.=="MP")],
+            Upper=Value[which(X.Bounds.=="LB")],
+            Lower=Value[which(X.Bounds.=="UB")]) %>%
+  transmute(Year_Key=unique(TimePeriod),
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],length(Year_Key)),
             Indicator_Type_Key=rep(Dim_Context_State_Wildlife_B$Indicator_Type_Key,length(Year_Key)),
-            Indicator_Value=Value,
+            Indicator_Value=Est,
             Indicator_Upper_Value=Upper,
             Indicator_Lower_Value=Lower)
 
@@ -111,7 +114,7 @@ Dim_Context_Threat_Wildlife_A <-
              Indicator_Label="Terrestrial & Marine* Habitat Loss",
              Panel_Label="Habitat Loss",
              Panel="Threat",
-             Indicator_Subcategory="Forest Loss",
+             Indicator_Subcategory="Tree Cover Loss",
              Indicator_Unit="M ha per year",
              Data_Source="Global Forest Watch")
 
@@ -140,11 +143,12 @@ Dim_Context_Response_Wildlife_A <-
              Indicator_Unit="M ha",
              Data_Source="WDPA")
 
-Fact_Context_Response_Wildlife_A <-read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/WDPA_timeseries.csv')%>%
+Fact_Context_Response_Wildlife_A <-
+  read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/WDPA_timeseries.csv') %>%
   transmute(Year_Key=year,
-            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],length(year)),
-            Indicator_Type_Key=rep(Dim_Context_Response_Wildlife_A$Indicator_Type_Key,length(year)),
-            Indicator_Value=Total_PA_Mha,
+            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],length(Year_Key)),
+            Indicator_Type_Key=rep(Dim_Context_Response_Wildlife_A$Indicator_Type_Key,length(Year_Key)),
+            Indicator_Value=Total_PA_Mha_time,
             Indicator_Upper_Value=NA,
             Indicator_Lower_Value=NA)
 
@@ -153,14 +157,15 @@ Fact_Context_Response_Wildlife_A <-read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_In
 Dim_Context_Response_Wildlife_B <- 
   data.frame(Indicator_Type_Key="GCR_WL_B",
              Indicator_Name="ICCA Coverage (M ha)",
-             Indicator_Label="Protected & Community Conserved Areas",
+             Indicator_Label="Protected & Community Conserved* Areas",
              Panel_Label="Habitat Protection",
              Panel="Response",
              Indicator_Subcategory="Community Conserved*",
              Indicator_Unit="M ha",
              Data_Source="WDPA")
 
-Fact_Context_Response_Wildlife_B <- read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/ICCA_timeseries.csv')%>%
+Fact_Context_Response_Wildlife_B <- 
+  read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/ICCA_timeseries.csv') %>%
   transmute(Year_Key=STATUS_YR,
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],length(STATUS_YR)),
             Indicator_Type_Key=rep(Dim_Context_Response_Wildlife_B$Indicator_Type_Key,length(STATUS_YR)),
@@ -212,14 +217,24 @@ Dim_Global_2030_Outcome1_Wildlife_A <-
              Display_Order=1)
 
 Fact_Global_2030_Outcome1_Wildlife_A <- 
-  data.frame(Year_Key=c(1995,2030),
-            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],2),
-            Indicator_Type_Key=rep(Dim_Global_2030_Outcome1_Wildlife_A$Indicator_Type_Key, 2),
+  read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/WDPA_timeseries.csv') %>%
+  transmute(Year_Key=year,
+            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],length(Year_Key)),
+            Indicator_Type_Key=rep(Dim_Global_2030_Outcome1_Wildlife_A$Indicator_Type_Key, length(Year_Key)),
             Practice_Outcome_Key=rep(practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Wildlife" &
-                                                                   grepl("Habitats",practice_outcome_key_ref$practice_outcome)], 2),
-            Indicator_Value=c(NA,30),
+                                                                   grepl("Habitats",practice_outcome_key_ref$practice_outcome)], length(Year_Key)),
+            Indicator_Value=Total_Mha_percent,
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)
+            Indicator_Lower_Value=NA) %>%
+  rbind.data.frame(.,
+                   data.frame(Year_Key=2030,
+                              Practice_Key=practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],
+                              Indicator_Type_Key=Dim_Global_2030_Outcome1_Wildlife_A$Indicator_Type_Key,
+                              Practice_Outcome_Key=practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Wildlife" &
+                                                                                  grepl("Habitats",practice_outcome_key_ref$practice_outcome)],
+                              Indicator_Value=30,
+                              Indicator_Upper_Value=NA,
+                              Indicator_Lower_Value=NA))
 
 # -- EFFECTIVE - ASSESSED
 
@@ -229,19 +244,20 @@ Dim_Global_2030_Outcome1_Wildlife_B <-
              Indicator_Label="Extensive, Effective, Connected, & Biologically Important Habitat Protection",
              Indicator_Subcategory="Effective (METT Assessed)*",
              Indicator_Unit="% protected area",
-             Data_source="METT",
+             Data_source="METT - UNEP-WCMC; WDPA",
              Indicator_Target=100,
              Indicator_Type="Outcome",
              Panel_Label="Vital Habitats Conserved",
              Display_Order=1)
 
-Fact_Global_2030_Outcome1_Wildlife_B <-read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/METT_area.csv')%>%
-  transmute(Year_Key=9999,
-             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],length(1)),
-             Indicator_Type_Key=rep(Dim_Global_2030_Outcome1_Wildlife_B$Indicator_Type_Key, length(1)),
+Fact_Global_2030_Outcome1_Wildlife_B <-
+  read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/METT_area.csv') %>%
+  transmute(Year_Key=2016,
+             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],length(Year_Key)),
+             Indicator_Type_Key=rep(Dim_Global_2030_Outcome1_Wildlife_B$Indicator_Type_Key, length(Year_Key)),
              Practice_Outcome_Key=rep(practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Wildlife" &
-                                                                    grepl("Habitats",practice_outcome_key_ref$practice_outcome)], length(1)),
-             Indicator_Value=100*(METT_meetsthreshold_Mha/3566.386),
+                                                                    grepl("Habitats",practice_outcome_key_ref$practice_outcome)], length(Year_Key)),
+             Indicator_Value=100*(METT_meetsthreshold_Mha/3351.04), # 2016 total cumulative PA coverage, since METT database was last updated 2016
              Indicator_Upper_Value=NA,
              Indicator_Lower_Value=NA)
 
@@ -253,18 +269,18 @@ Dim_Global_2030_Outcome1_Wildlife_C <-
              Indicator_Label="Extensive, Effective, Connected, & Biologically Important Habitat Protection",
              Indicator_Subcategory="Effective (Meets Score Threshold)*",
              Indicator_Unit="% assessed area",
-             Data_source="METT",
+             Data_source="METT - UNEP-WCMC; threshold methodology from Gill et al (2017); WDPA",
              Indicator_Target=100,
              Indicator_Type="Outcome",
              Panel_Label="Vital Habitats Conserved",
              Display_Order=1)
 
 Fact_Global_2030_Outcome1_Wildlife_C <-read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/METT_area.csv')%>%
-  transmute(Year_Key=9999,
-             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],length(1)),
-             Indicator_Type_Key=rep(Dim_Global_2030_Outcome1_Wildlife_C$Indicator_Type_Key, length(1)),
+  transmute(Year_Key=2016,
+             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],length(Year_Key)),
+             Indicator_Type_Key=rep(Dim_Global_2030_Outcome1_Wildlife_C$Indicator_Type_Key, length(Year_Key)),
              Practice_Outcome_Key=rep(practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Wildlife" &
-                                                                    grepl("Habitats",practice_outcome_key_ref$practice_outcome)], length(1)),
+                                                                    grepl("Habitats",practice_outcome_key_ref$practice_outcome)], length(Year_Key)),
              Indicator_Value=METT_mettsthreshold_percent,
              Indicator_Upper_Value=NA,
              Indicator_Lower_Value=NA)
@@ -273,23 +289,23 @@ Fact_Global_2030_Outcome1_Wildlife_C <-read.csv('1_Nov2018/2_FlatDataFiles/ConsD
 
 Dim_Global_2030_Outcome1_Wildlife_D <- 
   data.frame(Indicator_Type_Key="OUT1_WL_D",
-             Indicator_Name="FORTHCOMING: Percent of total protected area that meets a connectedness threshold (M ha PAs meeting threshold / M ha PAs)",
+             Indicator_Name="Percent of global protected area coverage that is well-connected (accounting for boundaries that limit ability to connect)",
              Indicator_Label="Extensive, Effective, Connected, & Biologically Important Habitat Protection",
-             Indicator_Subcategory="Connected*",
+             Indicator_Subcategory="Connected",
              Indicator_Unit="% protected area",
-             Data_source="",
+             Data_source="Saura et al (2018) Protected area connectivity: Shortfalls in global targets and country-level priorities",
              Indicator_Target=100,
              Indicator_Type="Outcome",
              Panel_Label="Vital Habitats Conserved",
              Display_Order=1)
 
 Fact_Global_2030_Outcome1_Wildlife_D <-
-  data.frame(Year_Key=9999,
+  data.frame(Year_Key=2016,
              Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],length(1)),
              Indicator_Type_Key=rep(Dim_Global_2030_Outcome1_Wildlife_D$Indicator_Type_Key, length(1)),
              Practice_Outcome_Key=rep(practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Wildlife" &
                                                                     grepl("Habitats",practice_outcome_key_ref$practice_outcome)], length(1)),
-             Indicator_Value=NA,
+             Indicator_Value=(9.9/14.7)*100,
              Indicator_Upper_Value=NA,
              Indicator_Lower_Value=NA)
 
