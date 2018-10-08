@@ -1,16 +1,41 @@
 # WDPA Metadata
-## _Last updated: 14 Aug 2018_
+## _Last updated: 7 Oct 2018_
 ___
 
 ### Title
+World Database on Protected Areas  
+
 ### Description
-### Date Accessed
-### Publisher
-### File Format
-### Access URL
+The World Database on Protected Areas (WDPA) is a joint project between UN Environment and the International Union for Conservation of Nature (IUCN). It is compiled and managed by the UN Environment World Conservation Monitoring Centre (UNEP-WCMC), in collaboration with governments, non-governmental organisations, academia and industry. The WDPA is the most comprehensive global database of marine and terrestrial protected areas, comprising both spatial data (i.e. boundaries and points) with associated attribute data (i.e. tabular information). It is made available online through Protected Planet (www.protectedplanet.net) where the data is both viewable and downloadable. 
+Manual: https://www.protectedplanet.net/c/wdpa-manual/wdpa-manual-v15  
+
+### Date Accessed  
+August 2018 from www.protectedplant.net
+
+### Publisher  
+United Nations Environment World Conservation Monitoring Centre (UNEP-WCMC) 
+
+### File Format  
+Shapefile     
+
+### Access URL  
+UNEP-WCMC and IUCN (2018), Protected Planet: The World Database on Protected Areas (WDPA)[On-line], Downloaded Aug 2018, Cambridge, UK: UNEP-WCMC and IUCN. Available at: www.protectedplanet.net. 
+
 ### Temporal Range & Frequency
+The year associated with each site in the WDPA corresponds to the year it was given its' designation. The earliest sites were established before 1900, however some sites do not have a year associated with their designation. Dataset extends to current year, updated monthly. In this analysis, sites where the year is unknown were aggregated with years 1995 and prior.   
+
 ### Spatial Range & Resolution
+Global extent. Resolution is variable among sites as a result of different managing/reporting entities. While some sites may provide highly detailed shapefile boundaries, other sites may only report an area and not have GIS capablities. 
+
 ### Contact Name and Email (of Publisher)
+protectedareas@unep-wcmc.org  
+
 ### Contact Name and Email (within WWF)
+
+
 ### Data Permissions (License & Rights)
 
+Source: https://www.protectedplanet.net/c/terms-and-conditions  
+Neither (a) the WDPA Materials nor (b) any work derived from or based upon the WDPA Materials (“Derivative Works") may be put to Commercial Use without the prior written permission of UNEP-WCMC. For the purposes of these Terms and Conditions, “Commercial Use" means a) any use by, on behalf of, or to inform or assist the activities of, a commercial entity (an entity that operates 'for profit') or b) use by any individual or non-profit entity for the purposes of revenue generation To apply for permission for Commercial Use of the WDPA Materials please send an email to business-support@unep-wcmc.org outlining your needs.
+
+The WDPA Materials may not be sub-licensed in whole or in part including within Derivative Works without the prior written permission of UNEP-WCMC. You may not redistribute the WDPA Data contained in the WDPA in whole or in part by any means including (but not limited to) electronic formats such as web downloads, through web services, through interactive web maps (including mobile applications) that grant users download access, KML Files or through file transfer protocols. If you know of others who wish to use the WDPA Data please refer them to protectedplanet.net. If you wish to provide a service through which the WDPA Data are downloadable or otherwise made available for redistribution you must contact protectedareas@unep-wcmc.org for permission and further guidance.

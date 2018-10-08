@@ -252,14 +252,15 @@ Dim_Global_2030_Outcome1_Wildlife_B <-
              Display_Order=1)
 
 Fact_Global_2030_Outcome1_Wildlife_B <-
-  data.frame(Year_Key=9999,
-             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],length(1)),
-             Indicator_Type_Key=rep(Dim_Global_2030_Outcome1_Wildlife_B$Indicator_Type_Key, length(1)),
-             Practice_Outcome_Key=rep(practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Wildlife" &
-                                                                    grepl("Habitats",practice_outcome_key_ref$practice_outcome)], length(1)),
-             Indicator_Value=NA,
-             Indicator_Upper_Value=NA,
-             Indicator_Lower_Value=NA)  %>%
+  read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/KBA_timeseries.csv')%>%
+  transmute(Year_Key=year,
+            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],length(Year_Key)),
+            Indicator_Type_Key=rep(Dim_Global_2030_Outcome1_Wildlife_B$Indicator_Type_Key, length(Year_Key)),
+            Practice_Outcome_Key=rep(practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Wildlife" &
+                                                                   grepl("Habitats",practice_outcome_key_ref$practice_outcome)], length(Year_Key)),
+            Indicator_Value=PA_in_KBA_percent,
+            Indicator_Upper_Value=NA,
+            Indicator_Lower_Value=NA)  %>%
   rbind.data.frame(.,
                    data.frame(Year_Key=2030,
                               Practice_Key=practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],
@@ -351,7 +352,8 @@ Dim_Global_2030_Outcome1_Wildlife_E <-
              Panel_Label="Vital Habitats Conserved",
              Display_Order=1)
 
-Fact_Global_2030_Outcome1_Wildlife_E <-read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/METT_area.csv')%>%
+Fact_Global_2030_Outcome1_Wildlife_E <-
+  read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/METT_area.csv')%>%
   transmute(Year_Key=2016,
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],length(Year_Key)),
             Indicator_Type_Key=rep(Dim_Global_2030_Outcome1_Wildlife_E$Indicator_Type_Key, length(Year_Key)),
