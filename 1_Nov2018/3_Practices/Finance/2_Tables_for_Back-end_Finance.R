@@ -146,7 +146,8 @@ Dim_Initiative_Indicator_Finance <-
             Indicator_Subcategory=Subcategory,
             Indicator_Target=Target,
             Indicator_Unit=Units,
-            Data_Source=Source)
+            Data_Source=Source,
+            Display_Order=Display.order)
 
 
 # ---- 3.4 Finance-specific Fact_Initiative_Indicators ----

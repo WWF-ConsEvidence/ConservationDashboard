@@ -514,7 +514,7 @@ Dim_Global_2030_Outcome3_CEP_A <-
              Indicator_Label="National Adaptation Plans, or equivalent",
              Indicator_Subcategory=NA,
              Indicator_Unit="Number of countries",
-             Data_source="UNFCC NAP Central",
+             Data_source="UNFCCC NAP Central",
              Indicator_Target=100,
              Indicator_Type="Outcome",
              Panel_Label="Adaptation",
@@ -602,7 +602,8 @@ Dim_Initiative_Indicator_CEP <-
             Indicator_Subcategory=Subcategory,
             Indicator_Target=Target,
             Indicator_Unit=Units,
-            Data_Source=Source)
+            Data_Source=Source,
+            Display_Order=Display.order)
 
 # ---- 4.4 CEP-specific Fact_Initiative_Indicators ----
 

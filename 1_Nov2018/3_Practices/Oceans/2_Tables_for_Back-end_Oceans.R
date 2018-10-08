@@ -149,7 +149,7 @@ Fact_Context_Response_Oceans_A <-
 Dim_Context_Response_Oceans_B <- 
   data.frame(Indicator_Type_Key="GCR_OC_B",
              Indicator_Name="Marine area committed to being protected (M ha)",
-             Indicator_Label="Protected & Pledged",
+             Indicator_Label="Protected & Pledged*",
              Panel_Label="Marine Protection",
              Panel="Response",
              Indicator_Subcategory="Pledged",
@@ -206,15 +206,25 @@ Dim_Global_2030_Outcome1_Oceans_A <-
              Panel_Label="Healthy & Productive Ecosystems",
              Display_Order=1)
 
-Fact_Global_2030_Outcome1_Oceans_A <-read.csv('METT_MPA.csv')%>%
-  transmute(Year_Key=9999,
-            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Oceans"],length(1)),
-            Indicator_Type_Key=rep(Dim_Global_2030_Outcome1_Oceans_A$Indicator_Type_Key, length(1)),
+Fact_Global_2030_Outcome1_Oceans_A <-
+  read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/METT_MPA.csv') %>%
+  transmute(Year_Key=2018,
+            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Oceans"],length(Year_Key)),
+            Indicator_Type_Key=rep(Dim_Global_2030_Outcome1_Oceans_A$Indicator_Type_Key, length(Year_Key)),
             Practice_Outcome_Key=rep(practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Oceans" &
-                                                                   grepl("Ecosystems",practice_outcome_key_ref$practice_outcome)], length(1)),
+                                                                   grepl("Ecosystems",practice_outcome_key_ref$practice_outcome)], length(Year_Key)),
             Indicator_Value=MPA_METT_percent,
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)
+            Indicator_Lower_Value=NA)  %>%
+  rbind.data.frame(.,
+                   data.frame(Year_Key=2030,
+                              Practice_Key=practice_key_ref$id[practice_key_ref$practice_name=="Oceans"],
+                              Indicator_Type_Key=Dim_Global_2030_Outcome1_Oceans_A$Indicator_Type_Key,
+                              Practice_Outcome_Key=practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Oceans" &
+                                                                                 grepl("Ecosystems",practice_outcome_key_ref$practice_outcome)],
+                              Indicator_Value=Dim_Global_2030_Outcome1_Oceans_A$Indicator_Target,
+                              Indicator_Upper_Value=NA,
+                              Indicator_Lower_Value=NA))
 
 # EFFECTIVELY MANAGED - MEETS THRESHOLD
 
@@ -230,15 +240,25 @@ Dim_Global_2030_Outcome1_Oceans_B <-
              Panel_Label="Healthy & Productive Ecosystems",
              Display_Order=1)
 
-Fact_Global_2030_Outcome1_Oceans_B <-read.csv('METT_MPA.csv')%>%
-  transmute(Year_Key=9999,
-             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Oceans"],length(1)),
-             Indicator_Type_Key=rep(Dim_Global_2030_Outcome1_Oceans_B$Indicator_Type_Key, length(1)),
+Fact_Global_2030_Outcome1_Oceans_B <-
+  read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/METT_MPA.csv') %>%
+  transmute(Year_Key=2018,
+             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Oceans"],length(Year_Key)),
+             Indicator_Type_Key=rep(Dim_Global_2030_Outcome1_Oceans_B$Indicator_Type_Key, length(Year_Key)),
              Practice_Outcome_Key=rep(practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Oceans" &
-                                                                    grepl("Ecosystems",practice_outcome_key_ref$practice_outcome)], length(1)),
+                                                                    grepl("Ecosystems",practice_outcome_key_ref$practice_outcome)], length(Year_Key)),
              Indicator_Value=MPA_threshold_percent,
              Indicator_Upper_Value=NA,
-             Indicator_Lower_Value=NA)
+             Indicator_Lower_Value=NA) %>%
+  rbind.data.frame(.,
+                   data.frame(Year_Key=2030,
+                              Practice_Key=practice_key_ref$id[practice_key_ref$practice_name=="Oceans"],
+                              Indicator_Type_Key=Dim_Global_2030_Outcome1_Oceans_B$Indicator_Type_Key,
+                              Practice_Outcome_Key=practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Oceans" &
+                                                                                 grepl("Ecosystems",practice_outcome_key_ref$practice_outcome)],
+                              Indicator_Value=Dim_Global_2030_Outcome1_Oceans_B$Indicator_Target,
+                              Indicator_Upper_Value=NA,
+                              Indicator_Lower_Value=NA))
 
 
 # ---- 3.2 Oceans Outcome 2 - SUSTAINABLE FISHERIES ----
@@ -320,7 +340,8 @@ Dim_Initiative_Indicator_Oceans <-
             Indicator_Subcategory=Subcategory,
             Indicator_Target=Target,
             Indicator_Unit=Units,
-            Data_Source=Source)
+            Data_Source=Source,
+            Display_Order=Display.order)
 
 
 # ---- 4.4 Oceans-specific Fact_Initiative_Indicators ----

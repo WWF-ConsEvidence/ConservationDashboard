@@ -86,7 +86,7 @@ Dim_Context_Threat_Governance_A <-
              Panel_Label="Unsustainable Development",
              Panel="Threat",
              Indicator_Subcategory="Total Loss",
-             Indicator_Unit="M ha",
+             Indicator_Unit="M ha per year",
              Data_Source="Global Forest Watch")
 
 Fact_Context_Threat_Governance_A <-
@@ -108,7 +108,7 @@ Dim_Context_Threat_Governance_B <-
              Panel_Label="Unsustainable Development",
              Panel="Threat",
              Indicator_Subcategory="Commodity Driven Deforestation",
-             Indicator_Unit="M ha",
+             Indicator_Unit="M ha per year",
              Data_Source="Global Forest Watch; Curtis et al (2018) Global drivers of forest loss")
 
 Fact_Context_Threat_Governance_B <-
@@ -224,7 +224,8 @@ Dim_Initiative_Indicator_Governance <-
             Indicator_Subcategory=Subcategory,
             Indicator_Target=Target,
             Indicator_Unit=Units,
-            Data_Source=Source)
+            Data_Source=Source,
+            Display_Order=Display.order)
 
 
 # ---- 3.4 Governance-specific Fact_Initiative_Indicators ----

@@ -265,7 +265,7 @@ Dim_Context_Response_Food_B <-
              Panel_Label="Emissions & Efficiency",
              Panel="Response",
              Indicator_Subcategory="Efficiency",
-             Indicator_Unit="Million kcal per tonne CO2e",
+             Indicator_Unit="M kcal per tonne CO2e",
              Data_Source="CAIT Climate Data Explorer (2017); FAO Food Balance Sheets")
 
 Fact_Context_Response_Food_B <-
@@ -345,7 +345,7 @@ Dim_Global_2030_Outcome1_Food_A <-
   data.frame(Indicator_Type_Key="OUT1_FD_A",
              Indicator_Name="FORTHCOMING: SDG 15.3.1 - Proportion of land that is degraded over total land area",
              Indicator_Label="Degraded Land and Sustainable Agricultural Land",
-             Indicator_Subcategory="Land Degradation (data to be released Feb 2019)",
+             Indicator_Subcategory="Land Degradation*",
              Indicator_Unit="% of total land",
              Data_source="UN SDG Indicator Bank -- UNCCD, FAO, UNSD, UNEP, UNFCCC, CBD",
              Indicator_Target=NA,
@@ -369,7 +369,7 @@ Dim_Global_2030_Outcome1_Food_B <-
   data.frame(Indicator_Type_Key="OUT1_FD_B",
              Indicator_Name="FORTHCOMING: SDG 2.4.1 - Proportion of agricultural land under productive and sustainable agriculture",
              Indicator_Label="Degraded Land and Sustainable Agricultural Land",
-             Indicator_Subcategory="Sustainable Agriculture (methodology under development)",
+             Indicator_Subcategory="Sustainable Agriculture*",
              Indicator_Unit="% of agricultural land",
              Data_source="UN SDG Indicator Bank -- FAO",
              Indicator_Target=NA,
@@ -396,7 +396,7 @@ Dim_Global_2030_Outcome2_Food_A <-
   data.frame(Indicator_Type_Key="OUT2_FD_A",
              Indicator_Name="FORTHCOMING: SDG 12.3.1.b -- Global Food Loss Index (GFLI)",
              Indicator_Label="Loss Index and Kilograms Wasted",
-             Indicator_Subcategory="Global Food Loss Index (methodology under development)",
+             Indicator_Subcategory="Global Food Loss Index*",
              Indicator_Unit="Index",
              Data_source="UN SDG Indicator Bank -- FAO",
              Indicator_Target=NA,
@@ -420,7 +420,7 @@ Dim_Global_2030_Outcome2_Food_B <-
   data.frame(Indicator_Type_Key="OUT2_FD_B",
              Indicator_Name="FORTHCOMING: SDG 12.3.1.a -- Per capita food waste (kg/year)",
              Indicator_Label="Loss Index and Kilograms Wasted",
-             Indicator_Subcategory="Per Capita Food Waste (methodology under development)",
+             Indicator_Subcategory="Per Capita Food Waste*",
              Indicator_Unit="kg/year",
              Data_source="UN SDG Indicator Bank -- UNEP",
              Indicator_Target=NA,
@@ -443,10 +443,10 @@ Fact_Global_2030_Outcome2_Food_B <-
 
 Dim_Global_2030_Outcome3_Food_A <- 
   data.frame(Indicator_Type_Key="OUT3_FD_A",
-             Indicator_Name="FORTHCOMING: Actual global food plate (FAO Food Balance sheets) compared to Harvard diet",
-             Indicator_Label="Global Food Plate",
+             Indicator_Name="FORTHCOMING: Actual global food plate (FAO Food Balance sheets) compared to EAT-Lancet diet",
+             Indicator_Label="Global Food Plate*",
              Indicator_Subcategory="(under development by members of Food Practice & WWF-UK)",
-             Indicator_Unit="% matched to EAT_Lancet diet",
+             Indicator_Unit="% matched to EAT-Lancet diet",
              Data_source="Developed and analyzed by WWF's Food Practice -- in collaboation with WWF-UK, Tanya Steele",
              Indicator_Target=NA,
              Indicator_Type="Outcome",

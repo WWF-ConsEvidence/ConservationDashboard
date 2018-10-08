@@ -136,7 +136,7 @@ Fact_Context_Threat_Wildlife_A <-
 Dim_Context_Response_Wildlife_A <- 
   data.frame(Indicator_Type_Key="GCR_WL_A",
              Indicator_Name="Global PA Coverage (terrestrial & marine; M ha)",
-             Indicator_Label="Protected & Community Conserved Areas",
+             Indicator_Label="Protected & Community Conserved* Areas",
              Panel_Label="Habitat Protection",
              Panel="Response",
              Indicator_Subcategory="Protected",
@@ -160,12 +160,13 @@ Dim_Context_Response_Wildlife_B <-
              Indicator_Label="Protected & Community Conserved* Areas",
              Panel_Label="Habitat Protection",
              Panel="Response",
-             Indicator_Subcategory="Community Conserved*",
+             Indicator_Subcategory="Community Conserved",
              Indicator_Unit="M ha",
              Data_Source="WDPA")
 
 Fact_Context_Response_Wildlife_B <- 
   read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/ICCA_timeseries.csv') %>%
+  subset(.,STATUS_YR>1994) %>%
   transmute(Year_Key=STATUS_YR,
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],length(STATUS_YR)),
             Indicator_Type_Key=rep(Dim_Context_Response_Wildlife_B$Indicator_Type_Key,length(STATUS_YR)),
@@ -202,13 +203,13 @@ Fact_Context_Wildlife <-
 
 # ---- 3.1 Wildlife Outcome 1 - VITAL HABITATS CONSERVED ----
 
-# -- EXTENSIVE
+# -- EXTENT
 
 Dim_Global_2030_Outcome1_Wildlife_A <- 
   data.frame(Indicator_Type_Key="OUT1_WL_A",
              Indicator_Name="Global protected area coverage, as percent of total land area",
              Indicator_Label="Extensive, Effective, Connected, & Biologically Important Habitat Protection",
-             Indicator_Subcategory="Extensive",
+             Indicator_Subcategory="Extent",
              Indicator_Unit="% global area",
              Data_source="WDPA",
              Indicator_Target=30,
@@ -236,86 +237,13 @@ Fact_Global_2030_Outcome1_Wildlife_A <-
                               Indicator_Upper_Value=NA,
                               Indicator_Lower_Value=NA))
 
-# -- EFFECTIVE - ASSESSED
+# -- BIOLOGICAL IMPORTANCE
 
 Dim_Global_2030_Outcome1_Wildlife_B <- 
   data.frame(Indicator_Type_Key="OUT1_WL_B",
-             Indicator_Name="Percent of total protected area that has been assessed using METT",
-             Indicator_Label="Extensive, Effective, Connected, & Biologically Important Habitat Protection",
-             Indicator_Subcategory="Effective (METT Assessed)*",
-             Indicator_Unit="% protected area",
-             Data_source="METT - UNEP-WCMC; WDPA",
-             Indicator_Target=100,
-             Indicator_Type="Outcome",
-             Panel_Label="Vital Habitats Conserved",
-             Display_Order=1)
-
-Fact_Global_2030_Outcome1_Wildlife_B <-
-  read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/METT_area.csv') %>%
-  transmute(Year_Key=2016,
-             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],length(Year_Key)),
-             Indicator_Type_Key=rep(Dim_Global_2030_Outcome1_Wildlife_B$Indicator_Type_Key, length(Year_Key)),
-             Practice_Outcome_Key=rep(practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Wildlife" &
-                                                                    grepl("Habitats",practice_outcome_key_ref$practice_outcome)], length(Year_Key)),
-             Indicator_Value=100*(METT_meetsthreshold_Mha/3351.04), # 2016 total cumulative PA coverage, since METT database was last updated 2016
-             Indicator_Upper_Value=NA,
-             Indicator_Lower_Value=NA)
-
-# -- EFFECTIVE - MEETS THRESHOLD
-
-Dim_Global_2030_Outcome1_Wildlife_C <- 
-  data.frame(Indicator_Type_Key="OUT1_WL_C",
-             Indicator_Name="Percent of total assessed area that meets a METT threshold of effectiveness, based on Nature's Gill et al (2017)",
-             Indicator_Label="Extensive, Effective, Connected, & Biologically Important Habitat Protection",
-             Indicator_Subcategory="Effective (Meets Score Threshold)*",
-             Indicator_Unit="% assessed area",
-             Data_source="METT - UNEP-WCMC; threshold methodology from Gill et al (2017); WDPA",
-             Indicator_Target=100,
-             Indicator_Type="Outcome",
-             Panel_Label="Vital Habitats Conserved",
-             Display_Order=1)
-
-Fact_Global_2030_Outcome1_Wildlife_C <-read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/METT_area.csv')%>%
-  transmute(Year_Key=2016,
-             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],length(Year_Key)),
-             Indicator_Type_Key=rep(Dim_Global_2030_Outcome1_Wildlife_C$Indicator_Type_Key, length(Year_Key)),
-             Practice_Outcome_Key=rep(practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Wildlife" &
-                                                                    grepl("Habitats",practice_outcome_key_ref$practice_outcome)], length(Year_Key)),
-             Indicator_Value=METT_mettsthreshold_percent,
-             Indicator_Upper_Value=NA,
-             Indicator_Lower_Value=NA)
-
-# -- CONNECTED
-
-Dim_Global_2030_Outcome1_Wildlife_D <- 
-  data.frame(Indicator_Type_Key="OUT1_WL_D",
-             Indicator_Name="Percent of global protected area coverage that is well-connected (accounting for boundaries that limit ability to connect)",
-             Indicator_Label="Extensive, Effective, Connected, & Biologically Important Habitat Protection",
-             Indicator_Subcategory="Connected",
-             Indicator_Unit="% protected area",
-             Data_source="Saura et al (2018) Protected area connectivity: Shortfalls in global targets and country-level priorities",
-             Indicator_Target=100,
-             Indicator_Type="Outcome",
-             Panel_Label="Vital Habitats Conserved",
-             Display_Order=1)
-
-Fact_Global_2030_Outcome1_Wildlife_D <-
-  data.frame(Year_Key=2016,
-             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],length(1)),
-             Indicator_Type_Key=rep(Dim_Global_2030_Outcome1_Wildlife_D$Indicator_Type_Key, length(1)),
-             Practice_Outcome_Key=rep(practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Wildlife" &
-                                                                    grepl("Habitats",practice_outcome_key_ref$practice_outcome)], length(1)),
-             Indicator_Value=(9.9/14.7)*100,
-             Indicator_Upper_Value=NA,
-             Indicator_Lower_Value=NA)
-
-# -- BIOLOGICALLY IMPORTANT
-
-Dim_Global_2030_Outcome1_Wildlife_E <- 
-  data.frame(Indicator_Type_Key="OUT1_WL_E",
              Indicator_Name="Percent of total protected area that is within Key Biodiversity Areas (M ha PAs within KBAs / M ha PAs)",
              Indicator_Label="Extensive, Effective, Connected, & Biologically Important Habitat Protection",
-             Indicator_Subcategory="Biologically Important",
+             Indicator_Subcategory="Biological Importance",
              Indicator_Unit="% protected area",
              Data_source="WDPA & KBA database",
              Indicator_Target=100,
@@ -323,15 +251,125 @@ Dim_Global_2030_Outcome1_Wildlife_E <-
              Panel_Label="Vital Habitats Conserved",
              Display_Order=1)
 
-Fact_Global_2030_Outcome1_Wildlife_E <-
+Fact_Global_2030_Outcome1_Wildlife_B <-
   data.frame(Year_Key=9999,
              Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],length(1)),
-             Indicator_Type_Key=rep(Dim_Global_2030_Outcome1_Wildlife_E$Indicator_Type_Key, length(1)),
+             Indicator_Type_Key=rep(Dim_Global_2030_Outcome1_Wildlife_B$Indicator_Type_Key, length(1)),
              Practice_Outcome_Key=rep(practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Wildlife" &
                                                                     grepl("Habitats",practice_outcome_key_ref$practice_outcome)], length(1)),
              Indicator_Value=NA,
              Indicator_Upper_Value=NA,
-             Indicator_Lower_Value=NA)
+             Indicator_Lower_Value=NA)  %>%
+  rbind.data.frame(.,
+                   data.frame(Year_Key=2030,
+                              Practice_Key=practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],
+                              Indicator_Type_Key=Dim_Global_2030_Outcome1_Wildlife_B$Indicator_Type_Key,
+                              Practice_Outcome_Key=practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Wildlife" &
+                                                                                 grepl("Habitats",practice_outcome_key_ref$practice_outcome)],
+                              Indicator_Value=Dim_Global_2030_Outcome1_Wildlife_B$Indicator_Target,
+                              Indicator_Upper_Value=NA,
+                              Indicator_Lower_Value=NA))
+
+# -- CONNECTEDNESS
+
+Dim_Global_2030_Outcome1_Wildlife_C <- 
+  data.frame(Indicator_Type_Key="OUT1_WL_C",
+             Indicator_Name="Percent of global protected area coverage that is well-connected (accounting for boundaries that limit ability to connect)",
+             Indicator_Label="Extensive, Effective, Connected, & Biologically Important Habitat Protection",
+             Indicator_Subcategory="Connectedness*",
+             Indicator_Unit="% protected area",
+             Data_source="Saura et al (2018) Protected area connectivity: Shortfalls in global targets and country-level priorities",
+             Indicator_Target=100,
+             Indicator_Type="Outcome",
+             Panel_Label="Vital Habitats Conserved",
+             Display_Order=1)
+
+Fact_Global_2030_Outcome1_Wildlife_C <-
+  data.frame(Year_Key=2016,
+             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],length(1)),
+             Indicator_Type_Key=rep(Dim_Global_2030_Outcome1_Wildlife_C$Indicator_Type_Key, length(1)),
+             Practice_Outcome_Key=rep(practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Wildlife" &
+                                                                    grepl("Habitats",practice_outcome_key_ref$practice_outcome)], length(1)),
+             Indicator_Value=(9.9/14.7)*100,
+             Indicator_Upper_Value=NA,
+             Indicator_Lower_Value=NA)  %>%
+  rbind.data.frame(.,
+                   data.frame(Year_Key=2030,
+                              Practice_Key=practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],
+                              Indicator_Type_Key=Dim_Global_2030_Outcome1_Wildlife_C$Indicator_Type_Key,
+                              Practice_Outcome_Key=practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Wildlife" &
+                                                                                 grepl("Habitats",practice_outcome_key_ref$practice_outcome)],
+                              Indicator_Value=Dim_Global_2030_Outcome1_Wildlife_C$Indicator_Target,
+                              Indicator_Upper_Value=NA,
+                              Indicator_Lower_Value=NA))
+
+# -- EFFECTIVENESS - ASSESSED
+
+Dim_Global_2030_Outcome1_Wildlife_D <- 
+  data.frame(Indicator_Type_Key="OUT1_WL_D",
+             Indicator_Name="Percent of total protected area that has been assessed using METT",
+             Indicator_Label="Extensive, Effective, Connected, & Biologically Important Habitat Protection",
+             Indicator_Subcategory="Effectiveness (METT Assessed)*",
+             Indicator_Unit="% protected area",
+             Data_source="METT - UNEP-WCMC; WDPA",
+             Indicator_Target=100,
+             Indicator_Type="Outcome",
+             Panel_Label="Vital Habitats Conserved",
+             Display_Order=1)
+
+Fact_Global_2030_Outcome1_Wildlife_D <-
+  read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/METT_area.csv') %>%
+  transmute(Year_Key=2016,
+            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],length(Year_Key)),
+            Indicator_Type_Key=rep(Dim_Global_2030_Outcome1_Wildlife_D$Indicator_Type_Key, length(Year_Key)),
+            Practice_Outcome_Key=rep(practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Wildlife" &
+                                                                   grepl("Habitats",practice_outcome_key_ref$practice_outcome)], length(Year_Key)),
+            Indicator_Value=100*(METT_meetsthreshold_Mha/3351.04), # 2016 total cumulative PA coverage, since METT database was last updated 2016
+            Indicator_Upper_Value=NA,
+            Indicator_Lower_Value=NA)  %>%
+  rbind.data.frame(.,
+                   data.frame(Year_Key=2030,
+                              Practice_Key=practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],
+                              Indicator_Type_Key=Dim_Global_2030_Outcome1_Wildlife_D$Indicator_Type_Key,
+                              Practice_Outcome_Key=practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Wildlife" &
+                                                                                 grepl("Habitats",practice_outcome_key_ref$practice_outcome)],
+                              Indicator_Value=Dim_Global_2030_Outcome1_Wildlife_D$Indicator_Target,
+                              Indicator_Upper_Value=NA,
+                              Indicator_Lower_Value=NA))
+
+# -- EFFECTIVENESS - MEETS THRESHOLD
+
+Dim_Global_2030_Outcome1_Wildlife_E <- 
+  data.frame(Indicator_Type_Key="OUT1_WL_E",
+             Indicator_Name="Percent of total assessed area that meets a METT threshold of effectiveness, based on Nature's Gill et al (2017)",
+             Indicator_Label="Extensive, Effective, Connected, & Biologically Important Habitat Protection",
+             Indicator_Subcategory="Effectiveness (Meets Score Threshold)*",
+             Indicator_Unit="% assessed area",
+             Data_source="METT - UNEP-WCMC; threshold methodology from Gill et al (2017); WDPA",
+             Indicator_Target=100,
+             Indicator_Type="Outcome",
+             Panel_Label="Vital Habitats Conserved",
+             Display_Order=1)
+
+Fact_Global_2030_Outcome1_Wildlife_E <-read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/METT_area.csv')%>%
+  transmute(Year_Key=2016,
+            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],length(Year_Key)),
+            Indicator_Type_Key=rep(Dim_Global_2030_Outcome1_Wildlife_E$Indicator_Type_Key, length(Year_Key)),
+            Practice_Outcome_Key=rep(practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Wildlife" &
+                                                                   grepl("Habitats",practice_outcome_key_ref$practice_outcome)], length(Year_Key)),
+            Indicator_Value=METT_mettsthreshold_percent,
+            Indicator_Upper_Value=NA,
+            Indicator_Lower_Value=NA)  %>%
+  rbind.data.frame(.,
+                   data.frame(Year_Key=2030,
+                              Practice_Key=practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],
+                              Indicator_Type_Key=Dim_Global_2030_Outcome1_Wildlife_E$Indicator_Type_Key,
+                              Practice_Outcome_Key=practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Wildlife" &
+                                                                                 grepl("Habitats",practice_outcome_key_ref$practice_outcome)],
+                              Indicator_Value=Dim_Global_2030_Outcome1_Wildlife_E$Indicator_Target,
+                              Indicator_Upper_Value=NA,
+                              Indicator_Lower_Value=NA))
+
 
 # ---- 3.2 Wildlife Outcome 2 - OVEREXPLOITATION PREVENTED ----
 
@@ -339,7 +377,7 @@ Dim_Global_2030_Outcome2_Wildlife_A <-
   data.frame(Indicator_Type_Key="OUT2_WL_A",
              Indicator_Name="FORTHCOMING: CITES Illegal Trade & Exploitation Index",
              Indicator_Label="Illegal Trade and Exploitation Index*",
-             Indicator_Subcategory="(under development by WWF & TRAFFIC)",
+             Indicator_Subcategory=NA,
              Indicator_Unit="",
              Data_source="CITES, processed by WWF/TRAFFIC",
              Indicator_Target=NA,
@@ -421,7 +459,8 @@ Dim_Initiative_Indicator_Wildlife <-
             Indicator_Subcategory=Subcategory,
             Indicator_Target=Target,
             Indicator_Unit=Units,
-            Data_Source=Source)
+            Data_Source=Source,
+            Display_Order=Display.order)
 
 
 # ---- 4.4 Wildlife-specific Fact_Initiative_Indicators ----

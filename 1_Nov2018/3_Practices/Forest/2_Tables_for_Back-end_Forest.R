@@ -254,7 +254,7 @@ Dim_Global_2030_Outcome1_Forest_A <-
   data.frame(Indicator_Type_Key="OUT1_FR_A",
              Indicator_Name="Effectively managed and protected forests",
              Indicator_Label="Effective Protection & Management",
-             Indicator_Subcategory="Reduced Degradation in Protected Areas* & FSC Certification in Managed Forests",
+             Indicator_Subcategory="Reduced Degradation* & FSC Certification",
              Indicator_Unit="% of total forest area",
              Data_source="FSC for Effective Management; FORTHCOMING for Effective Protection (either fragmentation data (WWF-DE) or global drivers of loss & WDPA data)",
              Indicator_Target=50,
@@ -298,7 +298,16 @@ Fact_Global_2030_Outcome2_Forest_A <-
                                                                    grepl("Deforestation",practice_outcome_key_ref$practice_outcome)], length(Year_Key)),
             Indicator_Value=Value,
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)
+            Indicator_Lower_Value=NA) %>%
+  rbind.data.frame(.,
+                   data.frame(Year_Key=2030,
+                              Practice_Key=practice_key_ref$id[practice_key_ref$practice_name=="Forests"],
+                              Indicator_Type=Dim_Global_2030_Outcome2_Forest_A$Indicator_Type_Key,
+                              Practice_Outcome_Key=practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Forests" &
+                                                                                 grepl("Deforestation",practice_outcome_key_ref$practice_outcome)],
+                              Indicator_Value=Dim_Global_2030_Outcome2_Forest_A$Indicator_Target,
+                              Indicator_Upper_Value=NA,
+                              Indicator_Lower_Value=NA))
 
 
 # ---- 3.3 Forest Outcome 3 - FOREST RESTORATION ----
@@ -345,7 +354,7 @@ Dim_Global_2030_Outcome3_Forest_B <-
   data.frame(Indicator_Type_Key="OUT3_FR_B",
              Indicator_Name="Area of commitments that are funded (millions ha)",
              Indicator_Label="Total Area Committed, Funded, & Restored",
-             Indicator_Subcategory="Funded",
+             Indicator_Subcategory="Funded*",
              Indicator_Unit="M ha",
              Data_source="Bonn Challenge, country-level commitments",
              Indicator_Target=350,
@@ -367,9 +376,9 @@ Fact_Global_2030_Outcome3_Forest_B <-
 
 Dim_Global_2030_Outcome3_Forest_C <- 
   data.frame(Indicator_Type_Key="OUT3_FR_C",
-             Indicator_Name="Area of forest retored (millions ha)",
+             Indicator_Name="Area of forest restored (millions ha)",
              Indicator_Label="Total Area Committed, Funded, & Restored",
-             Indicator_Subcategory="Restored",
+             Indicator_Subcategory="Restored*",
              Indicator_Unit="M ha",
              Data_source="Bonn Challenge, country-level commitments",
              Indicator_Target=350,
@@ -449,7 +458,8 @@ Dim_Initiative_Indicator_Forest <-
             Indicator_Subcategory=Subcategory,
             Indicator_Target=Target,
             Indicator_Unit=Units,
-            Data_Source=Source)
+            Data_Source=Source,
+            Display_Order=Display.order)
 
 
 # ---- 4.4 Forest-specific Fact_Initiative_Indicators ----

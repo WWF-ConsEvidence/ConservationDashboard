@@ -35,7 +35,7 @@
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #
 
-pacman::p_load(dplyr, xlsx)
+pacman::p_load(dplyr, xlsx, reshape2)
 
 
 practice_key_ref <- read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/cons_dashboard_dim_tables_20180828.xlsx',
@@ -71,7 +71,7 @@ Dim_Context_State_FW_A <-
 
 Fact_Context_State_FW_A <-
   read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/FW_LPI_output_2018_0910.csv') %>%
-  subset(.,Year<2016) %>%
+  subset(.,Year>1994 & Year<2016) %>%
   transmute(Year_Key=Year,
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Freshwater"],length(Year_Key)),
             Indicator_Type_Key=rep(Dim_Context_State_FW_A$Indicator_Type_Key,length(Year_Key)),
@@ -87,40 +87,40 @@ Fact_Context_State_FW_A <-
 Dim_Context_Threat_FW_A <- 
   data.frame(Indicator_Type_Key="GCT_FW_A",
              Indicator_Name="Connectivity Status Index (% of total watersheds that reach 95% connectivity threshold)",
-             Indicator_Label="Length of Free-Flowing Rivers (Connectivity Status Index)",
+             Indicator_Label="Free-Flowing Rivers (Connectivity Status Index)",
              Panel_Label="Water Infrastructure Development",
              Panel="Threat",
-             Indicator_Subcategory="Free-Flowing",
-             Indicator_Unit="Kilometers",
+             Indicator_Subcategory=NA,
+             Indicator_Unit="% of global river length",
              Data_Source="WWF/McGill -- value provided by Michele Thieme, WWF-US")
 
 Fact_Context_Threat_FW_A <-
   data.frame(Year_Key=2018,
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Freshwater"],length(1)),
             Indicator_Type_Key=rep(Dim_Context_Threat_FW_A$Indicator_Type_Key,length(1)),
-            Indicator_Value=9971600,
+            Indicator_Value=(9971600/11720000)*100,
             Indicator_Upper_Value=NA,
             Indicator_Lower_Value=NA)
 
-# -- WATER INFRASTRUCTURE DEVELOPMENT - TOTAL LENGTH
-
-Dim_Context_Threat_FW_B <- 
-  data.frame(Indicator_Type_Key="GCT_FW_B",
-             Indicator_Name="Connectivity Status Index (% of total watersheds that reach 95% connectivity threshold)",
-             Indicator_Label="Length of Free-Flowing Rivers (Connectivity Status Index)",
-             Panel_Label="Water Infrastructure Development",
-             Panel="Threat",
-             Indicator_Subcategory="Total",
-             Indicator_Unit="Kilometers",
-             Data_Source="WWF/McGill -- value provided by Michele Thieme, WWF-US")
-
-Fact_Context_Threat_FW_B <-
-  data.frame(Year_Key=2018,
-             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Freshwater"],length(1)),
-             Indicator_Type_Key=rep(Dim_Context_Threat_FW_B$Indicator_Type_Key,length(1)),
-             Indicator_Value=11720000,
-             Indicator_Upper_Value=NA,
-             Indicator_Lower_Value=NA)
+# # -- WATER INFRASTRUCTURE DEVELOPMENT - TOTAL LENGTH
+# 
+# Dim_Context_Threat_FW_B <- 
+#   data.frame(Indicator_Type_Key="GCT_FW_B",
+#              Indicator_Name="Connectivity Status Index (% of total watersheds that reach 95% connectivity threshold)",
+#              Indicator_Label="Length of Free-Flowing Rivers (Connectivity Status Index)",
+#              Panel_Label="Water Infrastructure Development",
+#              Panel="Threat",
+#              Indicator_Subcategory="Total",
+#              Indicator_Unit="Kilometers",
+#              Data_Source="WWF/McGill -- value provided by Michele Thieme, WWF-US")
+# 
+# Fact_Context_Threat_FW_B <-
+#   data.frame(Year_Key=2018,
+#              Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Freshwater"],length(1)),
+#              Indicator_Type_Key=rep(Dim_Context_Threat_FW_B$Indicator_Type_Key,length(1)),
+#              Indicator_Value=11720000,
+#              Indicator_Upper_Value=NA,
+#              Indicator_Lower_Value=NA)
 
 # ---- 2.3 Context - Response ----
 
@@ -153,13 +153,11 @@ Fact_Context_Response_FW_A <-
 Dim_Context_FW <- 
   rbind.data.frame(Dim_Context_State_FW_A,
                    Dim_Context_Threat_FW_A,
-                   Dim_Context_Threat_FW_B,
                    Dim_Context_Response_FW_A)
 
 Fact_Context_FW <-
   rbind.data.frame(Fact_Context_State_FW_A,
                    Fact_Context_Threat_FW_A,
-                   Fact_Context_Threat_FW_B,
                    Fact_Context_Response_FW_A)
 
 
@@ -213,12 +211,12 @@ Dim_Global_2030_Outcome1_FW_B <-
              Display_Order=1)
 
 Fact_Global_2030_Outcome1_FW_B <-
-  data.frame(Year_Key=2017,
-             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Freshwater"],length(1)),
-             Indicator_Type_Key=rep(Dim_Global_2030_Outcome1_FW_B$Indicator_Type_Key, length(1)),
+  data.frame(Year_Key=c(2017,2030),
+             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Freshwater"],2),
+             Indicator_Type_Key=rep(Dim_Global_2030_Outcome1_FW_B$Indicator_Type_Key, 2),
              Practice_Outcome_Key=rep(practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Freshwater" &
-                                                                    grepl("Habitats",practice_outcome_key_ref$practice_outcome)], length(1)),
-             Indicator_Value=16.0,
+                                                                    grepl("Habitats",practice_outcome_key_ref$practice_outcome)], 2),
+             Indicator_Value=c(16.0,Dim_Global_2030_Outcome1_FW_B$Indicator_Target),
              Indicator_Upper_Value=NA,
              Indicator_Lower_Value=NA)
 
@@ -303,12 +301,12 @@ Fact_Global_2030_Outcome2_FW_A <-
 
 Dim_Global_2030_Outcome2_FW_B <- 
   data.frame(Indicator_Type_Key="OUT2_FW_B",
-             Indicator_Name="Ambient water quality of ",
+             Indicator_Name="Ambient water quality of rivers",
              Indicator_Label="Improved Integrity & Quality",
-             Indicator_Subcategory="Ambient Water Quality",
+             Indicator_Subcategory="Ambient Water Quality*",
              Indicator_Unit="% river water bodies with good quality",
              Data_source="UN - SDG Indicator Bank (SDG 6.3.2)",
-             Indicator_Target=17,
+             Indicator_Target=NA,
              Indicator_Type="Outcome",
              Panel_Label="Clean Flowing Rivers",
              Display_Order=2)
@@ -382,7 +380,8 @@ Dim_Initiative_Indicator_FW <-
             Indicator_Subcategory=Subcategory,
             Indicator_Target=Target,
             Indicator_Unit=Units,
-            Data_Source=Source)
+            Data_Source=Source,
+            Display_Order=Display.order)
 
 
 # ---- 4.4 Freshwater-specific Fact_Initiative_Indicators ----
@@ -394,7 +393,7 @@ Fact_Initiative_Indicator_FW <-
   melt(.,measure.vars=c("Baseline.value","Current.value","Target")) %>%
   transmute(Initiative.indicator.key=Initiative.indicator.key,
             Initiative=Initiative,
-            Initiative.key=Initiative.key,
+              Initiative.key=Initiative.key,
             Practice.outcome.key=Practice.outcome.key,
             Year.type=c(rep("Baseline",length(variable[variable=="Baseline.value"])),
                         rep("Current",length(variable[variable=="Current.value"])),
@@ -445,11 +444,9 @@ Fact_Initiative_Financials_FW <-
 
 rm(Dim_Context_State_FW_A,
    Dim_Context_Threat_FW_A,
-   Dim_Context_Threat_FW_B,
    Dim_Context_Response_FW_A,
    Fact_Context_State_FW_A,
    Fact_Context_Threat_FW_A,
-   Fact_Context_Threat_FW_B,
    Fact_Context_Response_FW_A,
    Dim_Global_2030_Outcome1_FW_A,
    Dim_Global_2030_Outcome1_FW_B,

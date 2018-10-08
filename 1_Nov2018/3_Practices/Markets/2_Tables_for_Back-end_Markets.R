@@ -85,7 +85,7 @@ Dim_Context_State_Markets_B <-
              Panel_Label="Global Material Consumption",
              Panel="State",
              Indicator_Subcategory="Per GDP",
-             Indicator_Unit="Kilograms per constant 2010 USD",
+             Indicator_Unit="Kg per constant 2010 USD",
              Data_Source="UN SDG Indicator Bank -- SDG 12.2")
 
 Fact_Context_State_Markets_B <-
@@ -109,7 +109,7 @@ Dim_Context_Threat_Markets_A <-
              Indicator_Label="Illegal Trade and Exploitation Index*",
              Panel_Label="Demand & Trade of Illegal Wildlife",
              Panel="Threat",
-             Indicator_Subcategory="(under development by WWF & TRAFFIC)",
+             Indicator_Subcategory=NA,
              Indicator_Unit="",
              Data_Source="CITES, processed by WWF/TRAFFIC")
 
@@ -129,10 +129,10 @@ Fact_Context_Threat_Markets_A <-
 Dim_Context_Response_Markets_A <- 
   data.frame(Indicator_Type_Key="GCR_MK_A",
              Indicator_Name="Commodity Driven Deforestation (M ha per year)",
-             Indicator_Label="Deforestation & Deforestation-Free Commitments",
+             Indicator_Label="Commodity Driven Deforestation & Deforestation-Reduction Commitments",
              Panel_Label="Land Conversion",
              Panel="Response",
-             Indicator_Subcategory="Commodity Driven Deforestation",
+             Indicator_Subcategory="Deforestation",
              Indicator_Unit="M ha per year",
              Data_Source="Global Forest Watch - Curtis et al (2018) Classifying global drivers of forest loss")
 
@@ -150,13 +150,13 @@ Fact_Context_Response_Markets_A <-
 
 Dim_Context_Response_Markets_B <- 
   data.frame(Indicator_Type_Key="GCR_MK_B",
-             Indicator_Name="Deforestation-Free Commitments (# companies with commitments)",
-             Indicator_Label="Deforestation & Deforestation-Free Commitments",
+             Indicator_Name="Deforestation-Free Commitments (% 'exposed' companies with commitments)",
+             Indicator_Label="Commodity Driven Deforestation & Deforestation-Reduction Commitments",
              Panel_Label="Land Conversion",
              Panel="Response",
-             Indicator_Subcategory="D-Free Commitments",
-             Indicator_Unit="% 'exposed' companies with commitments", 
-             # an 'exposed' company is one that produces, procures, or uses soy, palm, timber & pulp, or cattle products as part of core business
+             Indicator_Subcategory="Commitments",
+             Indicator_Unit="% commodity-driven companies", 
+             # commodity-driven companies included are those that produce, procure, or use soy, palm, timber & pulp, or cattle products as part of core business
              Data_Source="Supply Change 2017 Report -- forest-trends.org")
 
 Fact_Context_Response_Markets_B <-
@@ -227,7 +227,8 @@ Dim_Initiative_Indicator_Markets <-
             Indicator_Subcategory=Subcategory,
             Indicator_Target=Target,
             Indicator_Unit=Units,
-            Data_Source=Source)
+            Data_Source=Source,
+            Display_Order=Display.order)
 
 
 # ---- 3.4 Markets-specific Fact_Initiative_Indicators ----
