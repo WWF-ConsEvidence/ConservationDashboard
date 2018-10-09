@@ -1,5 +1,5 @@
 # WDPA Metadata
-## _Last updated: 7 Oct 2018_
+## _Last updated: 9 Oct 2018_
 ___
 
 ### Title
@@ -16,13 +16,13 @@ August 2018 from www.protectedplant.net
 United Nations Environment World Conservation Monitoring Centre (UNEP-WCMC) 
 
 ### File Format  
-Shapefile     
+Shapefile - data provided as spatial polygons representing site boundaries and points where polygon data are not available.      
 
 ### Access URL  
 UNEP-WCMC and IUCN (2018), Protected Planet: The World Database on Protected Areas (WDPA)[On-line], Downloaded Aug 2018, Cambridge, UK: UNEP-WCMC and IUCN. Available at: www.protectedplanet.net. 
 
 ### Temporal Range & Frequency
-The year associated with each site in the WDPA corresponds to the year it was given its' designation. The earliest sites were established before 1900, however some sites do not have a year associated with their designation. Dataset extends to current year, updated monthly. In this analysis, sites where the year is unknown were aggregated with years 1995 and prior.   
+The year associated with each site in the WDPA corresponds to the year it was given its' designation. The earliest sites were established before 1900, however some sites do not have a year associated with their designation. The dataset extends to the current year (2018), and is updated on a monthly basis. In this analysis, sites where the year is unknown (STATUS_YR = 0 in dataset) were aggregated with years 1995 and prior.   
 
 ### Spatial Range & Resolution
 Global extent. Resolution is variable among sites as a result of different managing/reporting entities. While some sites may provide highly detailed shapefile boundaries, other sites may only report an area and not have GIS capablities. 
@@ -31,7 +31,7 @@ Global extent. Resolution is variable among sites as a result of different manag
 protectedareas@unep-wcmc.org  
 
 ### Contact Name and Email (within WWF)
-
+Colleen Nell (collnellphd@gmail.com)
 
 ### Data Permissions (License & Rights)
 
@@ -51,3 +51,4 @@ b. For point data, sites with no reported area were excluded. For remaining site
 c. Protected areas were then intersected with global boundaries for Exclusive Economic Zones (EEZ) and terrestrial borders to delineate as marine (within EEZ) or terrestrial.  Geomteries were repaired as necessary. Areas beyond national jurisdiction (ABNJ) were not included. The basemap layer used was provided by Brooks et al.2016 (https://doi.org/10.5061/dryad.6gb90.2).   
 d. For each year from 1995 - present, the intersected files were aggregated by geographic subregions for marine and terrestrial separately. For year 1995, all years before 1996 were aggregated together. In some cases, the year of designation for a site is unknown or not reported and treated as year 0 in these analyses. Transboundary sites that were assigned multiple ISO3 codes were split and aggregated based upon subregional boundaries. Global figures reflect the composite value of each geographic subregion. Again, this aggregation at the subregional level creates a union between overlapping spatial polygons to account for sites with multiple designations.   
 e. The global extent of protected area was calculated in M ha as the total coverage in each subregion for terrestrial and marine sites. These data were also used to calculate  protected area coverage separately for terrestrial and marine. Mollweide projection was used for area calculations. 
+
