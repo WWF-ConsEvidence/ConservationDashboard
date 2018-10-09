@@ -50,7 +50,7 @@ library(tidyr)
 library(beepr)
 
 # set working directory to input data '/ConsDB_Input/'
-setwd("/Users/colleennell/Dropbox/ConsDB_Input")
+setwd("/Users/collnell/Dropbox/ConsDB_Input")
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #
@@ -161,22 +161,8 @@ for (i in 1:length(ISO3.list)){
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 ## Intersect each ISO3.year with subregional coastline for terrestrial, marine, ABNJ
-ISO3.yr.list<-list.files('WDPA/ISO3_YEAR/')
-str_split(ISO3.yr.list, '_')[[1]][1]# ISO3
-str_split(ISO3.yr.list, '_')[[1]][2]# YEAR
-
-## deal with transboundary sites
-# all the ISO3s of PAs to intersect, some have multiple ISO3 due to transboundary sites
-isos<-read.csv('ISO3_subregions.csv')%>%transform(ISO3=as.character(ISO3))
-
-trans<-read.csv('WDPA/wdpa_transboundary.csv')
-head(trans)
-unique(trans$ISO3_multi)
-
-## for each subregion
-# read in ISO3_year
-# intersect with subregion boundaries
-iso.split<-split(isos.in, isos.in$GEO_subregion)
+ISO3.yr.list<-list.files('WDPA/ISO3_YEAR/')\
+#trans<-read.csv('WDPA/wdpa_transboundary.csv')
 
 ## Break up WDPA by UN subregion
 boundaries<-st_read('EEZ_WVS_layer/EEZv8_WVS_DIS_V3_ALL_final_v7disUNEP') # or EEZv8_WVS_DIS_V3_ALL_final_v7disIPBES
@@ -190,9 +176,10 @@ ABNJ<-boundaries%>%filter(type=='ABNJ')%>%st_transform('+proj=moll')
 rm(boundaries)
 
 ISO3.yr.list<-list.files('WDPA/ISO3_YEAR/')
-grep('AUS_2013', ISO3.yr.list)
+grep('AUS_2004', ISO3.yr.list)
+#'AUS_2013'
 
-## started at 10:25 am
+## started at 4 pm
 ## intersect each ISO3_YEAR with EEZ boundaries
 for (i in 306:length(ISO3.yr.list)){
   ISO3.yr.in <- st_read(paste0('WDPA/ISO3_YEAR/', ISO3.yr.list[i]))
@@ -209,49 +196,46 @@ for (i in 306:length(ISO3.yr.list)){
   }
 }
 
-## intersect each ISO3_YEAR with Land
-for (i in 1:length(ISO3.yr.list)){
-  ISO3.yr.in <- st_read(paste0('WDPA/ISO3_YEAR/', ISO3.yr.list[i]))
+## intersect each ISO3_YEAR with Land and ABJN - started at 4:30pm from AUS_2004
+for (i in 297:length(ISO3.yr.list)){
+  ISO3.yr.in <- st_read(paste0('WDPA/ISO3_YEAR/', ISO3.yr.list[i]))%>%st_buffer(0)
   ISO3_Land<-st_intersection(ISO3.yr.in, Land)%>%st_buffer(0)
   subr.list<-unique(ISO3_Land$G_UNEP_sub)
   if (dim(ISO3_Land)[1] == 0){
   } else if (dim(ISO3_Land)[1] > 0 & length(subr.list == 1)){
-    st_write(ISO3_Land, paste0('WDPA/ISO3_Land/Land_', ISO3.yr.list[i],'_', subr.list[1]), driver = 'ESRI Shapefile')
+    st_write(ISO3_Land, paste0('WDPA/ISO3_Land/Land_', ISO3.yr.list[i],'_', subr.list[1]), driver = 'ESRI Shapefile', delete_leyer=TRUE)
   } else if (dim(ISO3_EEZ)[1] > 0 & length(subr.list > 1)){
     for (k in 1:length(subr.list)){
       ISO3_Land<-ISO3_Land%>%filter(G_UNEP_sub == subr.list[k])%>%st_buffer(0)
-      st_write(ISO3_Land, paste0('WDPA/ISO3_Land/Land_', ISO3.yr.list[i],'_', subr.list[k]), driver = 'ESRI Shapefile')
+      st_write(ISO3_Land, paste0('WDPA/ISO3_Land/Land_', ISO3.yr.list[i],'_', subr.list[k]), driver = 'ESRI Shapefile', delete_leyer=TRUE)
     }
   }
+  ISO3_EEZ<-st_intersection(ISO3.yr.in, EEZ)%>%st_buffer(0)
+  subr.list<-unique(ISO3_EEZ$G_UNEP_sub)
+  if (dim(ISO3_EEZ)[1] == 0){
+  } else if (dim(ISO3_EEZ)[1] > 0 & length(subr.list == 1)){
+    st_write(ISO3_EEZ, paste0('WDPA/ISO3_EEZ/EEZ_', ISO3.yr.list[i],'_', subr.list[1]), driver = 'ESRI Shapefile', delete_leyer=TRUE)
+  } else if (dim(ISO3_EEZ)[1] > 0 & length(subr.list > 1)){
+    for (k in 1:length(subr.list)){
+      ISO3_EEZ<-ISO3_EEZ%>%filter(G_UNEP_sub == subr.list[k])%>%st_buffer(0)
+      st_write(ISO3_EEZ, paste0('WDPA/ISO3_EEZ/EEZ_', ISO3.yr.list[i],'_', subr.list[k]), driver = 'ESRI Shapefile', delete_leyer=TRUE) 
+    }
+  }
+  
   # ABNJ
   ISO3_ABNJ<-st_intersection(ISO3.yr.in, ABNJ)%>%st_buffer(0)
   subr.list<-unique(ISO3_ABNJ$G_UNEP_sub)
   if (dim(ISO3_ABNJ)[1] == 0){
   } else if (dim(ISO3_ABNJ)[1] > 0 & length(subr.list == 1)){
-    st_write(ISO3_ABNJ, paste0('WDPA/ISO3_ABNJ/ABNJ_', ISO3.yr.list[i],'_', subr.list[1]), driver = 'ESRI Shapefile')
+    st_write(ISO3_ABNJ, paste0('WDPA/ISO3_ABNJ/ABNJ_', ISO3.yr.list[i],'_', subr.list[1]), driver = 'ESRI Shapefile', delete_leyer=TRUE)
   } else if (dim(ISO3_ABNJ)[1] > 0 & length(subr.list > 1)){
     for (k in 1:length(subr.list)){
       ISO3_ABNJ<-ISO3_ABNJ%>%filter(G_UNEP_sub == subr.list[k])%>%st_buffer(0)
-      st_write(ISO3_ABNJ, paste0('WDPA/ISO3_ABNJ/ABNJ_', ISO3.yr.list[i],'_', subr.list[k]), driver = 'ESRI Shapefile')
+      st_write(ISO3_ABNJ, paste0('WDPA/ISO3_ABNJ/ABNJ_', ISO3.yr.list[i],'_', subr.list[k]), driver = 'ESRI Shapefile', delete_leyer=TRUE)
     }
   }
 }
 
-## intersect each ISO3_YEAR with ABNJ
-for (i in 1:length(ISO3.yr.list)){
-  ISO3.yr.in <- st_read(paste0('WDPA/ISO3_YEAR/', ISO3.yr.list[i]))
-  ISO3_ABNJ<-st_intersection(ISO3.yr.in, ABNJ)%>%st_buffer(0)
-  subr.list<-unique(ISO3_ABNJ$G_UNEP_sub)
-  if (dim(ISO3_ABNJ)[1] == 0){
-  } else if (dim(ISO3_ABNJ)[1] > 0 & length(subr.list == 1)){
-    st_write(ISO3_ABNJ, paste0('WDPA/ISO3_ABNJ/ABNJ_', ISO3.yr.list[i],'_', subr.list[1]), driver = 'ESRI Shapefile')
-  } else if (dim(ISO3_ABNJ)[1] > 0 & length(subr.list > 1)){
-    for (k in 1:length(subr.list)){
-      ISO3_ABNJ<-ISO3_ABNJ%>%filter(G_UNEP_sub == subr.list[k])%>%st_buffer(0)
-      st_write(ISO3_ABNJ, paste0('WDPA/ISO3_ABNJ/ABNJ_', ISO3.yr.list[i],'_', subr.list[k]), driver = 'ESRI Shapefile')
-    }
-  }
-}
 
 
 # for each subregion, find files with matching subregion
@@ -263,23 +247,15 @@ files.sub<-file.df%>%filter(GEO.sub.region )
 
 year.subs.fast<-grep('Central and Western Europe', list.files('WDPA/year_subregion'), value=TRUE) # find list of wdpa files
 
-for (i in 1:length(names(iso.split))){
-  sub.area<-boundaries%>%filter( == sub.list[i]) # subregion boundaries
-  sub.ISO3<-iso.split[[i]]$ISO3_multi # ISO3 list
-  # select files containing these ISO3 codes
-  
-  for (j in 1:length(sub.ISO3)){
-    
-    
-  }
-  
-  
-  for (i in 1:length())
-    
-    
-    
-    
-    
+
+## deal with transboundary sites
+# all the ISO3s of PAs to intersect, some have multiple ISO3 due to transboundary sites
+isos<-read.csv('ISO3_subregions.csv')%>%transform(ISO3=as.character(ISO3))
+
+trans<-read.csv('WDPA/wdpa_transboundary.csv')
+head(trans)
+unique(trans$ISO3_multi)
+
     # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     #
     # ---- SECTION 5:   ----
