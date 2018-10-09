@@ -58,7 +58,7 @@ setwd("/Users/collnell/Dropbox/ConsDB_Input")
 #
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-# polyogn data
+# polygon data
 wdpa.raw.polys <- st_read(dsn = 'WDPA_Aug2018-shapefile/', layer = 'WDPA_Aug2018-shapefile-polygons')
 
 # point data
@@ -161,16 +161,25 @@ for (i in 1:length(ISO3.list)){
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 ## Intersect each ISO3.year with subregional coastline for terrestrial, marine, ABNJ
-ISO3.yr.list<-list.files('WDPA/ISO3_YEAR/')\
-#trans<-read.csv('WDPA/wdpa_transboundary.csv')
+ISO3.yr.list<-list.files('WDPA/ISO3_YEAR/')
 
 ## Break up WDPA by UN subregion
 boundaries<-st_read('EEZ_WVS_layer/EEZv8_WVS_DIS_V3_ALL_final_v7disUNEP') # or EEZv8_WVS_DIS_V3_ALL_final_v7disIPBES
-sub.list<-unique(boundaries$G_UNEP_sub)
 
 EEZ<-boundaries%>%filter(type=='EEZ')%>%st_transform('+proj=moll')
 Land<-boundaries%>%filter(type=='Land')%>%st_transform('+proj=moll')
 ABNJ<-boundaries%>%filter(type=='ABNJ')%>%st_transform('+proj=moll')
+sub.list<-unique(boundaries$G_UNEP_sub)
+
+total_area<-set_units(st_area(eez), km^2)
+sum(total_area, na.rm=TRUE)#2.8945
+
+land_area<-set_units(st_area(land), km^2)
+sum(land_area, na.rm=TRUE) #1.4866
+
+eez_area<-set_units(st_area(water), km^2)
+sum(eez_area, na.rm=TRUE) #1.4079
+
 
 # clean
 rm(boundaries)
@@ -178,47 +187,31 @@ rm(boundaries)
 ISO3.yr.list<-list.files('WDPA/ISO3_YEAR/')
 grep('AUS_2004', ISO3.yr.list)
 #'AUS_2013'
-
-## started at 4 pm
-## intersect each ISO3_YEAR with EEZ boundaries
-for (i in 306:length(ISO3.yr.list)){
-  ISO3.yr.in <- st_read(paste0('WDPA/ISO3_YEAR/', ISO3.yr.list[i]))
-  ISO3_EEZ<-st_intersection(ISO3.yr.in, EEZ)%>%st_buffer(0)
-  subr.list<-unique(ISO3_EEZ$G_UNEP_sub)
-  if (dim(ISO3_EEZ)[1] == 0){
-  } else if (dim(ISO3_EEZ)[1] > 0 & length(subr.list == 1)){
-    st_write(ISO3_EEZ, paste0('WDPA/ISO3_EEZ/EEZ_', ISO3.yr.list[i],'_', subr.list[1]), driver = 'ESRI Shapefile')
-  } else if (dim(ISO3_EEZ)[1] > 0 & length(subr.list > 1)){
-    for (k in 1:length(subr.list)){
-      ISO3_EEZ<-ISO3_EEZ%>%filter(G_UNEP_sub == subr.list[k])%>%st_buffer(0)
-      st_write(ISO3_EEZ, paste0('WDPA/ISO3_EEZ/EEZ_', ISO3.yr.list[i],'_', subr.list[k]), driver = 'ESRI Shapefile') 
-    }
-  }
-}
+ISO3.yr.list[297]
 
 ## intersect each ISO3_YEAR with Land and ABJN - started at 4:30pm from AUS_2004
-for (i in 297:length(ISO3.yr.list)){
+for (i in 306:2999){
   ISO3.yr.in <- st_read(paste0('WDPA/ISO3_YEAR/', ISO3.yr.list[i]))%>%st_buffer(0)
   ISO3_Land<-st_intersection(ISO3.yr.in, Land)%>%st_buffer(0)
   subr.list<-unique(ISO3_Land$G_UNEP_sub)
   if (dim(ISO3_Land)[1] == 0){
   } else if (dim(ISO3_Land)[1] > 0 & length(subr.list == 1)){
-    st_write(ISO3_Land, paste0('WDPA/ISO3_Land/Land_', ISO3.yr.list[i],'_', subr.list[1]), driver = 'ESRI Shapefile', delete_leyer=TRUE)
+    st_write(ISO3_Land, paste0('WDPA/ISO3_Land/Land_', ISO3.yr.list[i],'_', subr.list[1]), driver = 'ESRI Shapefile', delete_layer=TRUE)
   } else if (dim(ISO3_EEZ)[1] > 0 & length(subr.list > 1)){
     for (k in 1:length(subr.list)){
       ISO3_Land<-ISO3_Land%>%filter(G_UNEP_sub == subr.list[k])%>%st_buffer(0)
-      st_write(ISO3_Land, paste0('WDPA/ISO3_Land/Land_', ISO3.yr.list[i],'_', subr.list[k]), driver = 'ESRI Shapefile', delete_leyer=TRUE)
+      st_write(ISO3_Land, paste0('WDPA/ISO3_Land/Land_', ISO3.yr.list[i],'_', subr.list[k]), driver = 'ESRI Shapefile', delete_layer=TRUE)
     }
   }
   ISO3_EEZ<-st_intersection(ISO3.yr.in, EEZ)%>%st_buffer(0)
   subr.list<-unique(ISO3_EEZ$G_UNEP_sub)
   if (dim(ISO3_EEZ)[1] == 0){
   } else if (dim(ISO3_EEZ)[1] > 0 & length(subr.list == 1)){
-    st_write(ISO3_EEZ, paste0('WDPA/ISO3_EEZ/EEZ_', ISO3.yr.list[i],'_', subr.list[1]), driver = 'ESRI Shapefile', delete_leyer=TRUE)
+    st_write(ISO3_EEZ, paste0('WDPA/ISO3_EEZ/EEZ_', ISO3.yr.list[i],'_', subr.list[1]), driver = 'ESRI Shapefile', delete_layer=TRUE)
   } else if (dim(ISO3_EEZ)[1] > 0 & length(subr.list > 1)){
     for (k in 1:length(subr.list)){
       ISO3_EEZ<-ISO3_EEZ%>%filter(G_UNEP_sub == subr.list[k])%>%st_buffer(0)
-      st_write(ISO3_EEZ, paste0('WDPA/ISO3_EEZ/EEZ_', ISO3.yr.list[i],'_', subr.list[k]), driver = 'ESRI Shapefile', delete_leyer=TRUE) 
+      st_write(ISO3_EEZ, paste0('WDPA/ISO3_EEZ/EEZ_', ISO3.yr.list[i],'_', subr.list[k]), driver = 'ESRI Shapefile', delete_layer=TRUE) 
     }
   }
   
@@ -227,16 +220,20 @@ for (i in 297:length(ISO3.yr.list)){
   subr.list<-unique(ISO3_ABNJ$G_UNEP_sub)
   if (dim(ISO3_ABNJ)[1] == 0){
   } else if (dim(ISO3_ABNJ)[1] > 0 & length(subr.list == 1)){
-    st_write(ISO3_ABNJ, paste0('WDPA/ISO3_ABNJ/ABNJ_', ISO3.yr.list[i],'_', subr.list[1]), driver = 'ESRI Shapefile', delete_leyer=TRUE)
+    st_write(ISO3_ABNJ, paste0('WDPA/ISO3_ABNJ/ABNJ_', ISO3.yr.list[i],'_', subr.list[1]), driver = 'ESRI Shapefile', delete_layer=TRUE)
   } else if (dim(ISO3_ABNJ)[1] > 0 & length(subr.list > 1)){
     for (k in 1:length(subr.list)){
       ISO3_ABNJ<-ISO3_ABNJ%>%filter(G_UNEP_sub == subr.list[k])%>%st_buffer(0)
-      st_write(ISO3_ABNJ, paste0('WDPA/ISO3_ABNJ/ABNJ_', ISO3.yr.list[i],'_', subr.list[k]), driver = 'ESRI Shapefile', delete_leyer=TRUE)
+      st_write(ISO3_ABNJ, paste0('WDPA/ISO3_ABNJ/ABNJ_', ISO3.yr.list[i],'_', subr.list[k]), driver = 'ESRI Shapefile', delete_layer=TRUE)
     }
   }
 }
 
-
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#
+# ---- SECTION 5: Intersect with global boundaries  ----
+#
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 # for each subregion, find files with matching subregion
 file.df<-data.frame(files = list.files('WDPA/ISO3_YEAR'))%>% # all files
@@ -255,30 +252,3 @@ isos<-read.csv('ISO3_subregions.csv')%>%transform(ISO3=as.character(ISO3))
 trans<-read.csv('WDPA/wdpa_transboundary.csv')
 head(trans)
 unique(trans$ISO3_multi)
-
-    # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    #
-    # ---- SECTION 5:   ----
-  #
-  # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  
-  ## Aggregate by WDPAID
-  # combines areas that are parcels within larger site
-  # do points and polygons separately to manage file sizes & processing time
-  
-  pts.id<-pts.buff%>%
-    group_by(WDPAID, MARINE, ISO3, STATUS, STATUS_YR, IUCN_CAT, GOV_TYPE, DESIG_ENG)%>%
-    summarize()
-  
-  
-  #
-  # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  #
-  # ---- SECTION 6:  ----
-  #
-  # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  #
-  
-  
-  
-  
