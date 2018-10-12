@@ -8,8 +8,9 @@
 # ---- inputs ----
 #  1) World database on protected areas (WPDA) shapefiles (points and polygons). 
 #     - Source: Accessed in August 2018 from www.protectedplanet.com. 
-#     - Metadata: Manual: https://www.protectedplanet.net/c/wdpa-manual  
-#     - Files: 1_Nov2018/2_FlatDataFiles/ConsDB_Input/WDPA_Aug2018-shapefile
+#     - Manual: https://www.unep-wcmc.org/system/dataset_file_fields/files/000/000/432/original/Manual_FINAL_EN.pdf?1486562872  
+#     - Files: 1_Nov2018/2_FlatDataFiles/ConsDB_Input/WDPA_Aug2018-shapefile  
+#     - Notes: This is an incomplete database of ICCAs. The WDPA contained sites that are recognized by the IUCN definition of protected area, which does not always encapsulate ICCAs. ICCAs that are not government recognized or whose locations are sensitive may not be included in the WDPA. Moreover, whether information on ICCAs is stored in the WDPA is the decision of the local community or indigenous people.  
 #
 # ---- outputs ----
 #  1) ICCA_by_year.shp - Polygon shapefile of state recognized ICCA sites documented in WDPA aggregated by year designated    
@@ -17,7 +18,6 @@
 # 
 # ---- code sections ----
 #
-#  
 #  1) Load libraries  
 #  2) Clean WDPA data and filter to ICCAs
 #  3) Aggregate ICCA areas
@@ -28,7 +28,7 @@
 # ---- SECTION 1: Load libraries ----
 #
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-#
+
 
 library(sf)
 library(units)
@@ -54,10 +54,10 @@ wdpa.raw.pts <- st_read(dsn = 'WDPA_Aug2018-shapefile/', layer ='WDPA_Aug2018-sh
 # Filter to ICCAs
 ICCA.polys<-wdpa.raw.polys%>%
   filter(GOV_TYPE %in% c('Indigenous peoples', 'Local communities'))%>%
-  select(WDPAID, NAME, DESIG_ENG, STATUS_YR, ISO3)%>%
+  select(WDPAID, NAME, DESIG_ENG, STATUS_YR, ISO3, REP_AREA)%>%
   st_transform('+proj=moll')
 
-ICCA.pts<-pas.pts%>%
+ICCA.pts<-wdpa.raw.pts%>%
   filter(GOV_TYPE %in% c('Indigenous peoples', 'Local communities'))%>%
   filter(REP_AREA > 0)%>%
   select(WDPAID, NAME, DESIG_ENG, STATUS_YR, ISO3, REP_AREA)%>%
@@ -67,6 +67,9 @@ ICCA.pts<-pas.pts%>%
 # Use reported area to give circular geodesic point buffer
 ICCA.pts.buff <- st_buffer(ICCA.pts, dist = set_units(sqrt(ICCA.pts$REP_AREA/pi), 'km')) # radius for buffer in km2
 
+# clean environment
+rm(wdpa.raw.polys)
+rm(wdpa.raw.pts)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #
@@ -75,13 +78,18 @@ ICCA.pts.buff <- st_buffer(ICCA.pts, dist = set_units(sqrt(ICCA.pts$REP_AREA/pi)
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 # combine into single feature
-ICCA.combine<-do.call(rbind, list(ICCA.pts.buff, ICCA.polys))
+ICCA.combine<-do.call(rbind, list(ICCA.pts.buff, ICCA.polys))%>%st_buffer(0)
 
-# Spatially aggregate each year
+# Spatially aggregate each year - eliminates overlapping areas
 ICCA.year<-ICCA.combine%>%group_by(STATUS_YR)%>%summarize()%>%st_buffer(0)
 
 # save shapefile - ICCAs aggregated by year 
 st_write(ICCA.year, 'ICCA_by_year', driver='ESRI Shapefile', delete_layer=TRUE)
+
+# clean up
+rm(ICCA.combine)
+rm(ICCA.pts.buff)
+rm(ICCA.polys)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #
@@ -92,13 +100,17 @@ st_write(ICCA.year, 'ICCA_by_year', driver='ESRI Shapefile', delete_layer=TRUE)
 ICCA.area<-ICCA.year%>%mutate(AREA_YR = set_units(st_area(.), 'ha'))
 
 # calculate coverage in M ha and as a percent of estimated global extent of ICCAs
-ICCA.df<-icca.area%>%
+ICCA.df<-ICCA.area%>%
   st_set_geometry(NULL)%>%
   transform(AREA_HA=as.numeric(AREA_YR))%>%
   mutate(AREA_HA_CUM = cumsum(AREA_HA), AREA_MHA_TIME = AREA_HA_CUM/1000000)%>%
-  mutate(AREA_EST_HA_MIN = 400000000, AREA_EST_HA_MAX = 800000000,
-         ICCA_PERCENT_EST_MIN = 100*(AREA_HA_CUM/AREA_EST_HA_MIN), ICCA_PERCENT_EST_MAX = 100*(AREA_HA_CUM/AREA_EST_HA_MAX))
-str(ICCA.df)
+  mutate(AREA_EST_MHA_MIN = 400, AREA_EST_MHA_MAX = 800)%>%
+  mutate(ICCA_PERCENT_EST = 100*(AREA_MHA_TIME/((AREA_EST_MHA_MIN+AREA_EST_MHA_MIN)/2)), 
+         ICCA_PERCENT_LOW = 100*(AREA_MHA_TIME/AREA_EST_MHA_MAX), ICCA_PERCENT_HI = 100*(AREA_MHA_TIME/AREA_EST_MHA_MIN))
 
 write.csv(ICCA.df, 'ICCA_timeseries.csv', row.names=FALSE)
 
+# clean up
+rm(ICCA.year)
+rm(ICCA.area)
+rm(ICCA.df)
