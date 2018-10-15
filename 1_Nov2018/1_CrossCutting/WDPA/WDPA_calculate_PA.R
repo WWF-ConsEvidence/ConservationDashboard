@@ -164,6 +164,7 @@ clean_wdpa('WDPA_Aug2018-shapefile/', type = 'UNEP')
 
 ## outputs
 # WDPA/ISO3_YEAR/ - folder is populated with files corresponding to each unique ISO3 code, aggregated at year from 0-present
+
 breakup_wdpa<-function(wdpa.combo){
   ## reduce size of polygon file
   wdpa.small<-wdpa.combo%>%select(WDPAID, ISO3, STATUS_YR)
@@ -173,40 +174,31 @@ breakup_wdpa<-function(wdpa.combo){
   iso3<-unique(wdpa.small$ISO3)
   
   for (i in 1:length(iso3)){ 
+    
     # filter to sites in given ISO3, aggregate by WDPAID
     ISO3.shp<-wdpa.small%>%filter(ISO3 == iso3[i])%>%group_by(WDPAID, ISO3, STATUS_YR)%>%summarize()
-    
-    # write file for ISO3
-    st_write(ISO3.shp,  paste0('WDPA/ISO3_ID/', iso3[i]), driver='ESRI Shapefile', delete_layer=TRUE)
-  }
-  rm(wdpa.small)
-  
-  ## aggregate at year
-  ISO3.list<-list.files('WDPA/ISO3_ID')
-  
-  ## For every ISO3, read in, filter, and aggregate by STATUS_YR
-  for (i in 1:length(ISO3.list)){
-    ISO3.in<-st_read(paste0('WDPA/ISO3_ID/',ISO3.list[i]))
-    year.list<-unique(ISO3.in$STATUS_YR)
+    year.list<-unique(ISO3.shp$STATUS_YR)
     
     for (j in 1:length(year.list)){
-      ISO3.year<-ISO3.in%>%
+      
+      ## filter, and aggregate by STATUS_YR
+      ISO3.year<-ISO3.shp%>%
         filter(STATUS_YR == year.list[j])%>%
         st_buffer(0)%>%
         group_by(ISO3, STATUS_YR)%>%
         summarize()%>%
         st_buffer(0);beep('ping')
-      st_write(ISO3.year, paste0('WDPA/ISO3_YEAR/',ISO3.list[i],'_', year.list[j]), delete_layer=TRUE, driver='ESRI Shapefile')
+      st_write(ISO3.year, paste0('WDPA/ISO3_YEAR/',iso3[i],'_', year.list[j]), delete_layer=TRUE, driver='ESRI Shapefile')
     }
-    
   }
-  
+  rm(wdpa.small)
 }
 
 # run 
 breakup_wdpa(wdpa.combo)
 
-# Processing time = ~5 hours
+# Processing time = ~4 hours
+
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #
@@ -229,9 +221,11 @@ intersect_wdpa<-function(ISO3.yr.list, start = 1, stop = length(ISO3.yr.list)){
   Land<-st_read('EEZ_WVS_layer/Land_UNEP')
   ABNJ<-st_read('EEZ_WVS_layer/ABNJ_UNEP')
   
-  ## intersect each ISO3_YEAR with boundaries
-  # create separate files for each piece for faster processing time
   for (i in start:stop){
+    
+    ## intersect each ISO3_YEAR with boundaries
+    # create separate files for each piece for faster processing time
+    
     #LAND
     ISO3.yr.in <- st_read(paste0('WDPA/ISO3_YEAR/', ISO3.yr.list[i]))%>%st_buffer(0)
     ISO3_Land<-st_intersection(ISO3.yr.in, Land)%>%st_buffer(0)
@@ -245,7 +239,7 @@ intersect_wdpa<-function(ISO3.yr.list, start = 1, stop = length(ISO3.yr.list)){
         ISO3_Land<-ISO3_Land%>%filter(G_UNEP_sub == subr.list[k])%>%st_buffer(0)
         st_write(ISO3_Land, paste0('WDPA/ISO3_Land/Land_', ISO3.yr.list[i],'_', subr.list[k]), driver = 'ESRI Shapefile', delete_layer=TRUE)
       }
-    }#Land end
+    }
     
     #EEZ
     ISO3_EEZ<-st_intersection(ISO3.yr.in, EEZ)%>%st_buffer(0)
@@ -259,7 +253,7 @@ intersect_wdpa<-function(ISO3.yr.list, start = 1, stop = length(ISO3.yr.list)){
         ISO3_EEZ<-ISO3_EEZ%>%filter(G_UNEP_sub == subr.list[k])%>%st_buffer(0)
         st_write(ISO3_EEZ, paste0('WDPA/ISO3_EEZ/EEZ_', ISO3.yr.list[i],'_', subr.list[k]), driver = 'ESRI Shapefile', delete_layer=TRUE) 
       }
-    }#EEZ end
+    }
     
     # ABNJ
     ISO3_ABNJ<-st_intersection(ISO3.yr.in, ABNJ)%>%st_buffer(0)
@@ -273,14 +267,14 @@ intersect_wdpa<-function(ISO3.yr.list, start = 1, stop = length(ISO3.yr.list)){
         ISO3_ABNJ<-ISO3_ABNJ%>%filter(G_UNEP_sub == subr.list[k])%>%st_buffer(0)
         st_write(ISO3_ABNJ, paste0('WDPA/ISO3_ABNJ/ABNJ_', ISO3.yr.list[i],'_', subr.list[k]), driver = 'ESRI Shapefile', delete_layer=TRUE)
       }
-    } #ABNJ end
-  } # close loop
-} # end function
+    }
+  } 
+} 
 
 # run
-intersect_wdpa(ISO3.yr.list, start=grep('USA_1935', ISO3.yr.list), stop=length(ISO3.yr.list)) # started with USA_1935 at 10 pm
+intersect_wdpa(ISO3.yr.list, start=grep('USA_1935', ISO3.yr.list), stop=length(ISO3.yr.list)) #
 
-# Processing time: 2 days
+# Processing time: 2-3 days
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++x
 #
@@ -288,23 +282,82 @@ intersect_wdpa(ISO3.yr.list, start=grep('USA_1935', ISO3.yr.list), stop=length(I
 #
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-# for each subregion, find files with matching subregion
-file.df<-data.frame(files = list.files('WDPA/ISO3_YEAR'))%>% # all files
-  separate(file, '_', into=c('ISO3', 'YEAR'), remove=FALSE)%>%
-  left_join(isos.in, by=c('ISO3'= 'ISO3_multi'))# match subregion
+## read in file names by subregion
+EEZ.files<-list.files('WDPA/ISO3_EEZ/') # all files
+EEZ.subs<-unique(str_split(EEZ.files, '_', simplify=TRUE)[,4]) # subregion names
+EEZ.subs[9]
 
-files.sub<-file.df%>%filter(GEO.sub.region )
+out.df<-NULL
 
-year.subs.fast<-grep('Central and Western Europe', list.files('WDPA/year_subregion'), value=TRUE) # find list of wdpa files
+for (k in 10:length(EEZ.subs)){
+  EEZ.sub.files<-grep(EEZ.subs[k], EEZ.files, value=TRUE, fixed=TRUE) # subregion files
+  EEZ.sub.years<-unique(str_split(EEZ.sub.files, '_', simplify=TRUE)[,3]) # subregion years
+  
+  for (m in 1:length(EEZ.sub.years)){
+    # select files for given year
+    year.files<-grep(paste0('_',EEZ.sub.years[m],'_'), EEZ.sub.files, value=TRUE)
+    
+    # read all subregion files in by year & aggregate
+    EEZ.in<-do.call(rbind, lapply(c(year.files), function(x) st_read(paste0('WDPA/ISO3_EEZ/', x))))%>%
+      group_by(G_UNEP_sub, STATUS_YR)%>%
+      summarize()%>%
+      st_buffer(0)
+    sub.df<-data.frame(subregion = EEZ.in$G_UNEP_sub,
+                       type = 'EEZ',
+                       year = EEZ.in$STATUS_YR,
+                       AREA_HA = set_units(st_area(EEZ.in), ha),
+                       AREA_KM2 = set_units(st_area(EEZ.in), km2),
+                       AREA_MHA = set_units(st_area(EEZ.in), ha)/1000000)
+    
+    st_write(EEZ.in, paste0('WDPA/SUB_YEAR/EEZ/', EEZ.sub.years[m],'_', EEZ.subs[k]), driver='ESRI Shapefile', delete_layer=TRUE)
+    out.df<-rbind(sub.df, out.df)
+  }
+}
+length(unique(out.df$subregion))
+
+write.csv(out.df, 'WDPA_EEZ_area.csv', row.names=FALSE)
+
+##LAND
+Land.files<-str_split(list.files('WDPA/ISO3_Land/'), '_', simplify=TRUE)[,4]
+
+## read in file names by subregion
+Land.files<-list.files('WDPA/ISO3_Land/') # all files
+Land.subs<-unique(str_split(Land.files, '_', simplify=TRUE)[,4]) # subregion names
+Land.subs[4]
+
+out.df<-NULL
+
+for (k in 4:length(Land.subs)){
+  Land.sub.files<-grep(Land.subs[k], Land.files, value=TRUE, fixed=TRUE) # subregion files
+  Land.sub.years<-unique(str_split(Land.sub.files, '_', simplify=TRUE)[,3]) # subregion years
+  
+  for (m in 1:length(Land.sub.years)){
+    # select files for given year
+    year.files<-grep(paste0('_',Land.sub.years[m],'_'), Land.sub.files, value=TRUE)
+    
+    # read all subregion files in by year & aggregate
+    Land.in<-do.call(rbind, lapply(c(year.files), function(x) st_read(paste0('WDPA/ISO3_Land/', x))))%>%
+      group_by(G_UNEP_sub, STATUS_YR)%>%
+      summarize()%>%
+      st_buffer(0)
+    sub.df<-data.frame(subregion = Land.in$G_UNEP_sub,
+                       type = 'Land',
+                       year = Land.in$STATUS_YR,
+                       AREA_HA = set_units(st_area(Land.in), ha),
+                       AREA_KM2 = set_units(st_area(Land.in), km2),
+                       AREA_MHA = set_units(st_area(Land.in), ha)/1000000)
+    
+    st_write(Land.in, paste0('WDPA/SUB_YEAR/Land/', Land.sub.years[m],'_', Land.subs[k]), driver='ESRI Shapefile', delete_layer=TRUE)
+    out.df<-rbind(sub.df, out.df)
+  }
+}
+length(unique(out.df$subregion))
+
+write.csv(out.df, 'WDPA_Land_area.csv', row.names=FALSE)
+
+ABNJ.files<-str_split(list.files('WDPA/ISO3_ABNJ/'), simplify=TRUE)[,4]
 
 
-## deal with transboundary sites
-# all the ISO3s of PAs to intersect, some have multiple ISO3 due to transboundary sites
-isos<-read.csv('ISO3_subregions.csv')%>%transform(ISO3=as.character(ISO3))
-
-trans<-read.csv('WDPA/wdpa_transboundary.csv')
-head(trans)
-unique(trans$ISO3_multi)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #
