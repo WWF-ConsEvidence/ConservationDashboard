@@ -93,7 +93,7 @@ clean_KBA<-function(KBA.filepath){
 KBA.filepath<-'KBA/KBAsGlobal_2018_01/'
 clean_KBA(KBA.filepath)
 
-# Processing time: 25 min - start at 13:25
+# Processing time: 25 min 
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #
@@ -103,45 +103,92 @@ clean_KBA(KBA.filepath)
 
 ## aggregate KBA at subregional level by type (Land, EEZ, ABNJ)
 KBA.in<-st_read('KBA/KBA_poly_pts')
-glimpse(KBA.in)
 
-intersect_KBA<-function(KBA.in){
+intersect_KBA<-function(KBA.in, type = 'UNEP'){
+  # repair broken geometries
+  KBA.in<-KBA.in%>%st_buffer(0)
+  
   # Divide into marine, land and ABNJ boundaries
-  EEZ<-st_read('EEZ_WVS_layer/EEZ_UNEP')
-  Land<-st_read('EEZ_WVS_layer/Land_UNEP')
-  ABNJ<-st_read('EEZ_WVS_layer/ABNJ_UNEP')
+  EEZ<-st_read(paste0('EEZ_WVS_layer/EEZ_',type))%>%st_buffer(0)
+  Land<-st_read(paste0('EEZ_WVS_layer/Land_',type))%>%st_buffer(0)
+  ABNJ<-st_read(paste0('EEZ_WVS_layer/ABNJ_',type))%>%st_buffer(0)
   
   # intersect with global boundaries to delineate Land, EEZ, ABNJ, and associate KBAs with global subregions
-  KBA.EEZ<-KBA.in%>%st_intersection(EEZ)%>%st_buffer(0)
-  EEZ.sub<-KBA.EEZ%>%group_by(G_UNEP_sub)%>%summarize()
+  KBA.EEZ<-st_intersection(KBA.in, EEZ)%>%st_buffer(0)
+  EEZ.sub<-KBA.EEZ%>%group_by(G_UNEP_sub)%>%summarize()%>%st_buffer(0)
   EEZ.sub.list<-unique(EEZ.sub$G_UNEP_sub)
   
   for (i in 1:length(EEZ.sub.list)){
     EEZ.filt<-EEZ.sub%>%filter(G_UNEP_sub == EEZ.sub.list[i])%>%st_buffer(0)
-    st_write(KBA.EEZ, paste0('KBA/KBA_EEZ_',EEZ.sub.list[i]), driver='ESRI Shapefile')
+    st_write(KBA.EEZ, paste0('KBA/subregion/KBA_EEZ_',EEZ.sub.list[i]), driver='ESRI Shapefile')
   }
   
-  KBA.Land<-KBA.in%>%st_intersection(Land)%>%st_buffer(0)
-  Land.sub<-KBA.Land%>%group_by(G_UNEP_sub)%>%summarize()
+  KBA.Land<-st_intersection(KBA.in, Land)%>%st_buffer(0)
+  Land.sub<-KBA.Land%>%group_by(G_UNEP_sub)%>%summarize()%>%st_buffer(0)
   Land.sub.list<-unique(Land.sub$G_UNEP_sub)
   
   for (i in 1:length(Land.sub.list)){
     Land.filt<-Land.sub%>%filter(G_UNEP_sub == Land.sub.list[i])%>%st_buffer(0)
-    st_write(KBA.Land, paste0('KBA/KBA_Land_',Land.sub.list[i]), driver='ESRI Shapefile')
+    st_write(KBA.Land, paste0('KBA/subregion/KBA_Land_',Land.sub.list[i]), driver='ESRI Shapefile')
   }
   
-  KBA.ABNJ<-KBA.in%>%st_intersection(ABNJ)%>%st_buffer(0)
-  ABNJ.sub<-KBA.ABNJ%>%group_by(G_UNEP_sub)%>%summarize()
+  KBA.ABNJ<-st_intersection(KBA.in, ABNJ)%>%st_buffer(0)
+  ABNJ.sub<-KBA.ABNJ%>%group_by(G_UNEP_sub)%>%summarize()%>%st_buffer(0)
   ABNJ.sub.list<-unique(ABNJ.sub$G_UNEP_sub)
   
   for (i in 1:length(ABNJ.sub.list)){
     ABNJ.filt<-ABNJ.sub%>%filter(G_UNEP_sub == ABNJ.sub.list[i])%>%st_buffer(0)
-    st_write(KBA.ABNJ, paste0('KBA/KBA_ABNJ_',ABNJ.sub.list[i]), driver='ESRI Shapefile')
+    st_write(KBA.ABNJ, paste0('KBA/subregion/KBA_ABNJ_',ABNJ.sub.list[i]), driver='ESRI Shapefile')
   }
 
   
 }
+intersect_KBA(KBA.in) #started at 3 pm
 
+# which files are missing?
+# ABNJ & Land - Northern Africa, Southern Africa, Western Africa, Western Indian Ocaen, South Asia, South East Asia, South Pacific, Western Europe, South America, 
+
+intersect_KBA<-function(KBA.in, type = 'UNEP'){
+  # repair broken geometries
+  KBA.in<-KBA.in%>%st_buffer(0)
+  
+  # Divide into marine, land and ABNJ boundaries
+  EEZ<-st_read(paste0('EEZ_WVS_layer/EEZ_',type))%>%st_buffer(0)
+  Land<-st_read(paste0('EEZ_WVS_layer/Land_',type))%>%st_buffer(0)
+  ABNJ<-st_read(paste0('EEZ_WVS_layer/ABNJ_',type))%>%st_buffer(0)
+  
+  # intersect with global boundaries to delineate Land, EEZ, ABNJ, and associate KBAs with global subregions
+  KBA.EEZ<-st_intersection(KBA.in, EEZ)%>%st_buffer(0)
+  EEZ.sub<-KBA.EEZ%>%group_by(G_UNEP_sub)%>%summarize()%>%st_buffer(0)
+  EEZ.sub.list<-unique(EEZ.sub$G_UNEP_sub)
+  
+  for (i in 1:length(EEZ.sub.list)){
+    EEZ.filt<-EEZ.sub%>%filter(G_UNEP_sub == EEZ.sub.list[i])%>%st_buffer(0)
+    st_write(KBA.EEZ, paste0('KBA/subregion/KBA_EEZ_',EEZ.sub.list[i]), driver='ESRI Shapefile')
+  }
+  
+  KBA.Land<-st_intersection(KBA.in, Land)%>%st_buffer(0)
+  Land.sub<-KBA.Land%>%group_by(G_UNEP_sub)%>%summarize()%>%st_buffer(0)
+  Land.sub.list<-unique(Land.sub$G_UNEP_sub)
+  
+  for (i in 1:length(Land.sub.list)){
+    Land.filt<-Land.sub%>%filter(G_UNEP_sub == Land.sub.list[i])%>%st_buffer(0)
+    st_write(KBA.Land, paste0('KBA/subregion/KBA_Land_',Land.sub.list[i]), driver='ESRI Shapefile')
+  }
+  
+  KBA.ABNJ<-st_intersection(KBA.in, ABNJ)%>%st_buffer(0)
+  ABNJ.sub<-KBA.ABNJ%>%group_by(G_UNEP_sub)%>%summarize()%>%st_buffer(0)
+  ABNJ.sub.list<-unique(ABNJ.sub$G_UNEP_sub)
+  
+  for (i in 1:length(ABNJ.sub.list)){
+    ABNJ.filt<-ABNJ.sub%>%filter(G_UNEP_sub == ABNJ.sub.list[i])%>%st_buffer(0)
+    st_write(KBA.ABNJ, paste0('KBA/subregion/KBA_ABNJ_',ABNJ.sub.list[i]), driver='ESRI Shapefile')
+  }
+  
+  
+}
+
+#############
 ## for a given list of years, intersects protected areas with KBA boundaries
 # calculates the total area of intersection & saves output shapefiles and csv of areas
 
