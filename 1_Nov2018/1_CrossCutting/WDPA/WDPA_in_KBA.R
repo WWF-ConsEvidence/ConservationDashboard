@@ -50,7 +50,7 @@ library(tidyr)
 library(reshape2)
 
 # set working directory to input data '/ConsDB_Input/'
-setwd("/Users/colleennell/Dropbox/ConsDB_Input")
+setwd("/Users/collnell/Dropbox/ConsDB_Input")
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #
@@ -97,7 +97,7 @@ clean_KBA(KBA.filepath)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #
-# ---- SECTION 3: Intersect WDPA with KBAs  ----
+# ---- SECTION 3: Intersect KBAs with global boundaries  ----
 #
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -143,49 +143,23 @@ intersect_KBA<-function(KBA.in, type = 'UNEP'){
 
   
 }
-intersect_KBA(KBA.in) #started at 3 pm
+intersect_KBA(KBA.in) 
 
-# which files are missing?
-# ABNJ & Land - Northern Africa, Southern Africa, Western Africa, Western Indian Ocaen, South Asia, South East Asia, South Pacific, Western Europe, South America, 
+# Processing time: 5 hours
 
-intersecting_KBA<-function(KBA.in, type = 'UNEP'){
-  # repair broken geometries
-  KBA.in<-KBA.in%>%st_buffer(0)
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#
+# ---- SECTION 4: Intersect WDPA with KBAs  ----
+#
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-  Land<-st_read(paste0('EEZ_WVS_layer/Land_',type))%>%st_buffer(0)
-  ABNJ<-st_read(paste0('EEZ_WVS_layer/ABNJ_',type))%>%st_buffer(0)
-
-  KBA.Land<-st_intersection(KBA.in, Land)%>%st_buffer(0)
-  Land.sub<-KBA.Land%>%group_by(G_UNEP_sub)%>%summarize()%>%st_buffer(0)
-  Land.sub.list<-unique(Land.sub$G_UNEP_sub)
-  
-  for (i in 1:length(Land.sub.list)){
-    Land.filt<-Land.sub%>%filter(G_UNEP_sub == Land.sub.list[i])%>%st_buffer(0)
-    st_write(KBA.Land, paste0('KBA/subregion/KBA_Land_',Land.sub.list[i]), driver='ESRI Shapefile')
-  }
-  
-  KBA.ABNJ<-st_intersection(KBA.in, ABNJ)%>%st_buffer(0)
-  ABNJ.sub<-KBA.ABNJ%>%group_by(G_UNEP_sub)%>%summarize()%>%st_buffer(0)
-  ABNJ.sub.list<-unique(ABNJ.sub$G_UNEP_sub)
-  
-  for (i in 1:length(ABNJ.sub.list)){
-    ABNJ.filt<-ABNJ.sub%>%filter(G_UNEP_sub == ABNJ.sub.list[i])%>%st_buffer(0)
-    st_write(KBA.ABNJ, paste0('KBA/subregion/KBA_ABNJ_',ABNJ.sub.list[i]), driver='ESRI Shapefile')
-  }
-  
-  
-}
-
-intersecting_KBA(KBA.in)
-
-#############
-## for a given list of years, intersects protected areas with KBA boundaries
-# calculates the total area of intersection & saves output shapefiles and csv of areas
+## for each year in the WDPA, intersect with KBAs to determine the total area of WDPAs in KBA
+# done at the subregional level
 
 year.list<-as.character(c(2000, 2005, 2006, 2007)) # modify list to desired years
 year.list
 
-intersect_KBA<-function(year.list){
+WDPA_in_KBA<-function(year.list){
   
   # filter KBA data to subregion
   kba.subregion<-st_read('WDPA/KBA_WDPA/KBA_subregion') # read in kba data aggregated at subregional level
@@ -223,7 +197,7 @@ intersect_KBA<-function(year.list){
   }
 }
 
-kba_cweuro(year.list)
+
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #

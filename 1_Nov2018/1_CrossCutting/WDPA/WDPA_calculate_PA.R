@@ -282,82 +282,119 @@ intersect_wdpa(ISO3.yr.list, start=grep('USA_1935', ISO3.yr.list), stop=length(I
 #
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-## read in file names by subregion
-EEZ.files<-list.files('WDPA/ISO3_EEZ/') # all files
-EEZ.subs<-unique(str_split(EEZ.files, '_', simplify=TRUE)[,4]) # subregion names
-EEZ.subs[9]
+## inputs: list of file names for land, eez, and abnj
+Land.files<-list.files('WDPA/ISO3_Land/') # land files
+EEZ.files<-list.files('WDPA/ISO3_EEZ/') # marine files
+ABNJ.files<-list.files('WDPA/ISO3_ABNJ/') # abnj files
 
-out.df<-NULL
-
-for (k in 10:length(EEZ.subs)){
-  EEZ.sub.files<-grep(EEZ.subs[k], EEZ.files, value=TRUE, fixed=TRUE) # subregion files
-  EEZ.sub.years<-unique(str_split(EEZ.sub.files, '_', simplify=TRUE)[,3]) # subregion years
+aggregate_WDPA<-function(EEZ.files, Land.files, ABNJ.files){
   
-  for (m in 1:length(EEZ.sub.years)){
-    # select files for given year
-    year.files<-grep(paste0('_',EEZ.sub.years[m],'_'), EEZ.sub.files, value=TRUE)
-    
-    # read all subregion files in by year & aggregate
-    EEZ.in<-do.call(rbind, lapply(c(year.files), function(x) st_read(paste0('WDPA/ISO3_EEZ/', x))))%>%
-      group_by(G_UNEP_sub, STATUS_YR)%>%
-      summarize()%>%
-      st_buffer(0)
-    sub.df<-data.frame(subregion = EEZ.in$G_UNEP_sub,
-                       type = 'EEZ',
-                       year = EEZ.in$STATUS_YR,
-                       AREA_HA = set_units(st_area(EEZ.in), ha),
-                       AREA_KM2 = set_units(st_area(EEZ.in), km2),
-                       AREA_MHA = set_units(st_area(EEZ.in), ha)/1000000)
-    
-    st_write(EEZ.in, paste0('WDPA/SUB_YEAR/EEZ/', EEZ.sub.years[m],'_', EEZ.subs[k]), driver='ESRI Shapefile', delete_layer=TRUE)
-    out.df<-rbind(sub.df, out.df)
-  }
-}
-length(unique(out.df$subregion))
-
-write.csv(out.df, 'WDPA_EEZ_area.csv', row.names=FALSE)
-
-##LAND
-Land.files<-str_split(list.files('WDPA/ISO3_Land/'), '_', simplify=TRUE)[,4]
-
-## read in file names by subregion
-Land.files<-list.files('WDPA/ISO3_Land/') # all files
-Land.subs<-unique(str_split(Land.files, '_', simplify=TRUE)[,4]) # subregion names
-Land.subs[4]
-
-out.df<-NULL
-
-for (k in 4:length(Land.subs)){
-  Land.sub.files<-grep(Land.subs[k], Land.files, value=TRUE, fixed=TRUE) # subregion files
-  Land.sub.years<-unique(str_split(Land.sub.files, '_', simplify=TRUE)[,3]) # subregion years
   
-  for (m in 1:length(Land.sub.years)){
-    # select files for given year
-    year.files<-grep(paste0('_',Land.sub.years[m],'_'), Land.sub.files, value=TRUE)
+  ##LAND
+  ## read in file names by subregion
+  Land.subs<-unique(str_split(Land.files, '_', simplify=TRUE)[,4]) # subregion names
+  Land.subs[4]
+  
+  out.df<-NULL
+  
+  for (k in 1:length(Land.subs)){
+    Land.sub.files<-grep(Land.subs[k], Land.files, value=TRUE, fixed=TRUE) # subregion files
+    Land.sub.years<-unique(str_split(Land.sub.files, '_', simplify=TRUE)[,3]) # subregion years
     
-    # read all subregion files in by year & aggregate
-    Land.in<-do.call(rbind, lapply(c(year.files), function(x) st_read(paste0('WDPA/ISO3_Land/', x))))%>%
-      group_by(G_UNEP_sub, STATUS_YR)%>%
-      summarize()%>%
-      st_buffer(0)
-    sub.df<-data.frame(subregion = Land.in$G_UNEP_sub,
-                       type = 'Land',
-                       year = Land.in$STATUS_YR,
-                       AREA_HA = set_units(st_area(Land.in), ha),
-                       AREA_KM2 = set_units(st_area(Land.in), km2),
-                       AREA_MHA = set_units(st_area(Land.in), ha)/1000000)
-    
-    st_write(Land.in, paste0('WDPA/SUB_YEAR/Land/', Land.sub.years[m],'_', Land.subs[k]), driver='ESRI Shapefile', delete_layer=TRUE)
-    out.df<-rbind(sub.df, out.df)
+    for (m in 1:length(Land.sub.years)){
+      # select files for given year
+      year.files<-grep(paste0('_',Land.sub.years[m],'_'), Land.sub.files, value=TRUE)
+      
+      # read all subregion files in by year & aggregate
+      Land.in<-do.call(rbind, lapply(c(year.files), function(x) st_read(paste0('WDPA/ISO3_Land/', x))))%>%
+        group_by(G_UNEP_sub, STATUS_YR)%>%
+        summarize()%>%
+        st_buffer(0)
+      sub.df<-data.frame(subregion = Land.in$G_UNEP_sub,
+                         type = 'Land',
+                         year = Land.in$STATUS_YR,
+                         AREA_HA = set_units(st_area(Land.in), ha),
+                         AREA_KM2 = set_units(st_area(Land.in), km2),
+                         AREA_MHA = set_units(st_area(Land.in), ha)/1000000)
+      
+      st_write(Land.in, paste0('WDPA/SUB_YEAR/Land/', Land.sub.years[m],'_', Land.subs[k]), driver='ESRI Shapefile', delete_layer=TRUE)
+      out.df<-rbind(sub.df, out.df)
+    }
   }
+  write.csv(out.df, 'WDPA_Land_area.csv', row.names=FALSE)
+  
+  ## read in file names by subregion
+  EEZ.subs<-unique(str_split(EEZ.files, '_', simplify=TRUE)[,4]) # subregion names
+  EEZ.subs[9]
+  
+  out.df<-NULL
+  
+  for (k in 10:length(EEZ.subs)){
+    EEZ.sub.files<-grep(EEZ.subs[k], EEZ.files, value=TRUE, fixed=TRUE) # subregion files
+    EEZ.sub.years<-unique(str_split(EEZ.sub.files, '_', simplify=TRUE)[,3]) # subregion years
+    
+    for (m in 1:length(EEZ.sub.years)){
+      # select files for given year
+      year.files<-grep(paste0('_',EEZ.sub.years[m],'_'), EEZ.sub.files, value=TRUE)
+      
+      # read all subregion files in by year & aggregate
+      EEZ.in<-do.call(rbind, lapply(c(year.files), function(x) st_read(paste0('WDPA/ISO3_EEZ/', x))))%>%
+        group_by(G_UNEP_sub, STATUS_YR)%>%
+        summarize()%>%
+        st_buffer(0)
+      sub.df<-data.frame(subregion = EEZ.in$G_UNEP_sub,
+                         type = 'EEZ',
+                         year = EEZ.in$STATUS_YR,
+                         AREA_HA = set_units(st_area(EEZ.in), ha),
+                         AREA_KM2 = set_units(st_area(EEZ.in), km2),
+                         AREA_MHA = set_units(st_area(EEZ.in), ha)/1000000)
+      
+      st_write(EEZ.in, paste0('WDPA/SUB_YEAR/EEZ/', EEZ.sub.years[m],'_', EEZ.subs[k]), driver='ESRI Shapefile', delete_layer=TRUE)
+      out.df<-rbind(sub.df, out.df)
+    }
+  }
+  
+  write.csv(out.df, 'WDPA_EEZ_area.csv', row.names=FALSE)
+  
+  ## ABNJ
+  ## read in file names by subregion
+  ABNJ.subs<-unique(str_split(ABNJ.files, '_', simplify=TRUE)[,4]) # subregion names
+  
+  out.df<-NULL
+  
+  for (k in 1:length(ABNJ.subs)){
+    ABNJ.sub.files<-grep(ABNJ.subs[k], ABNJ.files, value=TRUE, fixed=TRUE) # subregion files
+    ABNJ.sub.years<-unique(str_split(ABNJ.sub.files, '_', simplify=TRUE)[,3]) # subregion years
+    
+    for (m in 1:length(ABNJ.sub.years)){
+      # select files for given year
+      year.files<-grep(paste0('_',ABNJ.sub.years[m],'_'), ABNJ.sub.files, value=TRUE)
+      
+      # read all subregion files in by year & aggregate
+      ABNJ.in<-do.call(rbind, lapply(c(year.files), function(x) st_read(paste0('WDPA/ISO3_ABNJ/', x))))%>%
+        group_by(G_UNEP_sub, STATUS_YR)%>%
+        summarize()%>%
+        st_buffer(0)
+      sub.df<-data.frame(subregion = ABNJ.in$G_UNEP_sub,
+                         type = 'ABNJ',
+                         year = ABNJ.in$STATUS_YR,
+                         AREA_HA = set_units(st_area(ABNJ.in), ha),
+                         AREA_KM2 = set_units(st_area(ABNJ.in), km2),
+                         AREA_MHA = set_units(st_area(ABNJ.in), ha)/1000000)
+      
+      st_write(ABNJ.in, paste0('WDPA/SUB_YEAR/ABNJ/', ABNJ.sub.years[m],'_', ABNJ.subs[k]), driver='ESRI Shapefile', delete_layer=TRUE)
+      out.df<-rbind(sub.df, out.df)
+    }
+  }
+  write.csv(out.df, 'WDPA_ABNJ_area.csv', row.names=FALSE)
+  
 }
-length(unique(out.df$subregion))
 
-write.csv(out.df, 'WDPA_Land_area.csv', row.names=FALSE)
+## outputs
+# shapefiles for each year x subregion under terrestrial, marine and ABNJ delineations
+# csv - area calculations for each year x subregion; separate for land, marine and ABNJ
 
-ABNJ.files<-str_split(list.files('WDPA/ISO3_ABNJ/'), simplify=TRUE)[,4]
-
-
+## Processing time: 6 hours
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #
