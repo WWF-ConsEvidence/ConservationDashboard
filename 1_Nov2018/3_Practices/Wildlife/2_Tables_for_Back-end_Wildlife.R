@@ -170,7 +170,7 @@ Fact_Context_Response_Wildlife_B <-
   transmute(Year_Key=STATUS_YR,
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],length(STATUS_YR)),
             Indicator_Type_Key=rep(Dim_Context_Response_Wildlife_B$Indicator_Type_Key,length(STATUS_YR)),
-            Indicator_Value=AREA_CUM_MHA,
+            Indicator_Value=AREA_MHA_TIME,
             Indicator_Upper_Value=NA,
             Indicator_Lower_Value=NA)
 

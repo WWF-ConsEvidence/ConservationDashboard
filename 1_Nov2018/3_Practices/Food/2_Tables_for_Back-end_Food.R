@@ -522,7 +522,8 @@ Dim_Initiative_Indicator_Food <-
             Indicator_Subcategory=Subcategory,
             Indicator_Target=Target,
             Indicator_Unit=Units,
-            Data_Source=Source)
+            Data_Source=Source,
+            Display_Order=Display.order)
 
 
 # ---- 4.4 Food-specific Fact_Initiative_Indicators ----

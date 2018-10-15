@@ -279,7 +279,7 @@ Fact_Global_2030_Outcome1_Forest_A <-
 Dim_Global_2030_Outcome2_Forest_A <- 
   data.frame(Indicator_Type_Key="OUT2_FR_A",
              Indicator_Name="Commodity Driven Deforestation (M ha per year)",
-             Indicator_Label="Commodity Driven Deforestation",
+             Indicator_Label="Commodity Driven Forest Cover Loss",
              Indicator_Subcategory=NA,
              Indicator_Unit="M ha per year",
              Data_source="Global Forest Watch - Curtis et al (2018) Global drivers of forest loss",
@@ -302,7 +302,7 @@ Fact_Global_2030_Outcome2_Forest_A <-
   rbind.data.frame(.,
                    data.frame(Year_Key=2030,
                               Practice_Key=practice_key_ref$id[practice_key_ref$practice_name=="Forests"],
-                              Indicator_Type=Dim_Global_2030_Outcome2_Forest_A$Indicator_Type_Key,
+                              Indicator_Type_Key=Dim_Global_2030_Outcome2_Forest_A$Indicator_Type_Key,
                               Practice_Outcome_Key=practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Forests" &
                                                                                  grepl("Deforestation",practice_outcome_key_ref$practice_outcome)],
                               Indicator_Value=Dim_Global_2030_Outcome2_Forest_A$Indicator_Target,

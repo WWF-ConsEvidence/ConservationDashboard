@@ -204,6 +204,10 @@ dim.initiative.indicators.markets <-
   read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/fy18_initiative_indicators_fact_2018_0908.xlsx',sheetName="Sheet1") %>%
   subset(.,Practice=="Markets")
 
+dim.initiative.milestones.markets <-
+  read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/fy18_initiative_milestones_2018_0908.csv') %>%
+  subset(.,Practice=="Markets")
+
 
 # ---- 3.2 Markets-specific Dim_Initiative ----
 
@@ -286,6 +290,24 @@ Fact_Initiative_Financials_Markets <-
             Amount_secured=Funds.secured)
 
 
+# ---- 3.6 Markets-specific Milestone_Group_Bridge ----
+
+Milestone_Group_Bridge_Markets <-
+  left_join(dim.initiative.milestones.markets, dim.initiatives.markets, by=c("Initiative", "Practice")) %>%
+  transmute(Milestone_Key=Milestone.key,
+            Initiative_Key=Initiative.key)
+
+
+# ---- 3.7 Markets-specific Dim_Milestone ----
+
+Dim_Milestone_Markets <-
+  dim.initiative.milestones.markets %>%
+  transmute(Milestone_Key=Milestone.key,
+            Milestone_Name=Milestone,
+            Milestone_Target=Target,
+            Milestone_Status=Status,
+            Milestone_Status_Justification=Status.just)
+
 
 
 # ---- REMOVE CLUTTER ----
@@ -302,4 +324,5 @@ rm(sdg.12.2,
    Fact_Context_Response_Markets_A,
    Fact_Context_Response_Markets_B,
    dim.initiatives.markets,
-   dim.initiative.indicators.markets)
+   dim.initiative.indicators.markets,
+   dim.initiative.milestones.markets)
