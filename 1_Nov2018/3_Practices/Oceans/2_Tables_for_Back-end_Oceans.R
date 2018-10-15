@@ -55,16 +55,33 @@ practice_outcome_key_ref <- read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/co
 
 # ---- 2.1 Context - State ----
 
+GBR <-
+  read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/AIMS_GBR_2018_summary_report.csv') %>%
+  mutate(Mean_coral_fixed=NA)
 
-# -- COASTAL ECOSYSTEM EXTENT
+for(i in 1:length(GBR$Mean_coral_cover)) {
+  GBR$Mean_coral_fixed[i] <- ifelse(is.na(GBR$Mean_coral_cover[i]) &
+                                      GBR$Region[i+1]==GBR$Region[i],
+                                    mean(c(GBR$Mean_coral_cover[GBR$Year==GBR$Year[i]-1 &
+                                                                  GBR$Region==GBR$Region[i]],
+                                           GBR$Mean_coral_cover[GBR$Year==GBR$Year[i]+1 &
+                                                                  GBR$Region==GBR$Region[i]])),
+                                    ifelse(is.na(GBR$Mean_coral_cover[i]) &
+                                             GBR$Region[i+1]!=GBR$Region[i],
+                                           GBR$Mean_coral_cover[GBR$Year==GBR$Year[i]-1 &
+                                                                  GBR$Region==GBR$Region[i]],
+                                           GBR$Mean_coral_cover[i]))
+}
+
+# -- COASTAL ECOSYSTEMS - MANGROVE AREA
 
 Dim_Context_State_Oceans_A <- 
   data.frame(Indicator_Type_Key="GCS_OC_A",
              Indicator_Name="Global Mangrove coverage (M ha)",
-             Indicator_Label="Total Mangrove Area",
-             Panel_Label="Coastal Ecosystem Extent",
+             Indicator_Label="Total Mangrove Area & Great Barrier Reef (GBR) Coral Cover*",
+             Panel_Label="Coastal Ecosystems",
              Panel="State",
-             Indicator_Subcategory=NA,
+             Indicator_Subcategory="Mangrove Extent",
              Indicator_Unit="M ha",
              Data_Source="Global Mangrove Alliance")
 
@@ -76,6 +93,30 @@ Fact_Context_State_Oceans_A <-
             Indicator_Value=Area,
             Indicator_Upper_Value=NA,
             Indicator_Lower_Value=NA)
+
+# -- COASTAL ECOSYSTEMS - GBR CORAL COVER
+
+Dim_Context_State_Oceans_B <- 
+  data.frame(Indicator_Type_Key="GCS_OC_B",
+             Indicator_Name="Percent coral cover in the Great Barrier Reef",
+             Indicator_Label="Total Mangrove Area & Great Barrier Reef (GBR) Coral Cover*",
+             Panel_Label="Coastal Ecosystems",
+             Panel="State",
+             Indicator_Subcategory="GBR Coral Cover",
+             Indicator_Unit="%",
+             Data_Source="AIMS Long-term Reef Monitoring Program - Annual Summary Report on coral reef condition for 2017-18")
+
+Fact_Context_State_Oceans_B <-
+  GBR[GBR$Year<2018,] %>%
+  group_by(Year) %>%
+  summarise(Mean=mean(Mean_coral_fixed),
+            Std.dev=sd(Mean_coral_fixed)) %>%
+  transmute(Year_Key=Year,
+            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Oceans"],length(Year_Key)),
+            Indicator_Type_Key=rep(Dim_Context_State_Oceans_B$Indicator_Type_Key,length(Year_Key)),
+            Indicator_Value=Mean,
+            Indicator_Upper_Value=Mean+Std.dev,
+            Indicator_Lower_Value=Mean-Std.dev)
 
 
 # ---- 2.2 Context - Threat ----
@@ -169,6 +210,7 @@ Fact_Context_Response_Oceans_B <-
 
 Dim_Context_Oceans <- 
   rbind.data.frame(Dim_Context_State_Oceans_A,
+                   Dim_Context_State_Oceans_B,
                    Dim_Context_Threat_Oceans_A,
                    Dim_Context_Threat_Oceans_B,
                    Dim_Context_Response_Oceans_A,
@@ -176,6 +218,7 @@ Dim_Context_Oceans <-
 
 Fact_Context_Oceans <-
   rbind.data.frame(Fact_Context_State_Oceans_A,
+                   Fact_Context_State_Oceans_B,
                    Fact_Context_Threat_Oceans_A,
                    Fact_Context_Threat_Oceans_B,
                    Fact_Context_Response_Oceans_A,
@@ -194,6 +237,7 @@ Fact_Context_Oceans <-
 # ---- 3.1 Oceans Outcome 1 - HEALTHY & PRODUCTIVE ECOSYSTEMS ----
 
 # EFFECTIVELY MANAGED - ASSESSED
+
 Dim_Global_2030_Outcome1_Oceans_A <- 
   data.frame(Indicator_Type_Key="OUT1_OC_A",
              Indicator_Name="Management effectiveness, as proportion of MPA area that has been assessed using a METT",
@@ -403,12 +447,15 @@ Fact_Initiative_Financials_Oceans <-
 
 # ---- REMOVE CLUTTER ----
 
-rm(Dim_Context_State_Oceans_A,
+rm(GBR,
+   Dim_Context_State_Oceans_A,
+   Dim_Context_State_Oceans_B,
    Dim_Context_Threat_Oceans_A,
    Dim_Context_Threat_Oceans_B,
    Dim_Context_Response_Oceans_A,
    Dim_Context_Response_Oceans_B,
    Fact_Context_State_Oceans_A,
+   Fact_Context_State_Oceans_B,
    Fact_Context_Threat_Oceans_A,
    Fact_Context_Threat_Oceans_B,
    Fact_Context_Response_Oceans_A,

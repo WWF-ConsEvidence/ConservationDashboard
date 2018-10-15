@@ -70,9 +70,9 @@ Fact_Context_State_Governance_A <-
   transmute(Year_Key=STATUS_YR,
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Governance"],length(STATUS_YR)),
             Indicator_Type_Key=rep(Dim_Context_State_Governance_A$Indicator_Type_Key,length(STATUS_YR)),
-            Indicator_Value=ICCA_PERCENT_EST,
-            Indicator_Upper_Value=ICCA_PERCENT_HI,
-            Indicator_Lower_Value=ICCA_PERCENT_LOW)
+            Indicator_Value=ICCA_PERCENT_EST*100,
+            Indicator_Upper_Value=ICCA_PERCENT_HI*100,
+            Indicator_Lower_Value=ICCA_PERCENT_LOW*100)
 
 
 # ---- 2.2 Context - Threat ----
@@ -82,7 +82,7 @@ Fact_Context_State_Governance_A <-
 Dim_Context_Threat_Governance_A <- 
   data.frame(Indicator_Type_Key="GCT_GV_A",
              Indicator_Name="Intact ecosystems lost to unsustainable development",
-             Indicator_Label="Global Tree Cover Loss & Deforestation",
+             Indicator_Label="Global Tree Cover Loss",
              Panel_Label="Unsustainable Development",
              Panel="Threat",
              Indicator_Subcategory="Total Loss",
@@ -104,10 +104,10 @@ Fact_Context_Threat_Governance_A <-
 Dim_Context_Threat_Governance_B <- 
   data.frame(Indicator_Type_Key="GCT_GV_B",
              Indicator_Name="Intact ecosystems lost to unsustainable development",
-             Indicator_Label="Global Tree Cover Loss & Deforestation",
+             Indicator_Label="Global Tree Cover Loss",
              Panel_Label="Unsustainable Development",
              Panel="Threat",
-             Indicator_Subcategory="Commodity Driven Deforestation",
+             Indicator_Subcategory="Commodity Driven Loss",
              Indicator_Unit="M ha per year",
              Data_Source="Global Forest Watch; Curtis et al (2018) Global drivers of forest loss")
 
