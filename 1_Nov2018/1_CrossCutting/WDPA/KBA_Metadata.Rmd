@@ -1,0 +1,48 @@
+# KBA Metadata
+## _Last updated: 9 Oct 2018_
+___
+
+### Title
+Global Key Biodiversity Areas Boundaries    
+
+### Description
+Global Dataset containing the current boundaries for Key Biodiversity Areas (KBAs).  
+
+### Date Accessed  
+September 2018. Downloaded under licence from the Integrated Biodiversity Assessment Tool. http://www.ibatforbusiness.org  
+
+### Publisher  
+BirdLife International and Conservation International, 2018. Key Biodiversity Area (KBA) digital boundaries: September 2018 version. Maintained by BirdLife International on behalf of BirdLife International and Conservation International. Downloaded under licence from the Integrated Biodiversity Assessment Tool. http://www.ibatforbusiness.org
+
+### File Format  
+Shapefile - data provided as spatial polygons and points separately   
+
+### Access URL  
+Downloaded under licence from the Integrated Biodiversity Assessment Tool. http://www.ibatforbusiness.org
+
+### Temporal Range & Frequency
+September 2018 version     
+
+### Spatial Range & Resolution
+Global extent.   
+
+### Contact Name and Email (of Publisher)
+Please mark all correspondence: “FAO Information Management Division”.
+birdlife@birdlife.org  
+
+### Contact Name and Email (within WWF)
+  
+
+### Data Permissions (License & Rights)
+
+
+###  Statistical processing  
+
+R script: WDPA_in_KBA.R
+  
+Steps:    
+a. KBA point data are filtered to sites with a reported area and buffered using the radius of a circle of equivalent area. Buffered points and poylgons combined into a single feature and aggregated by Country.         
+b. Combined KBA polygons are intersected with global boundaries to delineate terrestrial, marine, and ABNJ KBAs. In this process, KBA polygons are associated with global subregions, which are used to subset KBA shapefiles. Geometries are repaied as necessary and subregional files are saved. The basemap layer used was provided by Brooks et al.2016 (https://doi.org/10.5061/dryad.6gb90.2). 
+c. WDPA spatial files aggregated by subregion at each year from 1995-2018 are intersected with KBA polygons for same subregion (terrestrial and EEZ) and ABNJ. 
+d. The total area of protected area that is within KBAs is calculated in M ha from intersected files for terrestrial, marine, and globally.The percent in KBA over time is calculated as the M ha of protected area in KBA divided by the annual total extent (M ha) of protected areas. Mollweide projection was used for area calculations. 
+
