@@ -87,7 +87,6 @@ METT_mostrecentyear <-
   group_by(PA_ID,WDPA.ID) %>%
   summarise(MostRecentYear=max(Year))
 
-
 # Final data sets, with repeat assessments removed, and ready to be paired to WDPA database
 # -- NOTE: will want to check PA_FullName against WDPA protected areas, to see if any of the observations 
 # --       with 999999999 as their WDPA.ID actually match.  Otherwise, will need to remove those PAs from analysis.
