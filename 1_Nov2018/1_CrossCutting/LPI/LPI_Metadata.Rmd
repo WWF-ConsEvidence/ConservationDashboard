@@ -1,0 +1,38 @@
+# LPI Metadata
+## _Last updated: 17 Oct 2018_
+___
+
+### Title
+Living Planet Index 
+
+### Description
+
+
+### Date Accessed  
+
+
+### Publisher  
+
+
+### File Format  
+     
+
+### Access URL  
+
+
+### Temporal Range & Frequency
+  
+
+### Spatial Range & Resolution
+
+
+### Contact Name and Email (of Publisher)
+
+
+### Contact Name and Email (within WWF)
+
+
+### Data Permissions (License & Rights)
+
+
+###  Statistical processing  
