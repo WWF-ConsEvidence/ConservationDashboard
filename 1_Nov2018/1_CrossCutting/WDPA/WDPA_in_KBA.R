@@ -207,12 +207,10 @@ write.csv(df.out, 'KBA/KBA_EEZ_year_1_1.csv', row.names=FALSE)
 
 # troubleshooting
 i<-14
-KBA.in<-st_read(paste0('KBA/subregion/',grep(subregions[i], EEZ.KBA.files, value=TRUE, fixed=TRUE))) # EEZ KBA file
+KBA.in<-st_read(paste0('KBA/subregion/',grep(subregions[i], EEZ.KBA.files, value=TRUE, fixed=TRUE)))%>%st_buffer(0) # EEZ KBA file
 glimpse(KBA.in)
 
 KBA.sub<-KBA.in%>%
-  filter(G_UNEP_sub == subregions[i])%>%
-  st_buffer(0)%>%
   group_by(type, G_UNEP_sub)%>%
   summarize()%>%
   st_buffer(0)
@@ -223,12 +221,15 @@ WDPA.sub.yrs
 
 j<-1
 WDPA.sub.yrs[j]
-WDPA.in<-st_read(paste0('WDPA/SUB_YEAR/EEZ/',WDPA.sub.yrs[j]))%>%
-  group_by(G_UNEP_sub, STATUS_YR)%>%summarize()%>%
+WDPA.in<-st_read(paste0('WDPA/SUB_YEAR/EEZ/',WDPA.sub.yrs[j]))#%>%
+
+WDPA.in.grpd<-WDPA.in%>%group_by(G_UNEP_sub, STATUS_YR)%>%
+  summarize()%>%
   st_buffer(0)
 glimpse(WDPA.in)
 
-WDPA.in.KBA<-st_intersection(WDPA.in, KBA.sub)%>%st_buffer(0)
+## HERE
+WDPA.in.KBA<-st_intersection(WDPA.in, KBA.sub)%>%st_buffer(0) # .in or .sub -- try WDPA.in.grpd
 plot(WDPA.in.KBA%>%select(type))
 
 ####

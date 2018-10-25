@@ -70,10 +70,14 @@ setwd("/Users/colleennell/Dropbox/ConsDB_Input")
 # type = type of subregion as either 'UNEP' or 'IPBES' for global boundaries
 
 ## outputs
-# WDPA/GLOBAL/wdpa_all_clean.shp - combined shapefile with cleaned WDPA sites, ready for processing
+# WDPA/GLOBAL/wdpa_all_clean.shp - combined shapefile with cleaned WDPA sites, ready for processing 
 # EEZ_WVS_layer/EEZ - global EEZ shapefile
 # EEZ_WVS_layer/ABNJ - ABNJ shapefile
 # EEZ_WVS_layer/Land - Land boundaries shapefile
+# WDPA_EEZ_area.csv - timeline of global protected area coverage in Exclusive Economic Zones by subregion
+# WDPA_Land_area.csv - timeline of global terrestrial protected area coverage by subregion
+# WDPA_ABNJ_area.csv - timeline of global protected area coverage in Areas Beyond National Jurisdiction by subregion
+# WDPA_timeseries.csv - collective timeline of protected area coverage in M ha and as percent for terrestrial, marine (EEZ) and ABNJ zones.
 
 clean_wdpa<-function('WDPA_Aug2018-shapefile/', type = 'UNEP'){
   ## read in WDPA data
@@ -134,6 +138,16 @@ clean_wdpa<-function('WDPA_Aug2018-shapefile/', type = 'UNEP'){
     
     ABNJ<-boundaries%>%filter(type=='ABNJ')%>%st_transform('+proj=moll')%>%st_buffer(0)
     st_write(ABNJ, paste0('EEZ_WVS_layer/ABNJ_',type), driver='ESRI Shapefile')
+    
+    ## find total area of regions in M ha
+    abnj_area<-set_units(st_area(ABNJ), ha)
+    sum(abnj_area, na.rm=TRUE)/1000000 # M ha = 22115.2
+    
+    land_area<-set_units(st_area(Land), ha)
+    sum(land_area, na.rm=TRUE)/1000000 # M ha = 14886.11
+    
+    eez_area<-set_units(st_area(EEZ), ha)
+    sum(eez_area, na.rm=TRUE)/1000000 # M ha = 14117.87
     
     # clean up
     rm(boundaries)
@@ -401,13 +415,39 @@ aggregate_WDPA<-function(EEZ.files, Land.files, ABNJ.files){
 # ---- SECTION 6: Calculate protected area coverage  ----
 #
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Land<-read.csv('WDPA_Land_area.csv')
+Land[is.na(Land)]<-0
+str(Land)
+
+Land.yr<-Land%>%
+  group_by(type, year)%>%
+  summarize_at(vars(AREA_HA:AREA_MHA), funs(sum))%>%
+  mutate_at(vars(AREA_HA_sum:AREA_MHA_sum), funs(TIME = cumsum))%>%
+  mutate(Land_area = 14886.11, Land_percent = 100*(AREA_MHA_sum_TIME/Land_area))
+
+EEZ<-read.csv('WDPA_EEZ_area.csv')
+EEZ[is.na(EEZ)]<-0
+str(EEZ)
+
+EEZ.yr<-EEZ%>%
+  group_by(type, year)%>%
+  summarize_at(vars(AREA_HA:AREA_MHA), funs(sum))%>%
+  mutate_at(vars(AREA_HA_sum:AREA_MHA_sum), funs(TIME = cumsum))%>%
+  mutate(EEZ_area = 14117.87, EEZ_percent = 100*(AREA_MHA_sum_TIME/EEZ_area))
 
 
-abnj_area<-set_units(st_area(ABNJ), ha)
-sum(abnj_area, na.rm=TRUE)/1000000 # M ha = 22115.2
+ABNJ<-read.csv('WDPA_ABNJ_area.csv')
+ABNJ[is.na(ABNJ)]<-0
+str(ABNJ)
 
-land_area<-set_units(st_area(Land), ha)
-sum(land_area, na.rm=TRUE)/1000000 # M ha = 14886.11
+ABNJ.yr<-ABNJ%>%
+  group_by(type, year)%>%
+  summarize_at(vars(AREA_HA:AREA_MHA), funs(sum))%>%
+  mutate_at(vars(AREA_HA_sum:AREA_MHA_sum), funs(TIME = cumsum))%>%
+  mutate(ABNJ_area = 122115.2, ABNJ_percent = 100*(AREA_MHA_sum_TIME/ABNJ_area))
 
-eez_area<-set_units(st_area(EEZ), ha)
-sum(eez_area, na.rm=TRUE)/1000000 # M ha = 14117.87
+## combine all
+Land.yr%>%select(type, year, area = Land_area, Mha = AREA_MHA_sum_TIME, percent = Land_percent)
+EEZ.yr%>%select(type, year, area = EEZ_area, Mha = AREA_MHA_sum_TIME, percent = EEZ_percent)
+ABNJ.yr%>%select(type, year, area = ABNJ_area, Mha = AREA_MHA_sum_TIME, percent = ABNJ_percent) 
+
