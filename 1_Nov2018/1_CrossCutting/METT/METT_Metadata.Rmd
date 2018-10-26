@@ -83,5 +83,11 @@ Each of the eight questions were recoded for each site (in both the METT1 and ME
 
 METT1 and METT3 data were joined together; and if there were any repeat assessments for a single site, the most recent assessment was used.  
 
+Next, the World Database on Protected Areas (WDPA) was subset and aggregated by (1) sites that had METT assessments and (2) sites that had METT assessments that met the threshold for effective management, using the reported WDPA ID. This aggregation accounts for potential spatial overlap in sites due to misreporting. The global extent of METT sites and effective sites was calculated in M ha and as a percent of total assessment sites. Spatial files were then intersected with the global boundaries for land, exclusive economic zones, and areas beyond national jurisdiction. 
+
+It should be noted that a large number of METT site did not have a valid WDPA ID associated with it or had an incorrect WDPA ID (approximately 30%, 600 METT assessments out of 2000 total). Efforts were made to match METT assessments without WDPA IDs to sites in the WDPA based upon the reported site name and ISO3 code, however only a few number of sites were matched. To be able to evaluate the efficacy of METT assessments it would be most valuable to have accurate and complete information on site associations with the WDPA.   
+
+ 
+
 
 
