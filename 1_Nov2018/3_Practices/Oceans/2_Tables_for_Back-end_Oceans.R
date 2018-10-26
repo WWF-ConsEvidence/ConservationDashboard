@@ -251,7 +251,7 @@ Dim_Global_2030_Outcome1_Oceans_A <-
              Display_Order=1)
 
 Fact_Global_2030_Outcome1_Oceans_A <-
-  read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/METT_MPA.csv') %>%
+  read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/METT/METT_MPA.csv') %>%
   transmute(Year_Key=2018,
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Oceans"],length(Year_Key)),
             Indicator_Type_Key=rep(Dim_Global_2030_Outcome1_Oceans_A$Indicator_Type_Key, length(Year_Key)),
@@ -285,7 +285,7 @@ Dim_Global_2030_Outcome1_Oceans_B <-
              Display_Order=1)
 
 Fact_Global_2030_Outcome1_Oceans_B <-
-  read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/METT_MPA.csv') %>%
+  read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/METT/METT_MPA.csv') %>%
   transmute(Year_Key=2018,
              Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Oceans"],length(Year_Key)),
              Indicator_Type_Key=rep(Dim_Global_2030_Outcome1_Oceans_B$Indicator_Type_Key, length(Year_Key)),

@@ -319,7 +319,7 @@ Dim_Global_2030_Outcome1_Wildlife_D <-
              Display_Order=1)
 
 Fact_Global_2030_Outcome1_Wildlife_D <-
-  read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/METT_area.csv') %>%
+  read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/METT/METT_area.csv') %>%
   transmute(Year_Key=2016,
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],length(Year_Key)),
             Indicator_Type_Key=rep(Dim_Global_2030_Outcome1_Wildlife_D$Indicator_Type_Key, length(Year_Key)),
@@ -353,7 +353,7 @@ Dim_Global_2030_Outcome1_Wildlife_E <-
              Display_Order=1)
 
 Fact_Global_2030_Outcome1_Wildlife_E <-
-  read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/METT_area.csv')%>%
+  read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/METT/METT_area.csv')%>%
   transmute(Year_Key=2016,
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],length(Year_Key)),
             Indicator_Type_Key=rep(Dim_Global_2030_Outcome1_Wildlife_E$Indicator_Type_Key, length(Year_Key)),
