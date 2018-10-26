@@ -70,9 +70,9 @@ Fact_Context_State_Governance_A <-
   transmute(Year_Key=STATUS_YR,
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Governance"],length(STATUS_YR)),
             Indicator_Type_Key=rep(Dim_Context_State_Governance_A$Indicator_Type_Key,length(STATUS_YR)),
-            Indicator_Value=ICCA_PERCENT_EST*100,
-            Indicator_Upper_Value=ICCA_PERCENT_HI*100,
-            Indicator_Lower_Value=ICCA_PERCENT_LOW*100)
+            Indicator_Value=ICCA_PERCENT_EST,
+            Indicator_Upper_Value=ICCA_PERCENT_HI,
+            Indicator_Lower_Value=ICCA_PERCENT_LOW)
 
 
 # ---- 2.2 Context - Threat ----

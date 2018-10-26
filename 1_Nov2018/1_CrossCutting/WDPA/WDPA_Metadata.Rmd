@@ -1,5 +1,5 @@
 # WDPA Metadata
-## _Last updated: 9 Oct 2018_
+## _Last updated: 26 Oct 2018_
 ___
 
 ### Title
@@ -47,16 +47,21 @@ The WDPA Materials may not be sub-licensed in whole or in part including within 
 Steps follow WCMC-UNEP: https://www.protectedplanet.net/c/calculating-protected-area-coverage 
 R script: WDPA_calculate_PA.R  
 
-1. Using the monthly release from August 2018, data were filtered to sites with a status of either 'designated', 'inscribed', or 'established' following IUCN definition of a protected area (http://www.biodiversitya-z.org/content/protected-area). UNESCO Man and Biosphere Reserves are excluded by this definition.
+
+1. Using the monthly release from August 2018, data were filtered to sites with a status of either 'designated', 'inscribed', or 'established' following IUCN definition of a protected area (http://www.biodiversitya-z.org/content/protected-area). UNESCO Man and Biosphere Reserves are excluded by this definition.         
 2. For point data, sites with no reported area were excluded. For remaining sites, reported area was used to calculate the radius of a circle with the given area and used to buffer spatial points into polygons. Buffered points and polygons were then combined and spatially aggregated by year for each unique ISO3 code. Due to multiple designations and misreporting of areas, protected areas can frequently overlap in the WDPA. This spatial union accounts for this and prevents double-counting of areas under the same ISO3.  
 3. Protected areas were then intersected with global boundaries for Exclusive Economic Zones (EEZ) and terrestrial borders to delineate as marine (within EEZ) or terrestrial.  Geometries were repaired as necessary. Areas beyond national jurisdiction (ABNJ) were not included. The basemap layer used was provided by Brooks et al.2016 (https://doi.org/10.5061/dryad.6gb90.2).   
 4. For each year from 1995 - present, the intersected files were aggregated by geographic subregions for marine and terrestrial separately. For year 1995, all years before 1996 were aggregated together. In some cases, the year of designation for a site is unknown or not reported and treated as year 0 in these analyses. Transboundary sites that were assigned multiple ISO3 codes were split and aggregated based upon subregional boundaries. Global figures reflect the composite value of each geographic subregion. Again, this aggregation at the subregional level creates a union between overlapping spatial polygons to account for sites with multiple designations.   
-5. The global extent of protected area was calculated in M ha as the total coverage in each subregion for terrestrial and marine sites. These data were also used to calculate protected area coverage separately for terrestrial and marine. Mollweide projection was used for area calculations. 
+5. The global extent of protected area was calculated in M ha as the total coverage in each subregion for terrestrial and marine sites. These data were also used to calculate protected area coverage separately for terrestrial and marine. Mollweide projection was used for area calculations. Results are saved as 'WDPA_timeseries.csv'.  
+
 
 **Calculate ICCA coverage**  
 R script: WDPA_calculate_ICCA.R  
 
+
 1. Using the monthly release from August 2018, data were filtered to sites designated as ICCAs by selecting sites in which the 'GOV_TYPE' was either "Local communities" or "Indigenous peoples".  
-2. For point data, sites with no reported area were excluded. For remaining sites, reported area was used to calculate the radius of a circle with the given area and used to buffer spatial points into polygons. Buffered points and polygons were then combined and spatially aggregated by year for each unique ISO3 code. Due to multiple designations and misreporting of areas, protected areas can frequently overlap in the WDPA. This spatial union accounts for this and prevents double-counting of areas under the same ISO3.  
+2. For point data, sites with no reported area were excluded. For remaining sites, reported area was used to calculate the radius of a circle with the given area and used to buffer spatial points into polygons. 
+3. Buffered points and polygons were combined and then spatially aggregated by year and ISO3 code. Due to multiple designations and misreporting of areas, protected areas can frequently overlap in the WDPA. This spatial union accounts for this and prevents double-counting of areas under the same ISO3.  
+4. Total ICCA coverage is calculated in M ha under a Mollweide projection and as a percent of estimated global extent of community conserved lands (400-800 M ha; estimate by IUCN). Results are saved as 'ICCA_timeseries.csv'.  
 
 

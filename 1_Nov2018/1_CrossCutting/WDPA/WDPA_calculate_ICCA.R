@@ -80,7 +80,7 @@ rm(wdpa.raw.pts)
 # combine into single feature
 ICCA.combine<-do.call(rbind, list(ICCA.pts.buff, ICCA.polys))%>%st_buffer(0)
 
-# Spatially aggregate each year - eliminates overlapping areas
+# Spatially aggregate each year - eliminates spatially overlapping areas
 ICCA.year<-ICCA.combine%>%group_by(STATUS_YR)%>%summarize()%>%st_buffer(0)
 
 # save shapefile - ICCAs aggregated by year 
@@ -106,7 +106,8 @@ ICCA.df<-ICCA.area%>%
   mutate(AREA_HA_CUM = cumsum(AREA_HA), AREA_MHA_TIME = AREA_HA_CUM/1000000)%>%
   mutate(AREA_EST_MHA_MIN = 400, AREA_EST_MHA_MAX = 800)%>%
   mutate(ICCA_PERCENT_EST = 100*(AREA_MHA_TIME/((AREA_EST_MHA_MIN+AREA_EST_MHA_MIN)/2)), 
-         ICCA_PERCENT_LOW = 100*(AREA_MHA_TIME/AREA_EST_MHA_MAX), ICCA_PERCENT_HI = 100*(AREA_MHA_TIME/AREA_EST_MHA_MIN))
+         ICCA_PERCENT_LOW = 100*(AREA_MHA_TIME/AREA_EST_MHA_MAX), 
+         ICCA_PERCENT_HI = 100*(AREA_MHA_TIME/AREA_EST_MHA_MIN))
 
 write.csv(ICCA.df, 'ICCA_timeseries.csv', row.names=FALSE)
 
