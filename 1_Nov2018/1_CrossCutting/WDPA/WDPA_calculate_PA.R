@@ -447,7 +447,11 @@ ABNJ.yr<-ABNJ%>%
   mutate(ABNJ_area = 122115.2, ABNJ_percent = 100*(AREA_MHA_sum_TIME/ABNJ_area))
 
 ## combine all
-Land.yr%>%select(type, year, area = Land_area, Mha = AREA_MHA_sum_TIME, percent = Land_percent)
-EEZ.yr%>%select(type, year, area = EEZ_area, Mha = AREA_MHA_sum_TIME, percent = EEZ_percent)
-ABNJ.yr%>%select(type, year, area = ABNJ_area, Mha = AREA_MHA_sum_TIME, percent = ABNJ_percent) 
+WDPA<-rbind(Land.yr%>%select(type, year, area = Land_area, Mha = AREA_MHA_sum_TIME, percent = Land_percent),
+            EEZ.yr%>%select(type, year, area = EEZ_area, Mha = AREA_MHA_sum_TIME, percent = EEZ_percent),
+            ABNJ.yr%>%select(type, year, area = ABNJ_area, Mha = AREA_MHA_sum_TIME, percent = ABNJ_percent))%>%
+  melt(id.vars=c('type','year'), variable.names='AREA')%>%
+  dcast(year~type+AREA)
+
+View(WDPA)
 

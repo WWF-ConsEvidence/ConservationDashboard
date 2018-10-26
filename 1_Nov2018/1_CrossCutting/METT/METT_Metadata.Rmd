@@ -81,5 +81,7 @@ The eight questions used to establish a score threshold were regarding:
     
 Each of the eight questions were recoded for each site (in both the METT1 and METT3 data frames) - given a score of 0 or 1 (0 = did not meet threshold; 1 = met threshold).  Each site was given an overall "score" ranging from 0 to 8, equalling the sum of all eight recoded questions.  To reach the score threshold, the site must have a score of 8.  
 
-METT1 and METT3 data were joined together; and if there were any repeat assessments for a single site, the most recent assessment was used.
+METT1 and METT3 data were joined together; and if there were any repeat assessments for a single site, the most recent assessment was used.  
+
+
 

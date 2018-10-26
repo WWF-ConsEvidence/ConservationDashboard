@@ -156,19 +156,16 @@ intersect_KBA(KBA.in)
 # done at the subregional level
 
 ## outputs shapefiles
-
 KBA.files<-list.files('KBA/subregion/') # KBA files - intersect each year or same subregion
 EEZ.KBA.files<-grep('EEZ',KBA.files, value=TRUE)
 subregions<-gsub('KBA_EEZ_', '', EEZ.KBA.files)
 subregions
-subregions[14]
+subregions[5]
 
 #df.out<-NULL
-for (i in 14:length(subregions)){
+for (i in 1:length(subregions)){
   KBA.in<-st_read(paste0('KBA/subregion/',grep(subregions[i], EEZ.KBA.files, value=TRUE, fixed=TRUE)))%>%st_buffer(0) # EEZ KBA file
   KBA.sub<-KBA.in%>%
-    filter(G_UNEP_sub == subregions[i])%>%
-    st_buffer(0)%>%
     group_by(type, G_UNEP_sub)%>%
     summarize()%>%
     st_buffer(0)
@@ -177,13 +174,9 @@ for (i in 14:length(subregions)){
   
   for (j in 1:length(WDPA.sub.yrs)){
     # read in
-    WDPA.in<-st_read(paste0('WDPA/SUB_YEAR/EEZ/',WDPA.sub.yrs[j]))%>%
-      group_by(G_UNEP_sub, STATUS_YR)%>%
-      summarize()%>%
-      st_buffer(0)
-    
+    WDPA.in<-st_read(paste0('WDPA/SUB_YEAR/EEZ/',WDPA.sub.yrs[j]))%>%st_buffer(0)
     # intersect
-    WDPA.in.KBA<-st_intersection(WDPA.in, KBA.sub)%>%st_buffer(0)
+    WDPA.in.KBA<-st_intersection(WDPA.in, KBA.sub)%>%st_buffer(0) 
     
     if(dim(WDPA.in.KBA)[1]!= 0){
       temp.df<-data.frame(subregion = subregions[i],
@@ -192,56 +185,70 @@ for (i in 14:length(subregions)){
                           AREA_KM2 = set_units(st_area(WDPA.in.KBA), km^2))%>%
         mutate(AREA_HA = set_units(AREA_KM2, ha))
       df.out<-rbind(df.out, temp.df)
-      st_write(WDPA.in.KBA, paste0('KBA/intersect/',WDPA.sub.yrs[j]), driver = 'ESRI Shapefile', delete_layer=TRUE)
+      st_write(WDPA.in.KBA, paste0('KBA/intersect/EEZ',WDPA.sub.yrs[j]), driver = 'ESRI Shapefile', delete_layer=TRUE)
     }else{}
     
   }
 } 
-# stopped at 0_North America
-subregions[i]
-tail(df.out)
+
+#write.csv(df.out, 'KBA/KBA_EEZ_year_all.csv', row.names=FALSE)
+
+##Land
+Land.KBA.files<-grep('Land',KBA.files, value=TRUE)
+Land.KBA.files
+subregions<-gsub('KBA_Land_', '', Land.KBA.files)
+subregions[4]
+
+# HERE - do all Land then ABNJ
+#df.out<-NULL
+for (i in 4:length(subregions)){
+  KBA.in<-st_read(paste0('KBA/subregion/',grep(subregions[i], Land.KBA.files, value=TRUE, fixed=TRUE)))%>%st_buffer(0) # Land KBA file
+  KBA.sub<-KBA.in%>%
+    group_by(type, G_UNEP_sub)%>%
+    summarize()%>%
+    st_buffer(0)
+  
+  WDPA.sub.yrs<-grep(subregions[i],list.files('WDPA/SUB_YEAR/Land'), value=TRUE, fixed=TRUE)
+  
+  for (j in 1:length(WDPA.sub.yrs)){
+    # read in
+    WDPA.in<-st_read(paste0('WDPA/SUB_YEAR/Land/',WDPA.sub.yrs[j]))%>%st_buffer(0)
+    # intersect
+    WDPA.in.KBA<-st_intersection(WDPA.in, KBA.sub)%>%st_buffer(0) 
+    
+    if(dim(WDPA.in.KBA)[1]!= 0){
+      temp.df<-data.frame(subregion = subregions[i],
+                          type = 'Land',
+                          year = str_split(WDPA.sub.yrs[j], '_', simplify=TRUE)[,1],
+                          AREA_KM2 = set_units(st_area(WDPA.in.KBA), km^2))%>%
+        mutate(AREA_HA = set_units(AREA_KM2, ha))
+      df.out<-rbind(df.out, temp.df)
+      st_write(WDPA.in.KBA, paste0('KBA/intersect/Land/',WDPA.sub.yrs[j]), driver = 'ESRI Shapefile', delete_layer=TRUE)
+    }else{}
+    
+  }
+} 
 str(df.out)
-#write.csv(df.out, 'KBA/KBA_EEZ_year.csv', row.names=FALSE) # saved 1:4
-#write.csv(df.out, 'KBA/KBA_EEZ_year_1_13.csv', row.names=FALSE)
-write.csv(df.out, 'KBA/KBA_EEZ_year_1_1.csv', row.names=FALSE)
+unique(df.out$subregion)
+write.csv(df.out, 'KBA/KBA_Land_year_1_3.csv', row.names=FALSE)
 
-# troubleshooting
-i<-14
-KBA.in<-st_read(paste0('KBA/subregion/',grep(subregions[i], EEZ.KBA.files, value=TRUE, fixed=TRUE)))%>%st_buffer(0) # EEZ KBA file
-glimpse(KBA.in)
-
+##need to do the same for ABNJ and Land
+i<-4
+KBA.in<-st_read(paste0('KBA/subregion/',grep(subregions[i], Land.KBA.files, value=TRUE, fixed=TRUE)))%>%st_buffer(0) # Land KBA file
 KBA.sub<-KBA.in%>%
   group_by(type, G_UNEP_sub)%>%
   summarize()%>%
   st_buffer(0)
 glimpse(KBA.sub)
+WDPA.sub.yrs<-grep(subregions[i],list.files('WDPA/SUB_YEAR/Land'), value=TRUE, fixed=TRUE)
 
-WDPA.sub.yrs<-grep(subregions[i],list.files('WDPA/SUB_YEAR/EEZ'), value=TRUE)
-WDPA.sub.yrs
-
+list.files('WDPA/SUB_YEAR/Land')
 j<-1
-WDPA.sub.yrs[j]
-WDPA.in<-st_read(paste0('WDPA/SUB_YEAR/EEZ/',WDPA.sub.yrs[j]))#%>%
+WDPA.in<-st_read(paste0('WDPA/SUB_YEAR/Land/',WDPA.sub.yrs[j]))%>%st_buffer(0)
+# intersect
+WDPA.in.KBA<-st_intersection(WDPA.in, KBA.sub)%>%st_buffer(0)
+## make sure all processes - eez NZ
 
-WDPA.in.grpd<-WDPA.in%>%group_by(G_UNEP_sub, STATUS_YR)%>%
-  summarize()%>%
-  st_buffer(0)
-glimpse(WDPA.in)
-
-## HERE
-WDPA.in.KBA<-st_intersection(WDPA.in, KBA.sub)%>%st_buffer(0) # .in or .sub -- try WDPA.in.grpd
-plot(WDPA.in.KBA%>%select(type))
-
-####
-temp.df<-data.frame(subregion = subregions[i],
-                    type = 'EEZ',
-                    year = str_split(WDPA.sub.yrs[j], '_', simplify=TRUE)[,1],
-                    AREA_KM2 = set_units(st_area(WDPA.in.KBA), km^2))%>%
-  mutate(AREA_HA = set_units(AREA_KM2, ha))
-df.out<-rbind(df.out, temp.df)
-st_write(WDPA.in.KBA, paste0('KBA/intersect/',WDPA.sub.yrs[j]), driver = 'ESRI Shapefile', delete_layer=TRUE)
-
-##need to do the same for ABNJ and Land
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #
 # ---- SECTION 5: Calculate total protected area in KBA  ----
