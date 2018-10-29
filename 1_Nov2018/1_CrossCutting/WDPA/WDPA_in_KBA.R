@@ -34,6 +34,7 @@
 #  2) Prepare KBA data
 #  3) Intersect KBAs with global boundaries
 #  4) Intersect KBAs with WDPA 
+#  5) Calculate total protected area in KBA
 #
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #
@@ -157,12 +158,11 @@ intersect_KBA(KBA.in)
 
 ## outputs shapefiles
 KBA.files<-list.files('KBA/subregion/') # KBA files - intersect each year or same subregion
+
 EEZ.KBA.files<-grep('EEZ',KBA.files, value=TRUE)
 subregions<-gsub('KBA_EEZ_', '', EEZ.KBA.files)
-subregions
-subregions[5]
 
-#df.out<-NULL
+df.out<-NULL
 for (i in 1:length(subregions)){
   KBA.in<-st_read(paste0('KBA/subregion/',grep(subregions[i], EEZ.KBA.files, value=TRUE, fixed=TRUE)))%>%st_buffer(0) # EEZ KBA file
   KBA.sub<-KBA.in%>%
@@ -190,18 +190,17 @@ for (i in 1:length(subregions)){
     
   }
 } 
-
 #write.csv(df.out, 'KBA/KBA_EEZ_year_all.csv', row.names=FALSE)
 
-##Land
+# Land
 Land.KBA.files<-grep('Land',KBA.files, value=TRUE)
-Land.KBA.files
 subregions<-gsub('KBA_Land_', '', Land.KBA.files)
-subregions[4]
+subregions[5]
+WDPA.sub.yrs[89]
 
 # HERE - do all Land then ABNJ
-#df.out<-NULL
-for (i in 4:length(subregions)){
+df.out<-NULL
+for (i in 5:length(subregions)){
   KBA.in<-st_read(paste0('KBA/subregion/',grep(subregions[i], Land.KBA.files, value=TRUE, fixed=TRUE)))%>%st_buffer(0) # Land KBA file
   KBA.sub<-KBA.in%>%
     group_by(type, G_UNEP_sub)%>%
@@ -227,11 +226,11 @@ for (i in 4:length(subregions)){
     }else{}
     
   }
-} 
+} ## strted with sub 4, file 139 at 1:50 pm
 str(df.out)
 unique(df.out$subregion)
 write.csv(df.out, 'KBA/KBA_Land_year_1_3.csv', row.names=FALSE)
-
+# on NZ 2002
 ##need to do the same for ABNJ and Land
 i<-4
 KBA.in<-st_read(paste0('KBA/subregion/',grep(subregions[i], Land.KBA.files, value=TRUE, fixed=TRUE)))%>%st_buffer(0) # Land KBA file
@@ -241,6 +240,7 @@ KBA.sub<-KBA.in%>%
   st_buffer(0)
 glimpse(KBA.sub)
 WDPA.sub.yrs<-grep(subregions[i],list.files('WDPA/SUB_YEAR/Land'), value=TRUE, fixed=TRUE)
+WDPA.sub.yrs[139]
 
 list.files('WDPA/SUB_YEAR/Land')
 j<-1
@@ -258,8 +258,8 @@ WDPA.in.KBA<-st_intersection(WDPA.in, KBA.sub)%>%st_buffer(0)
 # calcualte area in M ha
 
 ## read each file in and calculate total area by year
-kba.csv<-grep('.csv', list.files('WDPA/KBA_WDPA/area_time'), value=TRUE)
-all_area<-do.call(rbind, lapply(c(kba.csv), function(x) read.csv(paste0('WDPA/KBA_WDPA/area_time/', x))))
+land.area<-list.files('KBA/intersect/Land')
+all_area<-do.call(rbind, lapply(c(land.area), function(x) read.csv(paste0('KBA/intersect/Land/', x))))
 
 ## total for each year
 area.yr<-all_area%>%group_by(year, type)%>%summarize(KBA_KM2 = sum(PA_area_km2, na.rm=TRUE))%>%
@@ -275,12 +275,12 @@ area.wide<-area.long%>%dcast(year~type+UNIT, value.var='AREA')%>%
 head(area.wide)
 
 ## join with global PA data to calculate proportion of total
-wdpa<-read.csv('WDPA_timeseries.csv')
+wdpa<-read.csv('WDPA/WDPA_timeseries.csv')
 
 ## Indicator: Percent of total protected area that is within Key Biodiversity Areas (M ha PAs within KBAs / M ha PAs)
 kba.prop<-area.wide%>%
   left_join(wdpa, by='year')%>%
-  mutate(PA_in_KBA_percent = 100*(TOTAL_KBA_MHA_TIME/Total_PA_Mha_time))
+  mutate(PA_in_KBA_percent = 100*(TOTAL_KBA_MHA_TIME/Total_Mha))
 
 #PA_in_KBA_percent
 write.csv(kba.prop, 'KBA_timeseries.csv', row.names=FALSE)

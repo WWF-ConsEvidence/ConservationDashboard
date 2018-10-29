@@ -50,7 +50,7 @@ library(stringr)
 library(tidyr)
 
 # set working directory to input data '/ConsDB_Input/'
-setwd("/Users/colleennell/Dropbox/ConsDB_Input")
+setwd("/Users/collnell/Dropbox/ConsDB_Input")
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #
@@ -335,7 +335,7 @@ aggregate_WDPA<-function(EEZ.files, Land.files, ABNJ.files){
       out.df<-rbind(sub.df, out.df)
     }
   }
-  write.csv(out.df, 'WDPA_Land_area.csv', row.names=FALSE)
+  write.csv(out.df, 'WDPA/WDPA_Land_area.csv', row.names=FALSE)
   
   ## read in file names by subregion
   EEZ.subs<-unique(str_split(EEZ.files, '_', simplify=TRUE)[,4]) # subregion names
@@ -368,7 +368,7 @@ aggregate_WDPA<-function(EEZ.files, Land.files, ABNJ.files){
     }
   }
   
-  write.csv(out.df, 'WDPA_EEZ_area.csv', row.names=FALSE)
+  write.csv(out.df, 'WDPA/WDPA_EEZ_area.csv', row.names=FALSE)
   
   ## ABNJ
   ## read in file names by subregion
@@ -400,7 +400,7 @@ aggregate_WDPA<-function(EEZ.files, Land.files, ABNJ.files){
       out.df<-rbind(sub.df, out.df)
     }
   }
-  write.csv(out.df, 'WDPA_ABNJ_area.csv', row.names=FALSE)
+  write.csv(out.df, 'WDPA/WDPA_ABNJ_area.csv', row.names=FALSE)
   
 }
 
@@ -415,43 +415,67 @@ aggregate_WDPA<-function(EEZ.files, Land.files, ABNJ.files){
 # ---- SECTION 6: Calculate protected area coverage  ----
 #
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-Land<-read.csv('WDPA_Land_area.csv')
+Land<-read.csv('WDPA/WDPA_Land_area.csv')
 Land[is.na(Land)]<-0
 str(Land)
 
 Land.yr<-Land%>%
+  mutate(year = ifelse(year > 1990, year, 1990))%>%
   group_by(type, year)%>%
   summarize_at(vars(AREA_HA:AREA_MHA), funs(sum))%>%
-  mutate_at(vars(AREA_HA_sum:AREA_MHA_sum), funs(TIME = cumsum))%>%
-  mutate(Land_area = 14886.11, Land_percent = 100*(AREA_MHA_sum_TIME/Land_area))
+  mutate_at(vars(AREA_HA:AREA_MHA), funs(TIME = cumsum))%>%
+  mutate(Land_area = 14886.11, Land_percent = 100*(AREA_MHA_TIME/Land_area))
 
-EEZ<-read.csv('WDPA_EEZ_area.csv')
+EEZ<-read.csv('WDPA/WDPA_EEZ_area.csv')
 EEZ[is.na(EEZ)]<-0
 str(EEZ)
 
 EEZ.yr<-EEZ%>%
+  mutate(year = ifelse(year > 1990, year, 1990))%>%
   group_by(type, year)%>%
   summarize_at(vars(AREA_HA:AREA_MHA), funs(sum))%>%
-  mutate_at(vars(AREA_HA_sum:AREA_MHA_sum), funs(TIME = cumsum))%>%
-  mutate(EEZ_area = 14117.87, EEZ_percent = 100*(AREA_MHA_sum_TIME/EEZ_area))
+  mutate_at(vars(AREA_HA:AREA_MHA), funs(TIME = cumsum))%>%
+  mutate(EEZ_area = 14117.87, EEZ_percent = 100*(AREA_MHA_TIME/EEZ_area))
 
 
-ABNJ<-read.csv('WDPA_ABNJ_area.csv')
+ABNJ<-read.csv('WDPA/WDPA_ABNJ_area.csv')
 ABNJ[is.na(ABNJ)]<-0
-str(ABNJ)
 
 ABNJ.yr<-ABNJ%>%
+  mutate(year = ifelse(year > 1990, year, 1990))%>%
   group_by(type, year)%>%
   summarize_at(vars(AREA_HA:AREA_MHA), funs(sum))%>%
-  mutate_at(vars(AREA_HA_sum:AREA_MHA_sum), funs(TIME = cumsum))%>%
-  mutate(ABNJ_area = 122115.2, ABNJ_percent = 100*(AREA_MHA_sum_TIME/ABNJ_area))
+  mutate_at(vars(AREA_HA:AREA_MHA), funs(TIME = cumsum))%>%
+  mutate(ABNJ_area = 122115.2, ABNJ_percent = 100*(AREA_MHA_TIME/ABNJ_area))
 
 ## combine all
-WDPA<-rbind(Land.yr%>%select(type, year, area = Land_area, Mha = AREA_MHA_sum_TIME, percent = Land_percent),
-            EEZ.yr%>%select(type, year, area = EEZ_area, Mha = AREA_MHA_sum_TIME, percent = EEZ_percent),
-            ABNJ.yr%>%select(type, year, area = ABNJ_area, Mha = AREA_MHA_sum_TIME, percent = ABNJ_percent))%>%
-  melt(id.vars=c('type','year'), variable.names='AREA')%>%
+WDPA<-rbind(Land.yr%>%select(type, year, area = Land_area, Mha = AREA_MHA_TIME, percent = Land_percent),
+            EEZ.yr%>%select(type, year, area = EEZ_area, Mha = AREA_MHA_TIME, percent = EEZ_percent),
+            ABNJ.yr%>%select(type, year, area = ABNJ_area, Mha = AREA_MHA_TIME, percent = ABNJ_percent))%>%
+  melt(id.vars=c('type','year'), variable.name='AREA')%>%
   dcast(year~type+AREA)
 
 View(WDPA)
+i<-3
+WDPA[i,'ABNJ_area']
+WDPA[i-1,'ABNJ_area']
+
+## repeat values where NAs exist for ABNJ
+for (i in 1:nrow(WDPA)){
+  if (is.na(WDPA[i,'ABNJ_area']) & is.na(WDPA[i,'ABNJ_Mha']) & is.na(WDPA[i,'ABNJ_percent'])){
+    WDPA[i,'ABNJ_area']<-WDPA[i-1,'ABNJ_area']
+    WDPA[i,'ABNJ_Mha']<-WDPA[i-1,'ABNJ_Mha']
+    WDPA[i,'ABNJ_percent']<-WDPA[i-1,'ABNJ_percent']
+  }
+  
+}
+
+## calculate Total extent as sum of land and eez coverage
+
+WDPA_timeseries<-WDPA%>%mutate(Total_area = Land_area+EEZ_area,
+              Total_Mha = Land_Mha+EEZ_Mha,
+              Total_percent = 100*(Total_Mha/Total_area))
+
+# save
+write.csv(WDPA_timeseries, 'WDPA/WDPA_timeseries.csv', row.names=FALSE)
 
