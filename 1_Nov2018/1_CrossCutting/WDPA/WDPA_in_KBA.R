@@ -194,13 +194,13 @@ for (i in 1:length(subregions)){
 
 # Land
 Land.KBA.files<-grep('Land',KBA.files, value=TRUE)
-Land.KBA.files
 subregions<-gsub('KBA_Land_', '', Land.KBA.files)
-subregions[4]
+subregions[5]
+WDPA.sub.yrs[89]
 
 # HERE - do all Land then ABNJ
-#df.out<-NULL
-for (i in 4:length(subregions)){
+df.out<-NULL
+for (i in 5:length(subregions)){
   KBA.in<-st_read(paste0('KBA/subregion/',grep(subregions[i], Land.KBA.files, value=TRUE, fixed=TRUE)))%>%st_buffer(0) # Land KBA file
   KBA.sub<-KBA.in%>%
     group_by(type, G_UNEP_sub)%>%
@@ -209,7 +209,7 @@ for (i in 4:length(subregions)){
   
   WDPA.sub.yrs<-grep(subregions[i],list.files('WDPA/SUB_YEAR/Land'), value=TRUE, fixed=TRUE)
   
-  for (j in 139:length(WDPA.sub.yrs)){
+  for (j in 1:length(WDPA.sub.yrs)){
     # read in
     WDPA.in<-st_read(paste0('WDPA/SUB_YEAR/Land/',WDPA.sub.yrs[j]))%>%st_buffer(0)
     # intersect
@@ -226,7 +226,7 @@ for (i in 4:length(subregions)){
     }else{}
     
   }
-} 
+} ## strted with sub 4, file 139 at 1:50 pm
 str(df.out)
 unique(df.out$subregion)
 write.csv(df.out, 'KBA/KBA_Land_year_1_3.csv', row.names=FALSE)
@@ -258,8 +258,8 @@ WDPA.in.KBA<-st_intersection(WDPA.in, KBA.sub)%>%st_buffer(0)
 # calcualte area in M ha
 
 ## read each file in and calculate total area by year
-kba.csv<-grep('.csv', list.files('WDPA/KBA_WDPA/area_time'), value=TRUE)
-all_area<-do.call(rbind, lapply(c(kba.csv), function(x) read.csv(paste0('WDPA/KBA_WDPA/area_time/', x))))
+land.area<-list.files('KBA/intersect/Land')
+all_area<-do.call(rbind, lapply(c(land.area), function(x) read.csv(paste0('KBA/intersect/Land/', x))))
 
 ## total for each year
 area.yr<-all_area%>%group_by(year, type)%>%summarize(KBA_KM2 = sum(PA_area_km2, na.rm=TRUE))%>%
