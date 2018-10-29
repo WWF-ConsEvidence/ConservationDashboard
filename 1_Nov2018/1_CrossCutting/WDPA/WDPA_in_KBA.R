@@ -195,12 +195,20 @@ for (i in 1:length(subregions)){
 # Land
 Land.KBA.files<-grep('Land',KBA.files, value=TRUE)
 subregions<-gsub('KBA_Land_', '', Land.KBA.files)
-subregions[5]
-WDPA.sub.yrs[89]
+subregions[8]
 
+i<-8
+KBA.in<-st_read(paste0('KBA/subregion/',grep(subregions[i], Land.KBA.files, value=TRUE, fixed=TRUE)))%>%st_buffer(0) # Land KBA file
+KBA.sub<-KBA.in%>%
+  group_by(type, G_UNEP_sub)%>%
+  summarize()%>%
+  st_buffer(0)
+
+WDPA.sub.yrs<-grep(subregions[i],list.files('WDPA/SUB_YEAR/Land'), value=TRUE, fixed=TRUE)
+WDPA.sub.yrs[65]
 # HERE - do all Land then ABNJ
 df.out<-NULL
-for (i in 5:length(subregions)){
+for (i in 8:length(subregions)){
   KBA.in<-st_read(paste0('KBA/subregion/',grep(subregions[i], Land.KBA.files, value=TRUE, fixed=TRUE)))%>%st_buffer(0) # Land KBA file
   KBA.sub<-KBA.in%>%
     group_by(type, G_UNEP_sub)%>%
@@ -209,7 +217,7 @@ for (i in 5:length(subregions)){
   
   WDPA.sub.yrs<-grep(subregions[i],list.files('WDPA/SUB_YEAR/Land'), value=TRUE, fixed=TRUE)
   
-  for (j in 1:length(WDPA.sub.yrs)){
+  for (j in 65:length(WDPA.sub.yrs)){
     # read in
     WDPA.in<-st_read(paste0('WDPA/SUB_YEAR/Land/',WDPA.sub.yrs[j]))%>%st_buffer(0)
     # intersect
