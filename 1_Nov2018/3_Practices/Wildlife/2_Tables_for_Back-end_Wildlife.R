@@ -144,11 +144,11 @@ Dim_Context_Response_Wildlife_A <-
              Data_Source="WDPA")
 
 Fact_Context_Response_Wildlife_A <-
-  read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/WDPA/WDPA_timeseries.csv') %>%
-  transmute(Year_Key=year,
+  read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/WDPA_time.csv') %>%
+  transmute(Year_Key=YEAR,
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],length(Year_Key)),
             Indicator_Type_Key=rep(Dim_Context_Response_Wildlife_A$Indicator_Type_Key,length(Year_Key)),
-            Indicator_Value=Total_Mha,
+            Indicator_Value=TOTAL_MHA,
             Indicator_Upper_Value=NA,
             Indicator_Lower_Value=NA)
 
@@ -218,13 +218,13 @@ Dim_Global_2030_Outcome1_Wildlife_A <-
              Display_Order=1)
 
 Fact_Global_2030_Outcome1_Wildlife_A <- 
-  read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/WDPA/WDPA_timeseries.csv') %>%
-  transmute(Year_Key=year,
+  read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/WDPA_time.csv') %>%
+  transmute(Year_Key=YEAR,
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],length(Year_Key)),
             Indicator_Type_Key=rep(Dim_Global_2030_Outcome1_Wildlife_A$Indicator_Type_Key, length(Year_Key)),
             Practice_Outcome_Key=rep(practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Wildlife" &
                                                                    grepl("Habitats",practice_outcome_key_ref$practice_outcome)], length(Year_Key)),
-            Indicator_Value=Total_percent,
+            Indicator_Value=TOTAL_PERCENT,
             Indicator_Upper_Value=NA,
             Indicator_Lower_Value=NA) %>%
   rbind.data.frame(.,
@@ -252,7 +252,7 @@ Dim_Global_2030_Outcome1_Wildlife_B <-
              Display_Order=1)
 
 Fact_Global_2030_Outcome1_Wildlife_B <-
-  read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/KBA_timeseries.csv')%>%
+  read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/KBA/KBA_timeseries.csv')%>%
   transmute(Year_Key=year,
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],length(Year_Key)),
             Indicator_Type_Key=rep(Dim_Global_2030_Outcome1_Wildlife_B$Indicator_Type_Key, length(Year_Key)),
@@ -325,7 +325,7 @@ Fact_Global_2030_Outcome1_Wildlife_D <-
             Indicator_Type_Key=rep(Dim_Global_2030_Outcome1_Wildlife_D$Indicator_Type_Key, length(Year_Key)),
             Practice_Outcome_Key=rep(practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Wildlife" &
                                                                    grepl("Habitats",practice_outcome_key_ref$practice_outcome)], length(Year_Key)),
-            Indicator_Value=100*(METT_meetsthreshold_Mha/3351.04), # 2016 total cumulative PA coverage, since METT database was last updated 2016
+            Indicator_Value=100*(METT_meetsthreshold_Mha/4327.028912), # 2016 total cumulative PA coverage, since METT database was last updated 2016
             Indicator_Upper_Value=NA,
             Indicator_Lower_Value=NA)  %>%
   rbind.data.frame(.,
@@ -557,11 +557,13 @@ rm(Dim_Context_State_Wildlife_A,
    Dim_Global_2030_Outcome1_Wildlife_B,
    Dim_Global_2030_Outcome1_Wildlife_C,
    Dim_Global_2030_Outcome1_Wildlife_D,
+   Dim_Global_2030_Outcome1_Wildlife_E,
    Dim_Global_2030_Outcome2_Wildlife_A,
    Fact_Global_2030_Outcome1_Wildlife_A,
    Fact_Global_2030_Outcome1_Wildlife_B,
    Fact_Global_2030_Outcome1_Wildlife_C,
    Fact_Global_2030_Outcome1_Wildlife_D,
+   Fact_Global_2030_Outcome1_Wildlife_E,
    Fact_Global_2030_Outcome2_Wildlife_A,
    dim.initiatives.wildlife,
    dim.initiative.indicators.wildlife,
