@@ -81,39 +81,40 @@ plot.theme <- theme(plot.title=element_text(hjust=0.5),
 
 # ---- 2.1 Context - State ----
 
-BerkeleyEarth_airtemp <- 
-  read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/BerkeleyEarth_land_only_air_temp_dl_2018_0831.xlsx',
-            sheetName="Data")
+Temp_land_sea <- 
+  read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/Berkeley_land_sea_dl_2018_1026.csv')
+
+Temp_scaling_factor <- mean(Temp_land_sea$Annual_Anomaly[Temp_land_sea$Year>2005 &
+                                    Temp_land_sea$Year<2016]) - 0.98
 
 # -- SURFACE TEMPERATURE
 
 Dim_Context_State_CEP_A <- 
   data.frame(Indicator_Type_Key="GCS_CE_A",
-             Indicator_Name="Global annual summary of monthly air temperature over land (Celsius)",
-             Indicator_Label="Annual Average Air Temperature",
+             Indicator_Name="Global annual summary of surface temperature over land & sea (temperature anomaly from pre-industrial average)",
+             Indicator_Label="Global Average Surface Temperature",
              Panel_Label="Surface Temperature",
              Panel="State",
              Indicator_Subcategory=NA,
-             Indicator_Unit="Celsius",
-             Data_Source="Berkeley Earth, http://berkeleyearth.org/data/")
+             Indicator_Unit="Pre-industrial temperature anomaly (Celsius)",
+             Data_Source="Berkeley Earth Land & Ocean summary data, http://berkeleyearth.lbl.gov/auto/Global/Land_and_Ocean_summary.txt")
 
 Fact_Context_State_CEP_A <-
-  BerkeleyEarth_airtemp %>%
+  Temp_land_sea %>%
   transmute(Year_Key=Year,
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Climate & Energy"],length(Year_Key)),
             Indicator_Type_Key=rep(Dim_Context_State_CEP_A$Indicator_Type_Key,length(Year_Key)),
-            # 8.62 degrees (C) is the estimated absolute temperature between 1951-1980 that is used as a reference for all "annual anomalies" 
-            Indicator_Value=Annual_Anomaly+8.62, 
-            Indicator_Upper_Value=Annual_Unc+Annual_Anomaly+8.62,
-            Indicator_Lower_Value=-Annual_Unc+Annual_Anomaly+8.62)
+            Indicator_Value=Annual_Anomaly - Temp_scaling_factor, 
+            Indicator_Upper_Value=Annual_Unc + Annual_Anomaly - Temp_scaling_factor,
+            Indicator_Lower_Value=-Annual_Unc + Annual_Anomaly - Temp_scaling_factor)
 
 
 # ggplot(Fact_Context_State_CEP_A, aes(x=Year_Key,y=Indicator_Value,
 #                                      ymin=Indicator_Lower_Value,
 #                                      ymax=Indicator_Upper_Value)) +
 #   geom_ribbon(alpha=0.2) +
-#   geom_line(colour="blue") + 
-#   scale_x_continuous(breaks=c(1750,1800,1850,1900,1950,1975,2000,2015),
+#   geom_line(colour="blue") +
+#   scale_x_continuous(breaks=c(1850,1900,1950,1975,2000,2015),
 #                      expand=c(0,0)) +
 #   labs(x="Year", y="Average Annual Temperature (Celsius)") +
 #   plot.theme
@@ -334,13 +335,13 @@ Dim_Global_2030_Outcome1_CEP_A <-
 
 Fact_Global_2030_Outcome1_CEP_A <-
   read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/CAIT Country GHG Emissions.csv') %>%
-  subset(.,Country=="World", select=1:3) %>%
+  subset(.,Country=="World" & Year>2009, select=c(1,2,4)) %>%
   transmute(Year_Key=Year,
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Climate & Energy"],length(Year_Key)),
             Indicator_Type_Key=rep(Dim_Global_2030_Outcome1_CEP_A$Indicator_Type_Key, length(Year_Key)),
             Practice_Outcome_Key=rep(practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Climate & Energy" &
                                                                    grepl("Mitigation",practice_outcome_key_ref$practice_outcome)], length(Year_Key)),
-            Indicator_Value=Total.GHG.Emissions.Excluding.Land.Use.Change.and.Forestry..MtCO2e./1000,
+            Indicator_Value=Total.GHG.Emissions.Including.Land.Use.Change.and.Forestry..MtCO.e../1000,
             Indicator_Upper_Value=NA,
             Indicator_Lower_Value=NA)
 
@@ -663,7 +664,7 @@ Fact_Initiative_Financials_CEP <-
 
 # ---- REMOVE CLUTTER ----
 
-rm(BerkeleyEarth_airtemp,
+rm(Temp_land_sea,
    EIA_fossil_fuel,
    emissions.gap,
    sdg.7.energy,
