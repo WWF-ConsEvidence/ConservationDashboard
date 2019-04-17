@@ -77,7 +77,6 @@ setwd("/Users/collnell/Dropbox/ConsDB_Input")
 # WDPA_EEZ_area.csv - timeline of global protected area coverage in Exclusive Economic Zones by subregion
 # WDPA_Land_area.csv - timeline of global terrestrial protected area coverage by subregion
 # WDPA_ABNJ_area.csv - timeline of global protected area coverage in Areas Beyond National Jurisdiction by subregion
-# WDPA_timeseries.csv - collective timeline of protected area coverage in M ha and as percent for terrestrial, marine (EEZ) and ABNJ zones.
 
 clean_wdpa<-function('WDPA_Aug2018-shapefile/', type = 'UNEP'){
   ## read in WDPA data
