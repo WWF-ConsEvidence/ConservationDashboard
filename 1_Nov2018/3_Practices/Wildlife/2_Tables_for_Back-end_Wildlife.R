@@ -35,7 +35,7 @@
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #
 
-pacman::p_load(dplyr, xlsx)
+pacman::p_load(dplyr, xlsx, reshape2)
 
 
 practice_key_ref <- read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/cons_dashboard_dim_tables_20180828.xlsx',
@@ -68,8 +68,7 @@ Dim_Context_State_Wildlife_A <-
              Data_Source="Zoological Society of London; August 2018 Living Planet Index database")
 
 Fact_Context_State_Wildlife_A <-
-  read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/Global_LPI_calc_2018_0921.csv') %>%
-  subset(.,Year>1994 & Year<2016) %>%
+  read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/Global_LPI_fromflatfile_2017_0912.xlsx', sheetName="Sheet1") %>%
   transmute(Year_Key=Year,
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],length(Year_Key)),
             Indicator_Type_Key=rep(Dim_Context_State_Wildlife_A$Indicator_Type_Key,length(Year_Key)),
@@ -428,15 +427,15 @@ Fact_Global_2030_Outcome_Wildlife <-
 # ---- 4.1 Load data ----
 
 dim.initiatives.wildlife <- 
-  read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/fy18_initiative_reporting_dim_2018_0908.xlsx',sheetName="Sheet1") %>%
+  read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/fy18_initiative_reporting_dim_2018_1121.xlsx',sheetName="Sheet1") %>%
   subset(.,Practice=="Wildlife") 
 
 dim.initiative.indicators.wildlife <-
-  read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/fy18_initiative_indicators_fact_2018_0908.xlsx',sheetName="Sheet1") %>%
+  read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/fy18_initiative_indicators_fact_2018_1121.xlsx',sheetName="Sheet1") %>%
   subset(.,Practice=="Wildlife")
 
 dim.initiative.milestones.wildlife <-
-  read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/fy18_initiative_milestones_2018_0908.csv') %>%
+  read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/fy18_initiative_milestones_2018_1121.csv') %>%
   subset(.,Practice=="Wildlife")
 
 # ---- 4.2 Wildlife-specific Dim_Initiative ----
