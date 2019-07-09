@@ -1,0 +1,68 @@
+# LPI Metadata
+## _Last updated: 17 Oct 2018_
+___
+
+### Title
+Living Planet Index 
+
+### Description
+The Living Planet Index (LPI) is a measure of the state of the world's biological diversity based on population trends of vertebrate species from terrestrial, freshwater and marine habitats. The LPI has been adopted by the Convention of Biological Diversity (CBD) as an indicator of progress towards its 2011-2020 target to 'take effective and urgent action to halt the loss of biodiversity'.
+
+To calculate an LPI, a generalised additive modelling framework is used to determine the underlying trend in each population time-series (Collen et al. 2009; Loh et al. 2005). Average rates of change are then calculated and aggregated to the species level. For the global LPI, the method of aggregation has recently been revised to include a weighting system which gives trends from more species-rich systems, realms and groups more weight in the final index (McRae et al. 2017).
+
+The follow analysis used the rlpi statisical package (currently in beta/active development; can be found at https://github.com/Zoological-Society-of-London/rlpi), which calculates indices using the LPI methodology in McRae et al. (2017).  Specific biome and taxonomic diversity weightings were taken from the supplementary materials from McRae et al. (2017).  The version of the database used for analysis is the public release from August 2018 (because some records are confidential, results may differ slightly from other published reports).
+
+_References_
+http://livingplanetindex.org
+
+Collen, B., Loh, J., Whitmee, S., McRae, L., Amin, R., & J.E.M. Baillie (2009) Monitoring Change in Vertebrate Abundance: the Living Planet Index. Conservation Biology, 23(2), pp.317-327. https://doi.org/10.1111/j.1523-1739.2008.01117.x
+
+Loh, J., Green, R.E., Ricketts, T., Lamoreux, J., Jenkins, M., Kapos, V., & J. Randers (2005) The Living Planet Index: using species population time series to track trends in biodiversity.  Philosophical Transactions of the Royal Society B, 360, pp.289-295. https://doi.org/10.1098/rstb.2004.1584  
+
+McRae, L., Deinet, S., & R. Freeman (2017) The Diversity-Weighted Living Planet Index: Controlling for Taxonomic Bias in a Global Biodiversity Indicator. PLoS ONE, 12(1). https://doi.org/10.1371/journal.pone.0169156 
+
+### Date Accessed  
+August 2018
+
+### Publisher  
+Zoological Society of London and WWF
+
+http://livingplanetindex.org
+
+### File Format  
+Comma Separated Value (CSV) version of the Living Planet Index Database      
+
+### Access URL  
+http://livingplanetindex.org/data_portal
+
+### Temporal Range & Frequency
+The LPI is calculated for years 1970 - present. All index values are relative to the value of 1 for 1970 (reference year).
+
+There is a time lag in data availability, and the ability to calculate a global LPI using the most current data.  Most of the data is collected from published sources, and there is typically a delay in date of data collection and publication.  Furthermore, limited current data renders calculating a global LPI challenging until more data are put into the database.  This results in a ~3+ year time lag.  
+
+See http://livingplanetindex.org/documents/database_stats.pdf for more information on the temporal trends and time-series lengths of specific observations and species within the database.
+
+### Spatial Range & Resolution
+The LPI database is global in coverage, however there are known issues with spatial distribution of populations within the database -- with more populations coming from Europe and North America than anywhere else for both terrestrial & freshwater, and marine systems.  The diversity-weighted methodology introduced by McRae et al (2017) aim to reduce some of this bias in sample distribution.
+
+### Contact Name and Email (of Publisher)
+Indicators and Assessments Research Unit, Institute of Zoology, Zoological Society of London
+[Contact robin.freeman@ioz.ac.uk or louise.mcrae@ioz.ac.uk]
+
+### Contact Name and Email (within WWF)
+Kelly Claborn (kelly.claborn@wwf.org)
+
+### Data Permissions (License & Rights)
+The data are publically available, however are only for conservation purposes, scientific analysis or research.  The recipient of the data will provide a full and appropriate acknowledgement and citation in any materials of publications derived in part or in whole from the data.  Reproduction of the dataset or products derived from it, either whole or in part, for direct financial gain is prohibited without prior written permission of ZSL and WWF.  
+
+The full list of terms of use can be found at www.livingplanetindex.org/documents/data_agreement.pdf
+
+###  Statistical Processing  
+
+R Script: DRAFT_LPI.R
+
+Data processing follows the rlpi package created by ZSL (which can be found and downloaded from https://github.com/Zoological-Society-of-London/rlpi) and the methodology and weights used in McRae et al's (2017) 'The Diversity-Weighted Living Planet Index: Controlling for Taxonomic Bias in a Global Biodiversity Indicator'. Please see these references for in-depth details on the methodology and analytical modeling used to calculate the LPI.
+
+The first step in processing is to separate the data into the three systems (terrestrial, freshwater, marine) and calculate each of their respective LPIs.  To calculate an individual system's LPI, the data must also be broken apart by taxonomic order (e.g., birds, mammals) and realm (e.g., Afrotropical, Nearctic) and assigned the appropriate weighting (see S10-S13 Tables in the Supporting Information from McRae et al (2017)).  
+
+Once all three systems have had their respective LPI calculated, the global LPI is simply the average of the three systems -- all weighted equally.

@@ -1,0 +1,93 @@
+# METT Metadata
+## _Last updated: 15 Oct 2018_
+___
+
+### Title
+Management Effectiveness Tracking Tool (METT) & METT Score Threshold
+
+### Description
+
+The METT was developed as part of the WWF-World Bank Forest Alliance programme and the first version was field tested in 2001. Since then it has been adopted and adapted by the Global Environment Facility and many other countries, organisations and projects. The METT consists of two main sections: datasheets of key information on the protected area and an assessment form containing a questionnaire with four alternative responses to 30 questions, each with an associated score, a data field for notes and a justification for the answers, and a place to list steps to improve management if necessary.
+
+The METT is strongest at measuring the effectiveness of management and weaker at reflecting overall conservation results. It was designed primarily to track progress over time at a single site and to identify actions to address any management weaknesses; rather than to compare management between different sites (see Section 2.3 in the 2016 METT handbook for more information). However, the development of a large global database of METT results has encouraged several comparative analyses, to identify those management processes critical to success. One of these such analyses was completed by Gill et al in their 2017 paper in Nature, "Capacity shortfalls hinder the performance of marine protected areas globally".  Gill et al establish a threshold score for management efficacy, based on 8 of the 30 questions in the METT that we use to calculate the percent of protected areas that reach a METT score threshold. 
+
+__SOURCE:__  
+2016 METT handbook (https://www.protectedplanet.net/system/comfy/cms/files/files/000/000/045/original/WWF_METT_Handbook_2016_FINAL.pdf)
+
+__NOTE:__  
+Only METT data were included in the analysis, as detailed data (i.e., any information beyond metadata) on other Protectd Area Management Effectiveness (PAME) assessments are unavailable / not standardized - therefore eliminating the viability of calculating any 'score threshold' across the entirety of the PAME database. 
+
+METT-related documentation cite the METT as having been applied in over a fifth of the world's terrestrial protected areas (by area).  We were unable to replicate this high number, since all protected area sites within the METT database were cross-referenced to the World Database on Protected Areas (WDPA) to calculate the total area and many sites were unable to be matched to the WDPA.
+
+__MORE INFORMATION:__  
+See https://protectedplanet.net/c/protected-areas-management-effectiveness-pame/management-effectiveness-tracking-tool for more information on the METT, including the 2016 METT handbook and the most recent version of the tool. See the "Statistical Processing" section below for more details on the filtering of the data, and the score threshold information.
+
+### Date Accessed  
+September 2018 
+
+### Publisher  
+__METT:__ Protected Area Management Effectiveness (PAME) assessments (including the METT) are recorded in the Global Database on Protected Area Management Effectiveness (GD-PAME) developed by the University of Queensland and now managed by UNEP-WCMC (UNEP-WCMC and IUCN WCPA, 2016). 
+
+__SCORE THRESHOLD METHODOLOGY:__ Gill, D. et al. (2017) Capacity shortfalls hinder the performance of marine protected areas globally. Nature, 543(7647), p.665-669. Supplemental materials.
+
+### File Format  
+__METT:__ Access database 
+
+__SCORE THRESHOLD METHODOLOGY:__ Supplemental materials PDF document from Gill et al (2017)
+
+### Temporal Range & Frequency
+The year associated with each site in the METT database corresponds to the year it was assessed. Many sites have repeat assessments, so only the most recent year of assessment was included in the analysis.  Temporal range is from 2000-2016.  
+
+A note for interpretation: because we kept only the most recent year of assessment (even if it was from 10+ years ago), our analysis does not provide any information on management trends through time in a given protected area.  Furthermore, for those protected areas that met the score threshold, there is an inherent assumption that they continue to meet the threshold for effective management at present - no matter how long ago they completed their assessment.
+
+### Spatial Range & Resolution
+Global extent.  All protected areas that have used the METT and submitted their materials to UNEP-WCMC are included. 
+
+### Contact Name and Email (of Publisher)
+Naomi Kingston (naomi.kingston@unep-wcmc.org) 
+
+### Contact Name and Email (within WWF)
+Kelly Claborn (kelly.claborn@wwf.org)
+
+### Data Permissions (License & Rights)
+
+The METT database is managed by UNEP-WCMC.  The data - and any figures, analyses, or other insights gleaned from the database - are to be used for WWF internal purposes _ONLY_.  WWF may not share the data in any way, as UNEP-WCMC does not have permission from the data contributors to the make the data publicly available. 
+
+###  Processing  
+
+R script: DRAFT_METT.R
+
+
+Pulling from the METT database, most recently updated in 2016, there are two different lists of protected areas:  those that completed a METT using the version of tool from 2002 (METT 1), and those that used the most recent version from 2007 (METT 3).  METT1 and METT3 data were then each subset to only include identifying factors (e.g., WDPA.ID, Country, PA_Name, estimates of protected area size, etc.), and the eight questions that were used to calculate whether or not the protected area met the METT score threshold (according to Gill et al's (2017) methodology outlined in their supplemental materials).  
+
+The eight questions used to establish a score threshold were regarding:
+
+  * __Budget capacity__ 
+      * _Threshold:_ Acceptable budget capacity (score of 2 or 3)
+  * __Staff capacity and/or presence__
+      * _Threshold:_ Adequate staff capacity/presence (score of 3)
+  * __Implementation of planned management activities__ 
+      * _Threshold:_ Active implementation of pre-determined management activities (score of 2 or 3)
+  * __Degree of monitoring of management, users, and/or resource conditions__ 
+      * _Threshold:_ Monitoring informing management activities (score of 3)
+  * __Level of enforcement__ 
+      * _Threshold:_ Acceptable enforcement capacity and/or consistency (score of 2 or 3)
+  * __Delineation of PA boundaries__ 
+      * _Threshold:_ Clearly defined boundaries (score of 3)
+  * __Appropriateness of regulations controlling use__ 
+      * _Threshold:_ Appropriate PA regulations in place controlling use (score of 2 or 3)
+  * __Level of legislative support__ 
+      * _Threshold:_ Strong legislative support (i.e., legally gazetted) (score of 3)  
+    
+Each of the eight questions were recoded for each site (in both the METT1 and METT3 data frames) - given a score of 0 or 1 (0 = did not meet threshold; 1 = met threshold).  Each site was given an overall "score" ranging from 0 to 8, equalling the sum of all eight recoded questions.  To reach the score threshold, the site must have a score of 8.  
+
+METT1 and METT3 data were joined together; and if there were any repeat assessments for a single site, the most recent assessment was used.  
+
+Next, the World Database on Protected Areas (WDPA) was subset and aggregated by (1) sites that had METT assessments and (2) sites that had METT assessments that met the threshold for effective management, using the reported WDPA ID. This aggregation accounts for potential spatial overlap in sites due to misreporting. The global extent of METT sites and effective sites was calculated in M ha and as a percent of total assessment sites. Spatial files were then intersected with the global boundaries for land, exclusive economic zones, and areas beyond national jurisdiction. 
+
+It should be noted that a large number of METT site did not have a valid WDPA ID associated with it or had an incorrect WDPA ID (approximately 30%, 600 METT assessments out of 2000 total). Efforts were made to match METT assessments without WDPA IDs to sites in the WDPA based upon the reported site name and ISO3 code, however only a few number of sites were matched. To be able to evaluate the efficacy of METT assessments it would be most valuable to have accurate and complete information on site associations with the WDPA.   
+
+ 
+
+
+

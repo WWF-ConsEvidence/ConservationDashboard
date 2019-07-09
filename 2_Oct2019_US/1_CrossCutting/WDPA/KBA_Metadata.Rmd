@@ -1,0 +1,72 @@
+# KBA Metadata
+## _Last updated: 23 Oct 2018_
+___
+
+### Title
+Global Key Biodiversity Areas Boundaries    
+
+### Description
+Global Dataset containing the current boundaries for Key Biodiversity Areas (KBAs).  
+
+### Date Accessed  
+September 2018. Downloaded under licence from the Integrated Biodiversity Assessment Tool. http://www.ibatforbusiness.org  
+
+### Publisher  
+BirdLife International and Conservation International, 2018. Key Biodiversity Area (KBA) digital boundaries: September 2018 version. Maintained by BirdLife International on behalf of BirdLife International and Conservation International. Downloaded under licence from the Integrated Biodiversity Assessment Tool. http://www.ibatforbusiness.org
+
+### File Format  
+Shapefile - data provided as spatial polygons and points separately   
+
+### Access URL  
+Downloaded under licence from the Integrated Biodiversity Assessment Tool. http://www.ibatforbusiness.org
+
+### Temporal Range & Frequency
+September 2018 version     
+
+### Spatial Range & Resolution
+Global extent.   
+
+### Contact Name and Email (of Publisher)
+Please mark all correspondence: “FAO Information Management Division”.
+birdlife@birdlife.org  
+
+### Contact Name and Email (within WWF)
+  
+
+### Data Permissions (License & Rights)
+1	Terms of use
+1.1	The data are supplied only for conservation purposes, scientific analysis or research.
+
+1.2	The recipient of the data will provide a full and appropriate acknowledgement and citation in any materials or publications derived in part or in whole from the data; relevant citation details will be provided with each dataset. For any publications making substantial use of the data, BirdLife International welcomes the opportunity for coauthorship, collaboration and to comment prior to publication. Expressions of interest can be sent to science@birdlife.org.
+
+1.3	Reproduction of the dataset or products derived from it, either whole or in part, for commercial purposes is prohibited without prior written permission of BirdLife International. For the purposes of these Terms of Use, “commercial purposes” means a) any use by, on behalf of, or to inform or assist the activities of, a commercial entity (an entity that operates ‘for profit’) or b) use by any non-profit entity for the purposes of revenue generation. If you require permission please contact BirdLife via email to birdlife@birdlife.org or by writing to the Head of Information Management at the address below.
+
+1.4	The recipient will only use the data provided for the purpose for which it was requested, if subsequent or different use is required the recipient must contact the BirdLife secretariat again for written approval.
+
+1.5	The recipient will not pass the original datasets on to third parties and will direct all requests for use of the data back to the BirdLife Secretariat. 
+
+1.6	The recipient will not publish the data in their original format, either whole or in part, on a website, FTP site, CD, memory stick or any other media. The recipient should provide a link to the original data source location on the BirdLife International website where appropriate. 
+
+1.7	The recipient may only pass on datasets derived from the data supplied by BirdLife International if these derived data are supplied with the same terms of use.
+
+1.8	Use of these data does not constitute endorsement by BirdLife International of any derived products, reports or analyses. The BirdLife International logo must not be used on any derived products, reports or analyses, or supporting materials, without express permission.
+
+1.9	BirdLife International reserves the right to comment on the accuracy of representation of the data in material produced by a recipient.
+
+1.10	The data are provided with additional supporting metadata, describing how they were compiled, ownership, type and quality of data, and limitations.  The recipient must read all supporting information prior to any analysis and agree to abide by any stipulations contained therein. Where appropriate, the BirdLife Secretariat can provide additional guidance on request to aid in the correct use and interpretation of the data. BirdLife International endeavours to maintain accurate and up-to-date data at all times, but can accept no responsibility for the consequences of errors or omissions in the data, for misuse of the data by any organisation or individual, or for any damage done to computing systems into which the data are entered (see Disclaimer below).
+
+1.11	Either an electronic or two paper copies of all products published using data supplied by BirdLife International will be sent, free of charge, to the BirdLife Global Secretariat at:
+
+BirdLife International, David Attenborough Building, Pembroke Street, Cambridge, CB2 3QZ, UK or via email to science@birdlife.org
+
+
+###  Statistical processing  
+
+R script: WDPA_in_KBA.R
+  
+Steps:    
+a. KBA point data are filtered to sites with a reported area and buffered using the radius of a circle of equivalent area. Buffered points and poylgons combined into a single feature and aggregated by Country.         
+b. Combined KBA polygons are intersected with global boundaries to delineate terrestrial, marine, and ABNJ KBAs. In this process, KBA polygons are associated with global subregions, which are used to subset KBA shapefiles. Geometries are repaied as necessary and subregional files are saved. The basemap layer used was provided by Brooks et al.2016 (https://doi.org/10.5061/dryad.6gb90.2). 
+c. WDPA spatial files aggregated by subregion at each year from 1995-2018 are intersected with KBA polygons for same subregion (terrestrial and EEZ) and ABNJ. 
+d. The total area of protected area that is within KBAs is calculated in M ha from intersected files for terrestrial, marine, and globally.The percent in KBA over time is calculated as the M ha of protected area in KBA divided by the annual total extent (M ha) of protected areas. Mollweide projection was used for area calculations. Output file saved as 'KBA_timeseries.csv'  
+

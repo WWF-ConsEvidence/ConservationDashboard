@@ -1,0 +1,74 @@
+# Forest Global Context
+## State Indicator -- Tree Cover
+___
+
+### _Last updated: 29 Aug 2018_
+____
+
+#### Title
+
+#### Description
+#### Date Accessed
+#### Publisher
+#### File Format
+#### Access URL
+#### Temporal Range & Frequency
+#### Spatial Range & Resolution
+#### Contact Name and Email (of Publisher)
+#### Contact Name and Email (within WWF)
+#### Data Permissions (License & Rights)
+
+
+____
+```{r data input, include=FALSE}
+pacman::p_load(dplyr, ggplot2, ezknitr)
+
+plot.theme <- theme(plot.title=element_text(hjust=0.5),
+                    plot.margin=margin(t=5,r=20,b=5,l=5,unit="pt"),
+                    axis.ticks=element_blank(),
+                    panel.background=element_rect(fill="white",
+                                                  colour="#909090"),
+                    panel.border=element_rect(fill=NA,
+                                              size=0.25,
+                                              colour="#C0C0C0"),
+                    panel.grid.major.x=element_line(colour="#C0C0C0",
+                                                    size=0.25,
+                                                    linetype=3),
+                    panel.grid.major.y=element_blank(),
+                    axis.title=element_text(size=rel(0.9),
+                                            angle=0,
+                                            face="bold",
+                                            colour="#303030"),
+                    axis.text=element_text(size=rel(0.9),
+                                           angle=0,
+                                           colour="#303030"),
+                    legend.position="top",
+                    legend.justification="center",
+                    legend.box.spacing=unit(0.1,"cm"),
+                    legend.title=element_blank())
+
+sdg.15.1.1 <- 
+  read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/SDG_15.1.1_forest_area_dl_2018_0828.csv') %>%
+  transmute(Indicator=Indicator,
+            Description=rep("Forest area",length(SeriesDescription)),
+            Geography=GeoAreaName,
+            Year=TimePeriod,
+            Value=Value/1000,
+            Units=rep("Million ha",length(Units)),
+            Source=Source)
+```
+
+__Let's take a look at the data__
+```{r show data & plot, echo=FALSE}
+
+sdg.15.1.1
+
+ggplot(sdg.15.1.1) +
+  geom_line(aes(x=Year, y=Value),
+            colour="dark green",
+            size=1) +
+  plot.theme + labs(x="Year", y="Area (million ha)", title="Global Tree Cover")
+
+```
+
+
