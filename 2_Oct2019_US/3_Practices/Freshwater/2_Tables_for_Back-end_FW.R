@@ -247,7 +247,7 @@ Dim_Global_2030_Outcome1_FW_C <-
              US_Indicator="Yes")
 
 Fact_Global_2030_Outcome1_FW_C <-
-  read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/Ramsar_sitedata_dl_2018_0905.csv') %>%
+  read.csv('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/Ramsar_sitedata_dl_2019_0710.csv') %>%
   select(.,c("Designation.date","Area..ha.")) %>%
   mutate(Date=as.character(Designation.date),
          Year=as.numeric(substr(Date,(nchar(Date)-4)+1,nchar(Date)))) %>%
@@ -266,7 +266,8 @@ Fact_Global_2030_Outcome1_FW_C <-
 # append the Dim table, using the Ramsar data source imported for the Fact table
 
 Dim_Global_2030_Outcome1_FW_C$Indicator_Target <- 
-  2*Fact_Global_2030_Outcome1_FW_C$Indicator_Value[Fact_Global_2030_Outcome1_FW_C$Year_Key==2017]
+  2*Fact_Global_2030_Outcome1_FW_C$Indicator_Value[Fact_Global_2030_Outcome1_FW_C$Year_Key==2017 &
+                                                     !is.na(Fact_Global_2030_Outcome1_FW_C$Year_Key)]
 
 # Add target value to Fact table
 
@@ -366,20 +367,20 @@ Fact_Global_2030_Outcome_FW <-
 # ---- 4.1 Load data ----
 
 dim.initiatives.fw <- 
-  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_reporting_dim_2019_0703.xlsx',sheetName="Sheet1") %>%
+  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_reporting_dim_2019_0715.xlsx',sheetName="Sheet1") %>%
   subset(.,Practice=="Freshwater") 
 
 dim.initiative.indicators.fw <-
-  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_indicators_dim_2019_0703.xlsx',sheetName="Sheet1") %>%
+  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_indicators_dim_2019_0715.xlsx',sheetName="Sheet1") %>%
   subset(.,Practice=="Freshwater")
 
 fact.initiative.indicators.fw <-
-  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_indicators_fact_2019_0703.xlsx',sheetName="Sheet1") %>%
+  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_indicators_fact_2019_0715.xlsx',sheetName="Sheet1") %>%
   left_join(.,dim.initiatives.fw[,c("Initiative.key","Practice")], by="Initiative.key") %>%
   subset(.,Practice=="Freshwater")
 
 dim.initiative.milestones.fw <-
-  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_milestones_2019_0703.xlsx',sheetName="Sheet1") %>%
+  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_milestones_2019_0715.xlsx',sheetName="Sheet1") %>%
   subset(.,Practice=="Freshwater")
 
 

@@ -82,7 +82,7 @@ plot.theme <- theme(plot.title=element_text(hjust=0.5),
 # ---- 2.1 Context - State ----
 
 Temp_land_sea <- 
-  read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/Berkeley_land_sea_dl_2018_1026.csv')
+  read.csv('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/Berkeley_land_sea_dl_2019_0710.csv')
 
 Temp_scaling_factor <- mean(Temp_land_sea$Annual_Anomaly[Temp_land_sea$Year>2005 &
                                     Temp_land_sea$Year<2016]) - 0.98
@@ -511,7 +511,7 @@ Dim_Global_2030_Outcome2_CEP_D <-
              US_Indicator="Yes")
 
 Fact_Global_2030_Outcome2_CEP_D <-
-  read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/CoalPlantTracker_pipeline_2018_0906.xlsx',sheetName='Data') %>%
+  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/CoalPlantTracker_pipeline_2019_0711.xlsx',sheetName='Data') %>%
   subset(.,Pipeline=="All Pipeline") %>%
   transmute(Year_Key=Year,
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Climate & Energy"],length(Year_Key)),
@@ -548,7 +548,7 @@ Dim_Global_2030_Outcome3_CEP_A <-
              US_Indicator="Yes")
 
 Fact_Global_2030_Outcome3_CEP_A <-
-  read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/NAPCentral_countrylists_2018_0906.xlsx',sheetName='Sheet1') %>%
+  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/NAPCentral_countrylists_2019_0711.xlsx',sheetName='Sheet1') %>%
   group_by(Year) %>%
   summarise(NumCountries=length(Country)) %>%
   transmute(Year_Key=Year,
@@ -599,20 +599,20 @@ Fact_Global_2030_Outcome_CEP <-
 # ---- 4.1 Load data ----
 
 dim.initiatives.CEP <- 
-  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_reporting_dim_2019_0703.xlsx',sheetName="Sheet1") %>%
+  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_reporting_dim_2019_0715.xlsx',sheetName="Sheet1") %>%
   subset(.,Practice=="Climate & Energy") 
 
 dim.initiative.indicators.CEP <-
-  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_indicators_dim_2019_0703.xlsx',sheetName="Sheet1") %>%
+  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_indicators_dim_2019_0715.xlsx',sheetName="Sheet1") %>%
   subset(.,Practice=="Climate & Energy")
 
 fact.initiative.indicators.CEP <-
-  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_indicators_fact_2019_0703.xlsx',sheetName="Sheet1") %>%
+  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_indicators_fact_2019_0715.xlsx',sheetName="Sheet1") %>%
   left_join(.,dim.initiatives.CEP[,c("Initiative.key","Practice")], by="Initiative.key") %>%
   subset(.,Practice=="Climate & Energy")
 
 dim.initiative.milestones.CEP <-
-  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_milestones_2019_0703.xlsx',sheetName="Sheet1") %>%
+  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_milestones_2019_0715.xlsx',sheetName="Sheet1") %>%
   subset(.,Practice=="Climate & Energy")
 
 

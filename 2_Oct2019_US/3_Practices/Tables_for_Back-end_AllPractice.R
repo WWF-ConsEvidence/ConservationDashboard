@@ -120,49 +120,67 @@ write.xlsx(Fact_Global_2030_Outcomes,file.name,sheetName="Fact_Global_2030_Outco
 # ---- 3.1 Dim_Initiative ----
 
 Dim_Initiative <-
-  rbind.data.frame(Dim_Initiative_Food,
+  rbind.data.frame(Dim_Initiative_CEP,
+                   Dim_Initiative_Food,
                    Dim_Initiative_Forest,
-                   Dim_Initiative_FW)
+                   Dim_Initiative_FW,
+                   Dim_Initiative_Oceans,
+                   Dim_Initiative_Wildlife)
 
 
 # ---- 3.2 Dim_Initiative_Indicator_Type ----
 
 Dim_Initiative_Indicator_Type <-
-  rbind.data.frame(Dim_Initiative_Indicator_Food,
+  rbind.data.frame(Dim_Initiative_Indicator_CEP,
+                   Dim_Initiative_Indicator_Food,
                    Dim_Initiative_Indicator_Forest,
-                   Dim_Initiative_Indicator_FW)
+                   Dim_Initiative_Indicator_FW,
+                   Dim_Initiative_Indicator_Oceans,
+                   Dim_Initiative_Indicator_Wildlife)
 
 
 # ---- 3.3 Fact_Initiative_Indicators ----
 
 Fact_Initiative_Indicators <-
-  rbind.data.frame(Fact_Initiative_Indicator_Food,
+  rbind.data.frame(Fact_Initiative_Indicator_CEP,
+                   Fact_Initiative_Indicator_Food,
                    Fact_Initiative_Indicator_Forest,
-                   Fact_Initiative_Indicator_FW)
+                   Fact_Initiative_Indicator_FW,
+                   Fact_Initiative_Indicator_Oceans,
+                   Fact_Initiative_Indicator_Wildlife)
 
 
 # ---- 3.4 Fact_Initiative_Financials ----
 
 Fact_Initiative_Financials <-
-  rbind.data.frame(Fact_Initiative_Financials_Food,
+  rbind.data.frame(Fact_Initiative_Financials_CEP,
+                   Fact_Initiative_Financials_Food,
                    Fact_Initiative_Financials_Forest,
-                   Fact_Initiative_Financials_FW)
+                   Fact_Initiative_Financials_FW,
+                   Fact_Initiative_Financials_Oceans,
+                   Fact_Initiative_Financials_Wildlife)
 
 
 # ---- 3.5 Milestone_Group_Bridge ----
 
 Milestone_Group_Bridge <-
-  rbind.data.frame(Milestone_Group_Bridge_Food,
+  rbind.data.frame(Milestone_Group_Bridge_CEP,
+                   Milestone_Group_Bridge_Food,
                    Milestone_Group_Bridge_Forest,
-                   Milestone_Group_Bridge_FW)
+                   Milestone_Group_Bridge_FW,
+                   Milestone_Group_Bridge_Oceans,
+                   Milestone_Group_Bridge_Wildlife)
 
 
 # ---- 3.6 Dim_Milestone ----
 
 Dim_Milestone <-
-  rbind.data.frame(Dim_Milestone_Food,
+  rbind.data.frame(Dim_Milestone_CEP,
+                   Dim_Milestone_Food,
                    Dim_Milestone_Forest,
-                   Dim_Milestone_FW)
+                   Dim_Milestone_FW,
+                   Dim_Milestone_Oceans,
+                   Dim_Milestone_Wildlife)
 
 
 # ---- 3.7 Export Initiative Files ----

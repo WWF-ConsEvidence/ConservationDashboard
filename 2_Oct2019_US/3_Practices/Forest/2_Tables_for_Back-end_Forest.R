@@ -221,7 +221,7 @@ Dim_Context_Response_Forest_B <-
              US_Indicator="Yes")
 
 Fact_Context_Response_Forest_B <-
-  read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/FSC_area_2017_0915.csv') %>%
+  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/FSC_area_2019_0711.xlsx',sheetName="FSC_area_2017_0915") %>%
   transmute(Year_Key=Year,
              Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Forests"],length(Year_Key)),
              Indicator_Type_Key=rep(Dim_Context_Response_Forest_B$Indicator_Type_Key,length(Year_Key)),
@@ -347,7 +347,7 @@ Dim_Global_2030_Outcome3_Forest_A <-
              US_Indicator="Yes")
 
 Fact_Global_2030_Outcome3_Forest_A <-
-  read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/BonnChallenge_commitments_2018_0820.xlsx', 
+  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/BonnChallenge_commitments_2019_0710.xlsx', 
             sheetName="Sheet1") %>%
   group_by(Commitment_Year) %>%
   summarise(Indicator_Value=sum(Committed_Area)) %>%
@@ -448,20 +448,20 @@ Fact_Global_2030_Outcome_Forest <-
 # ---- 4.1 Load data ----
 
 dim.initiatives.forests <- 
-  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_reporting_dim_2019_0703.xlsx',sheetName="Sheet1") %>%
+  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_reporting_dim_2019_0715.xlsx',sheetName="Sheet1") %>%
   subset(.,Practice=="Forests") 
 
 dim.initiative.indicators.forests <-
-  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_indicators_dim_2019_0703.xlsx',sheetName="Sheet1") %>%
+  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_indicators_dim_2019_0715.xlsx',sheetName="Sheet1") %>%
   subset(.,Practice=="Forests")
 
 fact.initiative.indicators.forests <-
-  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_indicators_fact_2019_0703.xlsx',sheetName="Sheet1") %>%
+  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_indicators_fact_2019_0715.xlsx',sheetName="Sheet1") %>%
   left_join(.,dim.initiatives.forests[,c("Initiative.key","Practice")], by="Initiative.key") %>%
   subset(.,Practice=="Forests")
 
 dim.initiative.milestones.forests <-
-  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_milestones_2019_0703.xlsx',sheetName="Sheet1") %>%
+  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_milestones_2019_0715.xlsx',sheetName="Sheet1") %>%
   subset(.,Practice=="Forests")
 
 
