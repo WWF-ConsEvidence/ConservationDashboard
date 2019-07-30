@@ -1,9 +1,9 @@
 # 
-# code: Wildlife Practice Indicator and Initiative Tables
+# code: Wildlife Practice Indicator and Initiative Tables FOR 2019 US DASHBOARD
 # 
 # author: Kelly Claborn, clabornkelly@gmail.com
 # created: August 2018
-# modified: 
+# modified: July 2019
 # 
 # ---- inputs ----
 #  1) Wildlife-specific data tables (in 1_Nov2018/2_FlatDataFiles/ConsDB_Input)
@@ -65,7 +65,9 @@ Dim_Context_State_Wildlife_A <-
              Panel="State",
              Indicator_Subcategory="Living Planet Index",
              Indicator_Unit="Index",
-             Data_Source="Zoological Society of London; August 2018 Living Planet Index database")
+             Data_Source="Zoological Society of London; August 2018 Living Planet Index database",
+             Global_Indicator="Yes",
+             US_Indicator="Yes")
 
 Fact_Context_State_Wildlife_A <-
   read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/Global_LPI_fromflatfile_2017_0912.xlsx', sheetName="Sheet1") %>%
@@ -87,7 +89,9 @@ Dim_Context_State_Wildlife_B <-
              Panel="State",
              Indicator_Subcategory="Red List Index",
              Indicator_Unit="Index",
-             Data_Source="SDG Indicator Bank -- IUCN")
+             Data_Source="SDG Indicator Bank -- IUCN",
+             Global_Indicator="Yes",
+             US_Indicator="Yes")
 
 Fact_Context_State_Wildlife_B <-
   read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/SDG_15.5.1_RLI_dl_2018_0921.csv') %>%
@@ -115,7 +119,9 @@ Dim_Context_Threat_Wildlife_A <-
              Panel="Threat",
              Indicator_Subcategory="Tree Cover Loss",
              Indicator_Unit="M ha per year",
-             Data_Source="Global Forest Watch")
+             Data_Source="Global Forest Watch",
+             Global_Indicator="Yes",
+             US_Indicator="Yes")
 
 Fact_Context_Threat_Wildlife_A <-
   read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/GFW_ForestLoss_2018_0821.xlsx', sheetName="Sheet1") %>%
@@ -140,7 +146,9 @@ Dim_Context_Response_Wildlife_A <-
              Panel="Response",
              Indicator_Subcategory="Protected",
              Indicator_Unit="M ha",
-             Data_Source="WDPA")
+             Data_Source="WDPA",
+             Global_Indicator="Yes",
+             US_Indicator="Yes")
 
 Fact_Context_Response_Wildlife_A <-
   read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/WDPA_time.csv') %>%
@@ -161,7 +169,9 @@ Dim_Context_Response_Wildlife_B <-
              Panel="Response",
              Indicator_Subcategory="Community Conserved",
              Indicator_Unit="M ha",
-             Data_Source="WDPA")
+             Data_Source="WDPA",
+             Global_Indicator="Yes",
+             US_Indicator="Yes")
 
 Fact_Context_Response_Wildlife_B <- 
   read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/ICCA_timeseries.csv') %>%
@@ -214,7 +224,9 @@ Dim_Global_2030_Outcome1_Wildlife_A <-
              Indicator_Target=30,
              Indicator_Type="Outcome",
              Panel_Label="Vital Habitats Conserved",
-             Display_Order=1)
+             Display_Order=1,
+             Global_Indicator="Yes",
+             US_Indicator="Yes")
 
 Fact_Global_2030_Outcome1_Wildlife_A <- 
   read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/WDPA_time.csv') %>%
@@ -248,7 +260,9 @@ Dim_Global_2030_Outcome1_Wildlife_B <-
              Indicator_Target=100,
              Indicator_Type="Outcome",
              Panel_Label="Vital Habitats Conserved",
-             Display_Order=1)
+             Display_Order=1,
+             Global_Indicator="Yes",
+             US_Indicator="Yes")
 
 Fact_Global_2030_Outcome1_Wildlife_B <-
   read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/KBA/KBA_timeseries.csv')%>%
@@ -282,7 +296,9 @@ Dim_Global_2030_Outcome1_Wildlife_C <-
              Indicator_Target=100,
              Indicator_Type="Outcome",
              Panel_Label="Vital Habitats Conserved",
-             Display_Order=1)
+             Display_Order=1,
+             Global_Indicator="Yes",
+             US_Indicator="Yes")
 
 Fact_Global_2030_Outcome1_Wildlife_C <-
   data.frame(Year_Key=2016,
@@ -315,7 +331,9 @@ Dim_Global_2030_Outcome1_Wildlife_D <-
              Indicator_Target=100,
              Indicator_Type="Outcome",
              Panel_Label="Vital Habitats Conserved",
-             Display_Order=1)
+             Display_Order=1,
+             Global_Indicator="Yes",
+             US_Indicator="Yes")
 
 Fact_Global_2030_Outcome1_Wildlife_D <-
   read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/METT/METT_area.csv') %>%
@@ -349,7 +367,9 @@ Dim_Global_2030_Outcome1_Wildlife_E <-
              Indicator_Target=100,
              Indicator_Type="Outcome",
              Panel_Label="Vital Habitats Conserved",
-             Display_Order=1)
+             Display_Order=1,
+             Global_Indicator="Yes",
+             US_Indicator="Yes")
 
 Fact_Global_2030_Outcome1_Wildlife_E <-
   read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/METT/METT_area.csv')%>%
@@ -384,7 +404,9 @@ Dim_Global_2030_Outcome2_Wildlife_A <-
              Indicator_Target=NA,
              Indicator_Type="Outcome",
              Panel_Label="Overexploitation Prevented",
-             Display_Order=2)
+             Display_Order=2,
+             Global_Indicator="Yes",
+             US_Indicator="Yes")
 
 Fact_Global_2030_Outcome2_Wildlife_A <-
   data.frame(Year_Key=9999,
@@ -427,16 +449,22 @@ Fact_Global_2030_Outcome_Wildlife <-
 # ---- 4.1 Load data ----
 
 dim.initiatives.wildlife <- 
-  read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/fy18_initiative_reporting_dim_2018_1121.xlsx',sheetName="Sheet1") %>%
+  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_reporting_dim_2019_0703.xlsx',sheetName="Sheet1") %>%
   subset(.,Practice=="Wildlife") 
 
 dim.initiative.indicators.wildlife <-
-  read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/fy18_initiative_indicators_fact_2018_1121.xlsx',sheetName="Sheet1") %>%
+  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_indicators_dim_2019_0703.xlsx',sheetName="Sheet1") %>%
+  subset(.,Practice=="Wildlife")
+
+fact.initiative.indicators.wildlife <-
+  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_indicators_fact_2019_0703.xlsx',sheetName="Sheet1") %>%
+  left_join(.,dim.initiatives.wildlife[,c("Initiative.key","Practice")], by="Initiative.key") %>%
   subset(.,Practice=="Wildlife")
 
 dim.initiative.milestones.wildlife <-
-  read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/fy18_initiative_milestones_2018_1121.csv') %>%
+  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_milestones_2019_0703.xlsx',sheetName="Sheet1") %>%
   subset(.,Practice=="Wildlife")
+
 
 # ---- 4.2 Wildlife-specific Dim_Initiative ----
 
@@ -446,7 +474,10 @@ Dim_Initiative_Wildlife <-
             Initiative_Name=Initiative,
             Initiative_Status=Overall.status,
             Initiative_Status_Justification=Overall.just,
-            Initiative_Goal=Initiative.statement)
+            Initiative_Goal=Initiative.statement,
+            Global_Initiative=Global.initiative,
+            US_Initiative=US.initiative,
+            Display_Order=Display.order)
 
 
 # ---- 4.3 Wildlife-specific Dim_Initiative_Indicator_Type ----
@@ -458,51 +489,21 @@ Dim_Initiative_Indicator_Wildlife <-
             Indicator_Name=ifelse(!is.na(Indicator.name),as.character(Indicator.name),"FORTHCOMING"),
             Indicator_Label=ifelse(!is.na(Indicator.label),as.character(Indicator.label),"Not Yet Identified"),
             Indicator_Subcategory=Subcategory,
-            Indicator_Target=Target,
             Indicator_Unit=Units,
             Data_Source=Source,
-            Display_Order=Display.order)
+            Indicator_Target=Target,
+            Display_Order=Display.order,
+            Indicator_Statement=Statement)
 
 
 # ---- 4.4 Wildlife-specific Fact_Initiative_Indicators ----
 
 Fact_Initiative_Indicator_Wildlife <-
-  dim.initiative.indicators.wildlife %>%
-  left_join(.,dim.initiatives.wildlife[,c("Initiative.key","Initiative","Practice.outcome.key")],
-            by="Initiative") %>%
-  melt(.,measure.vars=c("Baseline.value","Current.value","Target")) %>%
-  transmute(Initiative.indicator.key=Initiative.indicator.key,
-            Initiative=Initiative,
-            Initiative.key=Initiative.key,
-            Practice.outcome.key=Practice.outcome.key,
-            Year.type=c(rep("Baseline",length(variable[variable=="Baseline.value"])),
-                        rep("Current",length(variable[variable=="Current.value"])),
-                        rep("Target",length(variable[variable=="Target"]))),
-            Year=c(Baseline.year[variable=="Baseline.value"],
-                   Current.year[variable=="Current.value"],
-                   Target.year[variable=="Target"]),
-            Raw.value=c(value[variable=="Baseline.value"],
-                        value[variable=="Current.value"],
-                        value[variable=="Target"]),
-            Raw.baseline.value=rep(value[variable=="Baseline.value"],3),
-            Value=ifelse(grepl("% change",Units,ignore.case=T)==T | 
-                           grepl("% reduction",Units,ignore.case=T)==T |
-                           grepl("% increase",Units,ignore.case=T)==T,
-                         ifelse(Year.type=="Baseline" & !is.na(Year),
-                                0,
-                                ifelse(Year.type=="Current" & Desired.trend=="Down",
-                                       (1-(Raw.value/Raw.baseline.value))*100,
-                                       ifelse(Year.type=="Current" & Desired.trend=="Up",
-                                              ((Raw.value/Raw.baseline.value)-1)*100,
-                                              Raw.value))),
-                         Raw.value)) %>%
-  .[!(is.na(.$Year)==T & .$Year.type=="Current") &
-      !(is.na(.$Value)==T & .$Year.type=="Target"),] %>%
+  fact.initiative.indicators.wildlife %>%
   transmute(Year_Key=ifelse(!is.na(Year),Year,9999),
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],length(Year_Key)),
             Initiative_Key=Initiative.key,
             Indicator_Type_Key=Initiative.indicator.key,
-            Practice_Outcome_Key=Practice.outcome.key,
             Indicator_Value=Value,
             Indicator_Upper_Value=NA,
             Indicator_Lower_Value=NA)
@@ -516,8 +517,9 @@ Fact_Initiative_Financials_Wildlife <-
   transmute(Date_Key=Date,
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],length(Date_Key)),
             Initiative_Key=Initiative.key,
-            Amount_needed=Funds.needed,
-            Amount_secured=Funds.secured)
+            Amount_Needed=Funds.needed,
+            Amount_Secured=Funds.secured,
+            Amount_Anticipated=Funds.anticipated)
 
 
 # ---- 4.6 Wildlife-specific Milestone_Group_Bridge ----
@@ -532,11 +534,17 @@ Milestone_Group_Bridge_Wildlife <-
 
 Dim_Milestone_Wildlife <-
   dim.initiative.milestones.wildlife %>%
-  transmute(Milestone_Key=Milestone.key,
+  transmute(Milestone_Surrogate_Key="",
+            Milestone_Key=Milestone.key,
             Milestone_Name=Milestone,
             Milestone_Target=Target,
             Milestone_Status=Status,
-            Milestone_Status_Justification=Status.just)
+            Milestone_Status_Justification=Status.just,
+            Creation_Date=Creation.date,
+            Effective_Start_Date=Effective.start.date,
+            Effective_End_Date=Effective.end.date,
+            Is_Active=Is.active)
+
 
 
 
@@ -566,4 +574,5 @@ rm(Dim_Context_State_Wildlife_A,
    Fact_Global_2030_Outcome2_Wildlife_A,
    dim.initiatives.wildlife,
    dim.initiative.indicators.wildlife,
+   fact.initiative.indicators.wildlife,
    dim.initiative.milestones.wildlife)

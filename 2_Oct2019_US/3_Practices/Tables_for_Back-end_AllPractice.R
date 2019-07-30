@@ -1,9 +1,9 @@
 # 
-# code: All Practices: Back-end Tables
+# code: All Practices: Back-end Tables FOR 2019 US DASHBOARD
 # 
 # author: Kelly Claborn, clabornkelly@gmail.com
 # created: August 2018
-# modified: 
+# modified: July 2019
 # 
 # ---- inputs ----
 #  1) 2_Tables_for_Back-end_CEP.R
@@ -51,10 +51,7 @@ Dim_Context_Indicator_Type <-
                    Dim_Context_Forest,
                    Dim_Context_FW,
                    Dim_Context_Oceans,
-                   Dim_Context_Wildlife,
-                   Dim_Context_Finance,
-                   Dim_Context_Governance,
-                   Dim_Context_Markets)
+                   Dim_Context_Wildlife)
 
 
 # ---- 1.2 Fact_Global_Context_Indicators ----
@@ -65,15 +62,12 @@ Fact_Global_Context_Indicators <-
                    Fact_Context_Forest,
                    Fact_Context_FW,
                    Fact_Context_Oceans,
-                   Fact_Context_Wildlife,
-                   Fact_Context_Finance,
-                   Fact_Context_Governance,
-                   Fact_Context_Markets)
+                   Fact_Context_Wildlife)
 
 
 # ---- 1.3 Export Global Context Files ----
 
-file.name <- paste("1_Nov2018/2_FlatDataFiles/ConsDB_Output/Tables_Back-end_produced_", format(Sys.Date(),format="%Y_%m%d"), ".xlsx",sep="")
+file.name <- paste("2_Oct2019_US/2_FlatDataFiles/ConsDB_Output_2019/Tables_Back-end_produced_", format(Sys.Date(),format="%Y_%m%d"), ".xlsx",sep="")
 
 write.xlsx(Dim_Context_Indicator_Type,file.name,sheetName="Dim_Context_Indicator_Type", row.names=F, showNA=F)
 write.xlsx(Fact_Global_Context_Indicators,file.name,sheetName="Fact_Global_Context_Indicators", append=T, row.names=F, showNA=F)
@@ -126,71 +120,49 @@ write.xlsx(Fact_Global_2030_Outcomes,file.name,sheetName="Fact_Global_2030_Outco
 # ---- 3.1 Dim_Initiative ----
 
 Dim_Initiative <-
-  rbind.data.frame(Dim_Initiative_CEP,
-                   Dim_Initiative_Food,
+  rbind.data.frame(Dim_Initiative_Food,
                    Dim_Initiative_Forest,
-                   Dim_Initiative_FW,
-                   Dim_Initiative_Oceans,
-                   Dim_Initiative_Wildlife,
-                   Dim_Initiative_Finance,
-                   Dim_Initiative_Governance,
-                   Dim_Initiative_Markets)
+                   Dim_Initiative_FW)
 
 
 # ---- 3.2 Dim_Initiative_Indicator_Type ----
 
 Dim_Initiative_Indicator_Type <-
-  rbind.data.frame(Dim_Initiative_Indicator_CEP,
-                   Dim_Initiative_Indicator_Food,
+  rbind.data.frame(Dim_Initiative_Indicator_Food,
                    Dim_Initiative_Indicator_Forest,
-                   Dim_Initiative_Indicator_FW,
-                   Dim_Initiative_Indicator_Oceans,
-                   Dim_Initiative_Indicator_Wildlife,
-                   Dim_Initiative_Indicator_Finance,
-                   Dim_Initiative_Indicator_Governance,
-                   Dim_Initiative_Indicator_Markets)
+                   Dim_Initiative_Indicator_FW)
 
 
 # ---- 3.3 Fact_Initiative_Indicators ----
 
 Fact_Initiative_Indicators <-
-  rbind.data.frame(Fact_Initiative_Indicator_CEP,
-                   Fact_Initiative_Indicator_Food,
+  rbind.data.frame(Fact_Initiative_Indicator_Food,
                    Fact_Initiative_Indicator_Forest,
-                   Fact_Initiative_Indicator_FW,
-                   Fact_Initiative_Indicator_Oceans,
-                   Fact_Initiative_Indicator_Wildlife,
-                   Fact_Initiative_Indicator_Finance,
-                   Fact_Initiative_Indicator_Governance,
-                   Fact_Initiative_Indicator_Markets)
+                   Fact_Initiative_Indicator_FW)
 
 
 # ---- 3.4 Fact_Initiative_Financials ----
 
 Fact_Initiative_Financials <-
-  rbind.data.frame(Fact_Initiative_Financials_CEP,
-                   Fact_Initiative_Financials_Food,
+  rbind.data.frame(Fact_Initiative_Financials_Food,
                    Fact_Initiative_Financials_Forest,
-                   Fact_Initiative_Financials_FW,
-                   Fact_Initiative_Financials_Oceans,
-                   Fact_Initiative_Financials_Wildlife,
-                   Fact_Initiative_Financials_Finance,
-                   Fact_Initiative_Financials_Governance,
-                   Fact_Initiative_Financials_Markets)
+                   Fact_Initiative_Financials_FW)
 
 
 # ---- 3.5 Milestone_Group_Bridge ----
 
 Milestone_Group_Bridge <-
-  rbind.data.frame(Milestone_Group_Bridge_Forest,
-                   Milestone_Group_Bridge_Wildlife)
+  rbind.data.frame(Milestone_Group_Bridge_Food,
+                   Milestone_Group_Bridge_Forest,
+                   Milestone_Group_Bridge_FW)
 
 
 # ---- 3.6 Dim_Milestone ----
 
 Dim_Milestone <-
-  rbind.data.frame(Dim_Milestone_Forest,
-                   Dim_Milestone_Wildlife)
+  rbind.data.frame(Dim_Milestone_Food,
+                   Dim_Milestone_Forest,
+                   Dim_Milestone_FW)
 
 
 # ---- 3.7 Export Initiative Files ----

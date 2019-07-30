@@ -38,10 +38,10 @@
 pacman::p_load(dplyr, xlsx, reshape2, ggplot2)
 
 
-practice_key_ref <- read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/cons_dashboard_dim_tables_20180828.xlsx',
+practice_key_ref <- read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/cons_dashboard_dim_tables_20180828.xlsx',
                               sheetName='Dim_Practice')
 
-practice_outcome_key_ref <- read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/cons_dashboard_dim_tables_20180828.xlsx',
+practice_outcome_key_ref <- read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/cons_dashboard_dim_tables_20180828.xlsx',
                                       sheetName='Dim_Practice_Outcome')
 
 
@@ -97,7 +97,9 @@ Dim_Context_State_CEP_A <-
              Panel="State",
              Indicator_Subcategory=NA,
              Indicator_Unit="Pre-industrial temperature anomaly (Celsius)",
-             Data_Source="Berkeley Earth Land & Ocean summary data, http://berkeleyearth.lbl.gov/auto/Global/Land_and_Ocean_summary.txt")
+             Data_Source="Berkeley Earth Land & Ocean summary data, http://berkeleyearth.lbl.gov/auto/Global/Land_and_Ocean_summary.txt",
+             Global_Indicator="Yes",
+             US_Indicator="Yes")
 
 Fact_Context_State_CEP_A <-
   Temp_land_sea %>%
@@ -144,7 +146,9 @@ Dim_Context_Threat_CEP_A <-
              Panel="Threat",
              Indicator_Subcategory="Coal",
              Indicator_Unit="% of total energy consumption",
-             Data_Source="U.S. Energy and Information Administration")
+             Data_Source="U.S. Energy and Information Administration",
+             Global_Indicator="Yes",
+             US_Indicator="Yes")
 
 Fact_Context_Threat_CEP_A <-
   EIA_fossil_fuel %>%
@@ -165,7 +169,9 @@ Dim_Context_Threat_CEP_B <-
              Panel="Threat",
              Indicator_Subcategory="Natural Gas",
              Indicator_Unit="% of total energy consumption",
-             Data_Source="U.S. Energy and Information Administration")
+             Data_Source="U.S. Energy and Information Administration",
+             Global_Indicator="Yes",
+             US_Indicator="Yes")
 
 Fact_Context_Threat_CEP_B <-
   EIA_fossil_fuel %>%
@@ -186,7 +192,9 @@ Dim_Context_Threat_CEP_C <-
              Panel="Threat",
              Indicator_Subcategory="Oil",
              Indicator_Unit="% of total energy consumption",
-             Data_Source="U.S. Energy and Information Administration")
+             Data_Source="U.S. Energy and Information Administration",
+             Global_Indicator="Yes",
+             US_Indicator="Yes")
 
 Fact_Context_Threat_CEP_C <-
   EIA_fossil_fuel %>%
@@ -222,7 +230,9 @@ Dim_Context_Response_CEP_A <-
              Panel="Response",
              Indicator_Subcategory="Current Policy Trajectory",
              Indicator_Unit="Gt CO2e",
-             Data_Source="UNEP, The Emissions Gap Report 2017 -- p.13-15")
+             Data_Source="UNEP, The Emissions Gap Report 2017 -- p.13-15",
+             Global_Indicator="Yes",
+             US_Indicator="Yes")
 
 Fact_Context_Response_CEP_A <-
   emissions.gap[emissions.gap$Trajectory=="Current policy",] %>%
@@ -243,7 +253,9 @@ Dim_Context_Response_CEP_B <-
              Panel="Response",
              Indicator_Subcategory="2 Degree C Pathway",
              Indicator_Unit="Gt CO2e",
-             Data_Source="UNEP, The Emissions Gap Report 2017 -- p.13-15")
+             Data_Source="UNEP, The Emissions Gap Report 2017 -- p.13-15",
+             Global_Indicator="Yes",
+             US_Indicator="Yes")
 
 Fact_Context_Response_CEP_B <-
   emissions.gap[emissions.gap$Trajectory=="2 degree pathway",] %>%
@@ -264,7 +276,9 @@ Dim_Context_Response_CEP_C <-
              Panel="Response",
              Indicator_Subcategory="1.5 Degree C Pathway",
              Indicator_Unit="Gt CO2e",
-             Data_Source="UNEP, The Emissions Gap Report 2017 -- p.13-15")
+             Data_Source="UNEP, The Emissions Gap Report 2017 -- p.13-15",
+             Global_Indicator="Yes",
+             US_Indicator="Yes")
 
 Fact_Context_Response_CEP_C <-
   emissions.gap[emissions.gap$Trajectory=="1.5 degree pathway",] %>%
@@ -331,7 +345,9 @@ Dim_Global_2030_Outcome1_CEP_A <-
              Indicator_Target=NA,
              Indicator_Type="Outcome",
              Panel_Label="Mitigation",
-             Display_Order=1)
+             Display_Order=1,
+             Global_Indicator="Yes",
+             US_Indicator="Yes")
 
 Fact_Global_2030_Outcome1_CEP_A <-
   read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/CAIT Country GHG Emissions.csv') %>%
@@ -382,7 +398,9 @@ Dim_Global_2030_Outcome2_CEP_A <-
              Indicator_Target=40,
              Indicator_Type="Outcome",
              Panel_Label="Energy",
-             Display_Order=2)
+             Display_Order=2,
+             Global_Indicator="Yes",
+             US_Indicator="Yes")
 
 Fact_Global_2030_Outcome2_CEP_A <-
   sdg.7.energy[grepl("Renewable",sdg.7.energy$SeriesDescription,ignore.case=T)==T,] %>%
@@ -417,7 +435,9 @@ Dim_Global_2030_Outcome2_CEP_B <-
                                                        sdg.7.energy$TimePeriod==2010],
              Indicator_Type="Outcome",
              Panel_Label="Energy",
-             Display_Order=2)
+             Display_Order=2,
+             Global_Indicator="Yes",
+             US_Indicator="Yes")
 
 Fact_Global_2030_Outcome2_CEP_B <-
   sdg.7.energy[grepl("Intensity",sdg.7.energy$SeriesDescription,ignore.case=T)==T,] %>%
@@ -450,7 +470,9 @@ Dim_Global_2030_Outcome2_CEP_C <-
              Indicator_Target=100,
              Indicator_Type="Outcome",
              Panel_Label="Energy",
-             Display_Order=2)
+             Display_Order=2,
+             Global_Indicator="Yes",
+             US_Indicator="Yes")
 
 Fact_Global_2030_Outcome2_CEP_C <-
   sdg.7.energy[grepl("Electricity",sdg.7.energy$SeriesDescription,ignore.case=T)==T &
@@ -484,7 +506,9 @@ Dim_Global_2030_Outcome2_CEP_D <-
              Indicator_Target=0,
              Indicator_Type="Outcome",
              Panel_Label="Energy",
-             Display_Order=2)
+             Display_Order=2,
+             Global_Indicator="Yes",
+             US_Indicator="Yes")
 
 Fact_Global_2030_Outcome2_CEP_D <-
   read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/CoalPlantTracker_pipeline_2018_0906.xlsx',sheetName='Data') %>%
@@ -519,7 +543,9 @@ Dim_Global_2030_Outcome3_CEP_A <-
              Indicator_Target=100,
              Indicator_Type="Outcome",
              Panel_Label="Adaptation",
-             Display_Order=3)
+             Display_Order=3,
+             Global_Indicator="Yes",
+             US_Indicator="Yes")
 
 Fact_Global_2030_Outcome3_CEP_A <-
   read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/NAPCentral_countrylists_2018_0906.xlsx',sheetName='Sheet1') %>%
@@ -573,19 +599,20 @@ Fact_Global_2030_Outcome_CEP <-
 # ---- 4.1 Load data ----
 
 dim.initiatives.CEP <- 
-  read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/fy18_initiative_reporting_dim_2018_1121.xlsx',sheetName="Sheet1") %>%
+  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_reporting_dim_2019_0703.xlsx',sheetName="Sheet1") %>%
   subset(.,Practice=="Climate & Energy") 
 
 dim.initiative.indicators.CEP <-
-  read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/fy18_initiative_indicators_fact_2018_1121.xlsx',sheetName="Sheet1") %>%
+  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_indicators_dim_2019_0703.xlsx',sheetName="Sheet1") %>%
   subset(.,Practice=="Climate & Energy")
 
 fact.initiative.indicators.CEP <-
-  read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/fy18_initiative_indicators_fact_2018_1121.xlsx',sheetName="Sheet1") %>%
+  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_indicators_fact_2019_0703.xlsx',sheetName="Sheet1") %>%
+  left_join(.,dim.initiatives.CEP[,c("Initiative.key","Practice")], by="Initiative.key") %>%
   subset(.,Practice=="Climate & Energy")
 
 dim.initiative.milestones.CEP <-
-  read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/fy18_initiative_milestones_2018_1121.csv') %>%
+  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_milestones_2019_0703.xlsx',sheetName="Sheet1") %>%
   subset(.,Practice=="Climate & Energy")
 
 
@@ -598,8 +625,8 @@ Dim_Initiative_CEP <-
             Initiative_Status=Overall.status,
             Initiative_Status_Justification=Overall.just,
             Initiative_Goal=Initiative.statement,
-            Global_Initiative=rep("No",length(Initiative.key)),
-            US_Initiative=rep("Yes",length(Initiative.key)),
+            Global_Initiative=Global.initiative,
+            US_Initiative=US.initiative,
             Display_Order=Display.order)
 
 
@@ -622,8 +649,6 @@ Dim_Initiative_Indicator_CEP <-
 
 Fact_Initiative_Indicator_CEP <-
   fact.initiative.indicators.CEP %>%
-  left_join(.,dim.initiatives.CEP[,c("Initiative.key","Initiative","Practice.outcome.key")],
-            by="Initiative") %>%
   transmute(Year_Key=ifelse(!is.na(Year),Year,9999),
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Climate & Energy"],length(Year_Key)),
             Initiative_Key=Initiative.key,
@@ -643,6 +668,30 @@ Fact_Initiative_Financials_CEP <-
             Amount_Needed=Funds.needed,
             Amount_Secured=Funds.secured,
             Amount_Anticipated=Funds.anticipated)
+
+
+# ---- 4.6 CEP-specific Milestone_Group_Bridge ----
+
+Milestone_Group_Bridge_CEP <-
+  left_join(dim.initiative.milestones.CEP, dim.initiatives.CEP, by=c("Initiative", "Practice")) %>%
+  transmute(Milestone_Key=Milestone.key,
+            Initiative_Key=Initiative.key)
+
+
+# ---- 4.7 CEP-specific Dim_Milestone ----
+
+Dim_Milestone_CEP <-
+  dim.initiative.milestones.CEP %>%
+  transmute(Milestone_Surrogate_Key="",
+            Milestone_Key=Milestone.key,
+            Milestone_Name=Milestone,
+            Milestone_Target=Target,
+            Milestone_Status=Status,
+            Milestone_Status_Justification=Status.just,
+            Creation_Date=Creation.date,
+            Effective_Start_Date=Effective.start.date,
+            Effective_End_Date=Effective.end.date,
+            Is_Active=Is.active)
 
 
 
@@ -679,4 +728,6 @@ rm(Temp_land_sea,
    Fact_Global_2030_Outcome2_CEP_D,
    Fact_Global_2030_Outcome3_CEP_A,
    dim.initiatives.CEP,
-   dim.initiative.indicators.CEP)
+   dim.initiative.indicators.CEP,
+   fact.initiative.indicators.CEP,
+   dim.initiative.milestones.CEP)

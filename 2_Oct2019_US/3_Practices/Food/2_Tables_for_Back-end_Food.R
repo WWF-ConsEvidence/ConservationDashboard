@@ -1,9 +1,9 @@
 # 
-# code: Food Practice Indicator and Initiative Tables
+# code: Food Practice Indicator and Initiative Tables FOR 2019 US DASHBOARD
 # 
 # author: Kelly Claborn, clabornkelly@gmail.com
 # created: August 2018
-# modified: 
+# modified: July 2019
 # 
 # ---- inputs ----
 #  1) Food-specific data tables (in 1_Nov2018/2_FlatDataFiles/ConsDB_Input)
@@ -68,7 +68,9 @@ Dim_Context_State_Food_A <-
              Panel="State",
              Indicator_Subcategory="Dietary Energy",
              Indicator_Unit="Kcal",
-             Data_Source="FAOSTAT, FAO Food Balance Sheets")
+             Data_Source="FAOSTAT, FAO Food Balance Sheets",
+             Global_Indicator="Yes",
+             US_Indicator="Yes")
 
 Fact_Context_State_Food_A <-
   FAOSTAT_FoodBalance %>%
@@ -90,7 +92,9 @@ Dim_Context_State_Food_B <-
              Panel="State",
              Indicator_Subcategory="Protein",
              Indicator_Unit="Grams",
-             Data_Source="FAOSTAT, FAO Food Balance Sheets")
+             Data_Source="FAOSTAT, FAO Food Balance Sheets",
+             Global_Indicator="Yes",
+             US_Indicator="Yes")
 
 Fact_Context_State_Food_B <-
   FAOSTAT_FoodBalance %>%
@@ -112,7 +116,9 @@ Dim_Context_State_Food_C <-
              Panel="State",
              Indicator_Subcategory="Fat",
              Indicator_Unit="Grams",
-             Data_Source="FAOSTAT, FAO Food Balance Sheets")
+             Data_Source="FAOSTAT, FAO Food Balance Sheets",
+             Global_Indicator="Yes",
+             US_Indicator="Yes")
 
 Fact_Context_State_Food_C <-
   FAOSTAT_FoodBalance %>%
@@ -139,7 +145,9 @@ Dim_Context_Threat_Food_A <-
              Panel="Threat",
              Indicator_Subcategory="Arable and Cropland",
              Indicator_Unit="% of total land",
-             Data_Source="OECDStat, from FAO")
+             Data_Source="OECDStat, from FAO",
+             Global_Indicator="Yes",
+             US_Indicator="Yes")
 
 Fact_Context_Threat_Food_A <-
   OECDStat_LandUse %>%
@@ -164,7 +172,9 @@ Dim_Context_Threat_Food_B <-
              Panel="Threat",
              Indicator_Subcategory="Meadows and Pastures",
              Indicator_Unit="% of total land",
-             Data_Source="OECDStat, from FAO")
+             Data_Source="OECDStat, from FAO",
+             Global_Indicator="Yes",
+             US_Indicator="Yes")
 
 Fact_Context_Threat_Food_B <-
   OECDStat_LandUse %>%
@@ -189,7 +199,9 @@ Dim_Context_Threat_Food_C <-
              Panel="Threat",
              Indicator_Subcategory="Forest",
              Indicator_Unit="% of total land",
-             Data_Source="OECDStat, from FAO")
+             Data_Source="OECDStat, from FAO",
+             Global_Indicator="Yes",
+             US_Indicator="Yes")
 
 Fact_Context_Threat_Food_C <-
   OECDStat_LandUse %>%
@@ -214,7 +226,9 @@ Dim_Context_Threat_Food_D <-
              Panel="Threat",
              Indicator_Subcategory="Other",
              Indicator_Unit="% of total land",
-             Data_Source="OECDStat, from FAO")
+             Data_Source="OECDStat, from FAO",
+             Global_Indicator="Yes",
+             US_Indicator="Yes")
 
 Fact_Context_Threat_Food_D <-
   OECDStat_LandUse %>%
@@ -244,7 +258,9 @@ Dim_Context_Response_Food_A <-
              Panel="Response",
              Indicator_Subcategory="Agricultural GHG Emissions",
              Indicator_Unit="Gt CO2e",
-             Data_Source="CAIT Climate Data Explorer. 2017. Washington, DC: World Resources Institute")
+             Data_Source="CAIT Climate Data Explorer. 2017. Washington, DC: World Resources Institute",
+             Global_Indicator="Yes",
+             US_Indicator="Yes")
 
 Fact_Context_Response_Food_A <-
   CAIT.emissions %>%
@@ -266,7 +282,9 @@ Dim_Context_Response_Food_B <-
              Panel="Response",
              Indicator_Subcategory="Efficiency",
              Indicator_Unit="M kcal per tonne CO2e",
-             Data_Source="CAIT Climate Data Explorer (2017); FAO Food Balance Sheets")
+             Data_Source="CAIT Climate Data Explorer (2017); FAO Food Balance Sheets",
+             Global_Indicator="Yes",
+             US_Indicator="Yes")
 
 Fact_Context_Response_Food_B <-
   left_join(CAIT.emissions[CAIT.emissions$Country=="World" & CAIT.emissions$Year<2014,c(1,2,14)],
@@ -351,7 +369,9 @@ Dim_Global_2030_Outcome1_Food_A <-
              Indicator_Target=NA,
              Indicator_Type="Outcome",
              Panel_Label="Sustainable Land Management",
-             Display_Order=1)
+             Display_Order=1,
+             Global_Indicator="Yes",
+             US_Indicator="Yes")
 
 Fact_Global_2030_Outcome1_Food_A <-
   data.frame(Year_Key=9999,
@@ -375,7 +395,9 @@ Dim_Global_2030_Outcome1_Food_B <-
              Indicator_Target=NA,
              Indicator_Type="Outcome",
              Panel_Label="Sustainable Land Management",
-             Display_Order=1)
+             Display_Order=1,
+             Global_Indicator="Yes",
+             US_Indicator="Yes")
 
 Fact_Global_2030_Outcome1_Food_B <-
   data.frame(Year_Key=9999,
@@ -402,7 +424,9 @@ Dim_Global_2030_Outcome2_Food_A <-
              Indicator_Target=NA,
              Indicator_Type="Outcome",
              Panel_Label="Food Loss & Waste",
-             Display_Order=2)
+             Display_Order=2,
+             Global_Indicator="Yes",
+             US_Indicator="Yes")
 
 Fact_Global_2030_Outcome2_Food_A <-
   data.frame(Year_Key=9999,
@@ -426,7 +450,9 @@ Dim_Global_2030_Outcome2_Food_B <-
              Indicator_Target=NA,
              Indicator_Type="Outcome",
              Panel_Label="Food Loss & Waste",
-             Display_Order=2)
+             Display_Order=2,
+             Global_Indicator="Yes",
+             US_Indicator="Yes")
 
 Fact_Global_2030_Outcome2_Food_B <-
   data.frame(Year_Key=9999,
@@ -451,7 +477,9 @@ Dim_Global_2030_Outcome3_Food_A <-
              Indicator_Target=NA,
              Indicator_Type="Outcome",
              Panel_Label="Healthy Diets",
-             Display_Order=3)
+             Display_Order=3,
+             Global_Indicator="Yes",
+             US_Indicator="Yes")
 
 Fact_Global_2030_Outcome3_Food_A <-
   data.frame(Year_Key=9999,
@@ -492,11 +520,20 @@ Fact_Global_2030_Outcome_Food <-
 # ---- 4.1 Load data ----
 
 dim.initiatives.food <- 
-  read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/fy18_initiative_reporting_dim_2018_1121.xlsx',sheetName="Sheet1") %>%
+  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_reporting_dim_2019_0703.xlsx',sheetName="Sheet1") %>%
   subset(.,Practice=="Food") 
 
 dim.initiative.indicators.food <-
-  read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/fy18_initiative_indicators_fact_2018_1121.xlsx',sheetName="Sheet1") %>%
+  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_indicators_dim_2019_0703.xlsx',sheetName="Sheet1") %>%
+  subset(.,Practice=="Food")
+
+fact.initiative.indicators.food <-
+  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_indicators_fact_2019_0703.xlsx',sheetName="Sheet1") %>%
+  left_join(.,dim.initiatives.food[,c("Initiative.key","Practice")], by="Initiative.key") %>%
+  subset(.,Practice=="Food")
+
+dim.initiative.milestones.food <-
+  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_milestones_2019_0703.xlsx',sheetName="Sheet1") %>%
   subset(.,Practice=="Food")
 
 
@@ -508,7 +545,10 @@ Dim_Initiative_Food <-
             Initiative_Name=Initiative,
             Initiative_Status=Overall.status,
             Initiative_Status_Justification=Overall.just,
-            Initiative_Goal=Initiative.statement)
+            Initiative_Goal=Initiative.statement,
+            Global_Initiative=Global.initiative,
+            US_Initiative=US.initiative,
+            Display_Order=Display.order)
   
 
 # ---- 4.3 Food-specific Dim_Initiative_Indicator_Type ----
@@ -520,51 +560,21 @@ Dim_Initiative_Indicator_Food <-
             Indicator_Name=ifelse(!is.na(Indicator.name),as.character(Indicator.name),"FORTHCOMING"),
             Indicator_Label=ifelse(!is.na(Indicator.label),as.character(Indicator.label),"Not Yet Identified"),
             Indicator_Subcategory=Subcategory,
-            Indicator_Target=Target,
             Indicator_Unit=Units,
             Data_Source=Source,
-            Display_Order=Display.order)
+            Indicator_Target=Target,
+            Display_Order=Display.order,
+            Indicator_Statement=Statement)
 
 
 # ---- 4.4 Food-specific Fact_Initiative_Indicators ----
 
 Fact_Initiative_Indicator_Food <-
-  dim.initiative.indicators.food %>%
-  left_join(.,dim.initiatives.food[,c("Initiative.key","Initiative","Practice.outcome.key")],
-            by="Initiative") %>%
-  melt(.,measure.vars=c("Baseline.value","Current.value","Target")) %>%
-  transmute(Initiative.indicator.key=Initiative.indicator.key,
-            Initiative=Initiative,
-            Initiative.key=Initiative.key,
-            Practice.outcome.key=Practice.outcome.key,
-            Year.type=c(rep("Baseline",length(variable[variable=="Baseline.value"])),
-                        rep("Current",length(variable[variable=="Current.value"])),
-                        rep("Target",length(variable[variable=="Target"]))),
-            Year=c(Baseline.year[variable=="Baseline.value"],
-                   Current.year[variable=="Current.value"],
-                   Target.year[variable=="Target"]),
-            Raw.value=c(value[variable=="Baseline.value"],
-                        value[variable=="Current.value"],
-                        value[variable=="Target"]),
-            Raw.baseline.value=rep(value[variable=="Baseline.value"],3),
-            Value=ifelse(grepl("% change",Units,ignore.case=T)==T | 
-                           grepl("% reduction",Units,ignore.case=T)==T |
-                           grepl("% increase",Units,ignore.case=T)==T,
-                         ifelse(Year.type=="Baseline" & !is.na(Year),
-                                0,
-                                ifelse(Year.type=="Current" & Desired.trend=="Down",
-                                       (1-(Raw.value/Raw.baseline.value))*100,
-                                       ifelse(Year.type=="Current" & Desired.trend=="Up",
-                                              ((Raw.value/Raw.baseline.value)-1)*100,
-                                              Raw.value))),
-                         Raw.value)) %>%
-  .[!(is.na(.$Year)==T & .$Year.type=="Current") &
-      !(is.na(.$Value)==T & .$Year.type=="Target"),] %>%
+  fact.initiative.indicators.food %>%
   transmute(Year_Key=ifelse(!is.na(Year),Year,9999),
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Food"],length(Year_Key)),
             Initiative_Key=Initiative.key,
             Indicator_Type_Key=Initiative.indicator.key,
-            Practice_Outcome_Key=Practice.outcome.key,
             Indicator_Value=Value,
             Indicator_Upper_Value=NA,
             Indicator_Lower_Value=NA)
@@ -577,8 +587,34 @@ Fact_Initiative_Financials_Food <-
   transmute(Date_Key=Date,
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Food"],length(Date_Key)),
             Initiative_Key=Initiative.key,
-            Amount_needed=NA,
-            Amount_secured=NA)
+            Amount_Needed=Funds.needed,
+            Amount_Secured=Funds.secured,
+            Amount_Anticipated=Funds.anticipated)
+
+
+# ---- 4.6 Food-specific Milestone_Group_Bridge ----
+
+Milestone_Group_Bridge_Food <-
+  left_join(dim.initiative.milestones.food, dim.initiatives.food, by=c("Initiative", "Practice")) %>%
+  transmute(Milestone_Key=Milestone.key,
+            Initiative_Key=Initiative.key)
+
+
+# ---- 4.7 Food-specific Dim_Milestone ----
+
+Dim_Milestone_Food <-
+  dim.initiative.milestones.food %>%
+  transmute(Milestone_Surrogate_Key="",
+            Milestone_Key=Milestone.key,
+            Milestone_Name=Milestone,
+            Milestone_Target=Target,
+            Milestone_Status=Status,
+            Milestone_Status_Justification=Status.just,
+            Creation_Date=Creation.date,
+            Effective_Start_Date=Effective.start.date,
+            Effective_End_Date=Effective.end.date,
+            Is_Active=Is.active)
+
 
 
 
@@ -617,4 +653,6 @@ rm(FAOSTAT_FoodBalance,
    Fact_Global_2030_Outcome2_Food_B,
    Fact_Global_2030_Outcome3_Food_A,
    dim.initiatives.food,
-   dim.initiative.indicators.food)
+   dim.initiative.indicators.food,
+   fact.initiative.indicators.food,
+   dim.initiative.milestones.food)

@@ -1,9 +1,9 @@
 # 
-# code: Freshwater Practice Indicator and Initiative Tables
+# code: Freshwater Practice Indicator and Initiative Tables FOR 2019 US DASHBOARD
 # 
 # author: Kelly Claborn, clabornkelly@gmail.com
 # created: August 2018
-# modified: 
+# modified: July 2019
 # 
 # ---- inputs ----
 #  1) Freshwater-specific data tables (in 1_Nov2018/2_FlatDataFiles/ConsDB_Input)
@@ -67,7 +67,9 @@ Dim_Context_State_FW_A <-
              Panel="State",
              Indicator_Subcategory=NA,
              Indicator_Unit="Index",
-             Data_Source="Zoological Society of London; 2016 Living Planet Index database")
+             Data_Source="Zoological Society of London; 2016 Living Planet Index database",
+             Global_Indicator="Yes",
+             US_Indicator="Yes")
 
 Fact_Context_State_FW_A <-
   read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/FW_LPI_output_2018_0910.csv') %>%
@@ -92,7 +94,9 @@ Dim_Context_Threat_FW_A <-
              Panel="Threat",
              Indicator_Subcategory=NA,
              Indicator_Unit="% of global river length",
-             Data_Source="WWF/McGill -- value provided by Michele Thieme, WWF-US")
+             Data_Source="WWF/McGill -- value provided by Michele Thieme, WWF-US",
+             Global_Indicator="Yes",
+             US_Indicator="Yes")
 
 Fact_Context_Threat_FW_A <-
   data.frame(Year_Key=2018,
@@ -134,7 +138,9 @@ Dim_Context_Response_FW_A <-
              Panel="Response",
              Indicator_Subcategory=NA,
              Indicator_Unit="% of countries with high implementation",
-             Data_Source="UN SDG Indicator bank - SDG 6.5.1 - UNEP")
+             Data_Source="UN SDG Indicator bank - SDG 6.5.1 - UNEP",
+             Global_Indicator="Yes",
+             US_Indicator="Yes")
 
 Fact_Context_Response_FW_A <-
   read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/SDG_6.5.1_iwrm_implementation_dl_2018_0905.csv') %>%
@@ -184,7 +190,9 @@ Dim_Global_2030_Outcome1_FW_A <-
              Indicator_Target=NA,
              Indicator_Type="Outcome",
              Panel_Label="Healthy Habitats & Species",
-             Display_Order=1)
+             Display_Order=1,
+             Global_Indicator="Yes",
+             US_Indicator="Yes")
 
 Fact_Global_2030_Outcome1_FW_A <-
   data.frame(Year_Key=2015,
@@ -208,7 +216,9 @@ Dim_Global_2030_Outcome1_FW_B <-
              Indicator_Target=32,
              Indicator_Type="Outcome",
              Panel_Label="Healthy Habitats & Species",
-             Display_Order=1)
+             Display_Order=1,
+             Global_Indicator="Yes",
+             US_Indicator="Yes")
 
 Fact_Global_2030_Outcome1_FW_B <-
   data.frame(Year_Key=c(2017,2030),
@@ -232,7 +242,9 @@ Dim_Global_2030_Outcome1_FW_C <-
              Indicator_Target=NA,
              Indicator_Type="Outcome",
              Panel_Label="Healthy Habitats & Species",
-             Display_Order=1)
+             Display_Order=1,
+             Global_Indicator="Yes",
+             US_Indicator="Yes")
 
 Fact_Global_2030_Outcome1_FW_C <-
   read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/Ramsar_sitedata_dl_2018_0905.csv') %>%
@@ -284,7 +296,9 @@ Dim_Global_2030_Outcome2_FW_A <-
              Indicator_Target=NA,
              Indicator_Type="Outcome",
              Panel_Label="Clean Flowing Rivers",
-             Display_Order=2)
+             Display_Order=2,
+             Global_Indicator="Yes",
+             US_Indicator="Yes")
 
 Fact_Global_2030_Outcome2_FW_A <-
   data.frame(Year_Key=2018,
@@ -309,7 +323,9 @@ Dim_Global_2030_Outcome2_FW_B <-
              Indicator_Target=NA,
              Indicator_Type="Outcome",
              Panel_Label="Clean Flowing Rivers",
-             Display_Order=2)
+             Display_Order=2,
+             Global_Indicator="Yes",
+             US_Indicator="Yes")
 
 Fact_Global_2030_Outcome2_FW_B <-
   data.frame(Year_Key=9999,
@@ -350,11 +366,20 @@ Fact_Global_2030_Outcome_FW <-
 # ---- 4.1 Load data ----
 
 dim.initiatives.fw <- 
-  read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/fy18_initiative_reporting_dim_2018_1121.xlsx',sheetName="Sheet1") %>%
+  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_reporting_dim_2019_0703.xlsx',sheetName="Sheet1") %>%
   subset(.,Practice=="Freshwater") 
 
 dim.initiative.indicators.fw <-
-  read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/fy18_initiative_indicators_fact_2018_1121.xlsx',sheetName="Sheet1") %>%
+  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_indicators_dim_2019_0703.xlsx',sheetName="Sheet1") %>%
+  subset(.,Practice=="Freshwater")
+
+fact.initiative.indicators.fw <-
+  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_indicators_fact_2019_0703.xlsx',sheetName="Sheet1") %>%
+  left_join(.,dim.initiatives.fw[,c("Initiative.key","Practice")], by="Initiative.key") %>%
+  subset(.,Practice=="Freshwater")
+
+dim.initiative.milestones.fw <-
+  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_milestones_2019_0703.xlsx',sheetName="Sheet1") %>%
   subset(.,Practice=="Freshwater")
 
 
@@ -366,7 +391,10 @@ Dim_Initiative_FW <-
             Initiative_Name=Initiative,
             Initiative_Status=Overall.status,
             Initiative_Status_Justification=Overall.just,
-            Initiative_Goal=Initiative.statement)
+            Initiative_Goal=Initiative.statement,
+            Global_Initiative=Global.initiative,
+            US_Initiative=US.initiative,
+            Display_Order=Display.order)
 
 
 # ---- 4.3 Freshwater-specific Dim_Initiative_Indicator_Type ----
@@ -378,51 +406,21 @@ Dim_Initiative_Indicator_FW <-
             Indicator_Name=ifelse(!is.na(Indicator.name),as.character(Indicator.name),"FORTHCOMING"),
             Indicator_Label=ifelse(!is.na(Indicator.label),as.character(Indicator.label),"Not Yet Identified"),
             Indicator_Subcategory=Subcategory,
-            Indicator_Target=Target,
             Indicator_Unit=Units,
             Data_Source=Source,
-            Display_Order=Display.order)
+            Indicator_Target=Target,
+            Display_Order=Display.order,
+            Indicator_Statement=Statement)
 
 
 # ---- 4.4 Freshwater-specific Fact_Initiative_Indicators ----
 
 Fact_Initiative_Indicator_FW <-
-  dim.initiative.indicators.fw %>%
-  left_join(.,dim.initiatives.fw[,c("Initiative.key","Initiative","Practice.outcome.key")],
-            by="Initiative") %>%
-  melt(.,measure.vars=c("Baseline.value","Current.value","Target")) %>%
-  transmute(Initiative.indicator.key=Initiative.indicator.key,
-            Initiative=Initiative,
-              Initiative.key=Initiative.key,
-            Practice.outcome.key=Practice.outcome.key,
-            Year.type=c(rep("Baseline",length(variable[variable=="Baseline.value"])),
-                        rep("Current",length(variable[variable=="Current.value"])),
-                        rep("Target",length(variable[variable=="Target"]))),
-            Year=c(Baseline.year[variable=="Baseline.value"],
-                   Current.year[variable=="Current.value"],
-                   Target.year[variable=="Target"]),
-            Raw.value=c(value[variable=="Baseline.value"],
-                        value[variable=="Current.value"],
-                        value[variable=="Target"]),
-            Raw.baseline.value=rep(value[variable=="Baseline.value"],3),
-            Value=ifelse(grepl("% change",Units,ignore.case=T)==T | 
-                           grepl("% reduction",Units,ignore.case=T)==T |
-                           grepl("% increase",Units,ignore.case=T)==T,
-                         ifelse(Year.type=="Baseline" & !is.na(Year),
-                                0,
-                                ifelse(Year.type=="Current" & Desired.trend=="Down",
-                                       (1-(Raw.value/Raw.baseline.value))*100,
-                                       ifelse(Year.type=="Current" & Desired.trend=="Up",
-                                              ((Raw.value/Raw.baseline.value)-1)*100,
-                                              Raw.value))),
-                         Raw.value)) %>%
-  .[!(is.na(.$Year)==T & .$Year.type=="Current") &
-      !(is.na(.$Value)==T & .$Year.type=="Target"),] %>%
+  fact.initiative.indicators.fw %>%
   transmute(Year_Key=ifelse(!is.na(Year),Year,9999),
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Freshwater"],length(Year_Key)),
             Initiative_Key=Initiative.key,
             Indicator_Type_Key=Initiative.indicator.key,
-            Practice_Outcome_Key=Practice.outcome.key,
             Indicator_Value=Value,
             Indicator_Upper_Value=NA,
             Indicator_Lower_Value=NA)
@@ -435,8 +433,34 @@ Fact_Initiative_Financials_FW <-
   transmute(Date_Key=Date,
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Freshwater"],length(Date_Key)),
             Initiative_Key=Initiative.key,
-            Amount_needed=Funds.needed,
-            Amount_secured=Funds.secured)
+            Amount_Needed=Funds.needed,
+            Amount_Secured=Funds.secured,
+            Amount_Anticipated=Funds.anticipated)
+
+
+# ---- 4.6 Freshwater-specific Milestone_Group_Bridge ----
+
+Milestone_Group_Bridge_FW <-
+  left_join(dim.initiative.milestones.fw, dim.initiatives.fw, by=c("Initiative", "Practice")) %>%
+  transmute(Milestone_Key=Milestone.key,
+            Initiative_Key=Initiative.key)
+
+
+# ---- 4.7 Freshwater-specific Dim_Milestone ----
+
+Dim_Milestone_FW <-
+  dim.initiative.milestones.fw %>%
+  transmute(Milestone_Surrogate_Key="",
+            Milestone_Key=Milestone.key,
+            Milestone_Name=Milestone,
+            Milestone_Target=Target,
+            Milestone_Status=Status,
+            Milestone_Status_Justification=Status.just,
+            Creation_Date=Creation.date,
+            Effective_Start_Date=Effective.start.date,
+            Effective_End_Date=Effective.end.date,
+            Is_Active=Is.active)
+
 
 
 
@@ -459,4 +483,6 @@ rm(Dim_Context_State_FW_A,
    Fact_Global_2030_Outcome2_FW_A,
    Fact_Global_2030_Outcome2_FW_B,
    dim.initiatives.fw,
-   dim.initiative.indicators.fw)
+   dim.initiative.indicators.fw,
+   fact.initiative.indicators.fw,
+   dim.initiative.milestones.fw)
