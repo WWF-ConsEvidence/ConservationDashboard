@@ -148,7 +148,7 @@ Dim_Context_Threat_Forest_A <-
              US_Indicator="Yes")
 
 Fact_Context_Threat_Forest_A <-
-  read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/GFW_treeloss_bydriver_2018_0919.xlsx', sheetName="Sheet1") %>%
+  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/GFW_treeloss_bydriver_2019_0723.xlsx', sheetName="Sheet1") %>%
   subset(.,Geography=="World" & Loss_type=="Total Loss") %>%
   transmute(Year_Key=Year,
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Forests"],length(Year_Key)),
@@ -307,7 +307,7 @@ Dim_Global_2030_Outcome2_Forest_A <-
              US_Indicator="Yes")
 
 Fact_Global_2030_Outcome2_Forest_A <-
-  read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/GFW_treeloss_bydriver_2018_0919.xlsx', sheetName="Sheet1") %>%
+  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/GFW_treeloss_bydriver_2019_0723.xlsx', sheetName="Sheet1") %>%
   subset(.,Loss_type=="Commodity Driven Deforestation") %>%
   transmute(Year_Key=Year,
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Forests"],length(Year_Key)),

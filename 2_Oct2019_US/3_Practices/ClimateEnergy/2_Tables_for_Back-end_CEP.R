@@ -125,7 +125,7 @@ Fact_Context_State_CEP_A <-
 # ---- 2.2 Context - Threat ----
 
 EIA_fossil_fuel <- 
-  read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/US_EIA_fossil_fuel_consump_dl_2018_0830.xlsx',
+  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/US_EIA_fossil_fuel_consump_dl_2019_0723.xlsx',
                             sheetName='Data') %>%
   subset(.,Geography=="World") %>%
   melt(.,id.vars=c("Primary_Energy","Geography","Units"),
@@ -218,7 +218,7 @@ Fact_Context_Threat_CEP_C <-
 
 # ---- 2.3 Context - Response ----
 
-emissions.gap <- read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/UNEP_emissions_gap2017_2018_0908.xlsx',sheetName="Data")
+emissions.gap <- read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/UNEP_emissions_gap2018_2019_0723.xlsx',sheetName="Data")
 
 # -- EMISSIONS GAP - CURRENT POLICY TRAJECTORY
 
@@ -383,7 +383,7 @@ Fact_Global_2030_Outcome1_CEP_A <-
 
 # ---- 3.2 CEP Outcome 2 - ENERGY ----
 
-sdg.7.energy <- read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/SDG_7_energy_dl_2018_0827.csv')
+sdg.7.energy <- read.csv('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/SDG_7_energy_dl_2019_0723.csv')
 
 # -- RENEWABLE ENERGY
 

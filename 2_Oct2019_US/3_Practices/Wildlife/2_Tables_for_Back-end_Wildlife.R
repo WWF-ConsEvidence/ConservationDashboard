@@ -124,7 +124,7 @@ Dim_Context_Threat_Wildlife_A <-
              US_Indicator="Yes")
 
 Fact_Context_Threat_Wildlife_A <-
-  read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/GFW_ForestLoss_2018_0821.xlsx', sheetName="Sheet1") %>%
+  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/GFW_treeloss_bydriver_2019_0723.xlsx', sheetName="Sheet1") %>%
   subset(.,Geography=="World") %>%
   transmute(Year_Key=Year,
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],length(Year_Key)),

@@ -56,7 +56,7 @@ practice_outcome_key_ref <- read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/co
 # ---- 2.1 Context - State ----
 
 GBR <-
-  read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/AIMS_GBR_2018_summary_report.csv') %>%
+  read.csv('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/AIMS_GBR_2019_summary_report_0723.csv') %>%
   mutate(Mean_coral_fixed=NA)
 
 for(i in 1:length(GBR$Mean_coral_cover)) {
