@@ -35,7 +35,7 @@
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #
 
-pacman::p_load(dplyr, xlsx)
+pacman::p_load(xlsx, dplyr)
 
 
 practice_key_ref <- read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/cons_dashboard_dim_tables_20180828.xlsx',
@@ -356,9 +356,9 @@ Fact_Context_Food <-
 #
 
 
-# ---- 3.1 Food Outcome 1 - SUSTAINABLE LAND MANAGEMENT ----
+# ---- 3.1 Food Outcome 1 - SUSTAINABLE LAND MANAGEMENT / HABITAT CONVERSION FOR FOOD ----
 
-# -- LAND DEGRADATION
+# -- LAND DEGRADATION -- GLOBAL-SPECIFIC
 
 Dim_Global_2030_Outcome1_Food_A <- 
   data.frame(Indicator_Type_Key="OUT1_FD_A",
@@ -372,7 +372,7 @@ Dim_Global_2030_Outcome1_Food_A <-
              Panel_Label="Sustainable Land Management",
              Display_Order=1,
              Global_Indicator="Yes",
-             US_Indicator="Yes")
+             US_Indicator="No")
 
 Fact_Global_2030_Outcome1_Food_A <-
   data.frame(Year_Key=9999,
@@ -384,7 +384,7 @@ Fact_Global_2030_Outcome1_Food_A <-
             Indicator_Upper_Value=NA,
             Indicator_Lower_Value=NA)
 
-# -- SUSTAINABLE AGRICULTURE
+# -- SUSTAINABLE AGRICULTURE -- GLOBAL-SPECIFIC
 
 Dim_Global_2030_Outcome1_Food_B <- 
   data.frame(Indicator_Type_Key="OUT1_FD_B",
@@ -398,7 +398,7 @@ Dim_Global_2030_Outcome1_Food_B <-
              Panel_Label="Sustainable Land Management",
              Display_Order=1,
              Global_Indicator="Yes",
-             US_Indicator="Yes")
+             US_Indicator="No")
 
 Fact_Global_2030_Outcome1_Food_B <-
   data.frame(Year_Key=9999,
@@ -410,6 +410,70 @@ Fact_Global_2030_Outcome1_Food_B <-
             Indicator_Upper_Value=NA,
             Indicator_Lower_Value=NA)
 
+# -- TERRESTRIAL HABITAT CONVERSION -- US-SPECIFIC 
+
+Dim_Global_2030_Outcome1_Food_C <- 
+  data.frame(Indicator_Type_Key="OUT1_FD_C",
+             Indicator_Name="Commodity-driven forest cover loss",
+             Indicator_Label="Terrestrial & Mangrove Habitat Conversion",
+             Indicator_Subcategory="Commodity Driven Forest Cover Loss",
+             Indicator_Unit="M ha per year",
+             Data_source="Global Forest Watch - Curtis et al (2018) Global drivers of forest loss",
+             Indicator_Target=0,
+             Indicator_Type="Outcome",
+             Panel_Label="Habitat Conversion for Food",
+             Display_Order=1,
+             Global_Indicator="No",
+             US_Indicator="Yes")
+
+Fact_Global_2030_Outcome1_Food_C <-
+  data.frame(Year_Key=9999,
+             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Food"],length(1)),
+             Indicator_Type_Key=rep(Dim_Global_2030_Outcome1_Food_C$Indicator_Type_Key, length(1)),
+             Practice_Outcome_Key=rep(practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Food" &
+                                                                    grepl("Production",practice_outcome_key_ref$practice_outcome)], length(1)),
+             Indicator_Value=NA,
+             Indicator_Upper_Value=NA,
+             Indicator_Lower_Value=NA)
+
+
+# -- MANGROVE HABITAT CONVERSION -- US-SPECIFIC
+
+Dim_Global_2030_Outcome1_Food_D <- 
+  data.frame(Indicator_Type_Key="OUT1_FD_D",
+             Indicator_Name="Mangrove forest change",
+             Indicator_Label="Terrestrial & Mangrove Habitat Conversion",
+             Indicator_Subcategory="Aquaculture Driven Mangrove Cover Loss",
+             Indicator_Unit="M ha per year",
+             Data_source="Thomas et al (2017) Distribution and drivers of global mangrove forest change, 1996-2010",
+             Indicator_Target=0,
+             Indicator_Type="Outcome",
+             Panel_Label="Habitat Conversion for Food",
+             Display_Order=1,
+             Global_Indicator="No",
+             US_Indicator="Yes")
+
+Fact_Global_2030_Outcome1_Food_D <-
+  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/GFW_treeloss_bydriver_2019_0723.xlsx', sheetName="Sheet1") %>%
+  subset(.,Loss_type=="Commodity Driven Deforestation") %>%
+  transmute(Year_Key=Year,
+            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Food"],length(Year_Key)),
+            Indicator_Type_Key=rep(Dim_Global_2030_Outcome1_Food_D$Indicator_Type_Key, length(Year_Key)),
+            Practice_Outcome_Key=rep(practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Food" &
+                                                                   grepl("Production",practice_outcome_key_ref$practice_outcome)], length(Year_Key)),
+            Indicator_Value=Value,
+            Indicator_Upper_Value=NA,
+            Indicator_Lower_Value=NA) %>%
+  rbind.data.frame(.,
+                   data.frame(Year_Key=2030,
+                              Practice_Key=practice_key_ref$id[practice_key_ref$practice_name=="Food"],
+                              Indicator_Type_Key=Dim_Global_2030_Outcome1_Food_D$Indicator_Type_Key,
+                              Practice_Outcome_Key=practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Food" &
+                                                                                 grepl("Production",practice_outcome_key_ref$practice_outcome)],
+                              Indicator_Value=Dim_Global_2030_Outcome1_Food_D$Indicator_Target,
+                              Indicator_Upper_Value=NA,
+                              Indicator_Lower_Value=NA))
+
 
 # ---- 3.2 Food Outcome 2 - FOOD LOSS & WASTE ----
 
@@ -419,10 +483,10 @@ Dim_Global_2030_Outcome2_Food_A <-
   data.frame(Indicator_Type_Key="OUT2_FD_A",
              Indicator_Name="FORTHCOMING: SDG 12.3.1.b -- Global Food Loss Index (GFLI)",
              Indicator_Label="Loss Index and Kilograms Wasted",
-             Indicator_Subcategory="Global Food Loss Index*",
-             Indicator_Unit="Index",
-             Data_source="UN SDG Indicator Bank -- FAO",
-             Indicator_Target=NA,
+             Indicator_Subcategory="Per Capita Global Food Loss",
+             Indicator_Unit="kg/yr",
+             Data_source="FAO. (2011). Global food losses and food waste [Report]: Dusseldorf, Germany.",
+             Indicator_Target=81,
              Indicator_Type="Outcome",
              Panel_Label="Food Loss & Waste",
              Display_Order=2,
@@ -430,12 +494,12 @@ Dim_Global_2030_Outcome2_Food_A <-
              US_Indicator="Yes")
 
 Fact_Global_2030_Outcome2_Food_A <-
-  data.frame(Year_Key=9999,
-            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Food"],length(1)),
-            Indicator_Type_Key=rep(Dim_Global_2030_Outcome2_Food_A$Indicator_Type_Key, length(1)),
+  data.frame(Year_Key=c(2011,2030),
+            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Food"],2),
+            Indicator_Type_Key=rep(Dim_Global_2030_Outcome2_Food_A$Indicator_Type_Key, 2),
             Practice_Outcome_Key=rep(practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Food" &
-                                                                   grepl("Waste",practice_outcome_key_ref$practice_outcome)], length(1)),
-            Indicator_Value=NA,
+                                                                   grepl("Waste",practice_outcome_key_ref$practice_outcome)], 2),
+            Indicator_Value=c(162,81),
             Indicator_Upper_Value=NA,
             Indicator_Lower_Value=NA)
 
@@ -445,10 +509,10 @@ Dim_Global_2030_Outcome2_Food_B <-
   data.frame(Indicator_Type_Key="OUT2_FD_B",
              Indicator_Name="FORTHCOMING: SDG 12.3.1.a -- Per capita food waste (kg/year)",
              Indicator_Label="Loss Index and Kilograms Wasted",
-             Indicator_Subcategory="Per Capita Food Waste*",
-             Indicator_Unit="kg/year",
-             Data_source="UN SDG Indicator Bank -- UNEP",
-             Indicator_Target=NA,
+             Indicator_Subcategory="Per Capita Global Food Waste",
+             Indicator_Unit="kg/yr",
+             Data_source="FAO. (2011). Global food losses and food waste [Report]: Dusseldorf, Germany.",
+             Indicator_Target=25.5,
              Indicator_Type="Outcome",
              Panel_Label="Food Loss & Waste",
              Display_Order=2,
@@ -456,12 +520,12 @@ Dim_Global_2030_Outcome2_Food_B <-
              US_Indicator="Yes")
 
 Fact_Global_2030_Outcome2_Food_B <-
-  data.frame(Year_Key=9999,
-            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Food"],length(1)),
-            Indicator_Type_Key=rep(Dim_Global_2030_Outcome2_Food_B$Indicator_Type_Key, length(1)),
+  data.frame(Year_Key=c(2011,2030),
+            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Food"],2),
+            Indicator_Type_Key=rep(Dim_Global_2030_Outcome2_Food_B$Indicator_Type_Key, 2),
             Practice_Outcome_Key=rep(practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Food" &
-                                                                   grepl("Waste",practice_outcome_key_ref$practice_outcome)], length(1)),
-            Indicator_Value=NA,
+                                                                   grepl("Waste",practice_outcome_key_ref$practice_outcome)], 2),
+            Indicator_Value=c(51,25.5),
             Indicator_Upper_Value=NA,
             Indicator_Lower_Value=NA)
 
@@ -498,6 +562,8 @@ Fact_Global_2030_Outcome3_Food_A <-
 Dim_Global_2030_Outcome_Food <-
   rbind.data.frame(Dim_Global_2030_Outcome1_Food_A,
                    Dim_Global_2030_Outcome1_Food_B,
+                   Dim_Global_2030_Outcome1_Food_C,
+                   Dim_Global_2030_Outcome1_Food_D,
                    Dim_Global_2030_Outcome2_Food_A,
                    Dim_Global_2030_Outcome2_Food_B,
                    Dim_Global_2030_Outcome3_Food_A)
@@ -505,6 +571,8 @@ Dim_Global_2030_Outcome_Food <-
 Fact_Global_2030_Outcome_Food <-
   rbind.data.frame(Fact_Global_2030_Outcome1_Food_A,
                    Fact_Global_2030_Outcome1_Food_B,
+                   Fact_Global_2030_Outcome1_Food_C,
+                   Fact_Global_2030_Outcome1_Food_D,
                    Fact_Global_2030_Outcome2_Food_A,
                    Fact_Global_2030_Outcome2_Food_B,
                    Fact_Global_2030_Outcome3_Food_A)
@@ -521,21 +589,19 @@ Fact_Global_2030_Outcome_Food <-
 # ---- 4.1 Load data ----
 
 dim.initiatives.food <- 
-  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_reporting_dim_2019_0715.xlsx',sheetName="Sheet1") %>%
-  subset(.,Practice=="Food") 
+  dim.initiatives %>% subset(Practice=="Food") 
 
 dim.initiative.indicators.food <-
-  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_indicators_dim_2019_0715.xlsx',sheetName="Sheet1") %>%
-  subset(.,Practice=="Food")
+  dim.initiative.indicators %>% subset(Practice=="Food")
 
 fact.initiative.indicators.food <-
-  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_indicators_fact_2019_0715.xlsx',sheetName="Sheet1") %>%
-  left_join(.,dim.initiatives.food[,c("Initiative.key","Practice")], by="Initiative.key") %>%
-  subset(.,Practice=="Food")
+  fact.initiative.indicators %>% subset(Practice=="Food")
 
 dim.initiative.milestones.food <-
-  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_milestones_2019_0715.xlsx',sheetName="Sheet1") %>%
-  subset(.,Practice=="Food")
+  dim.initiative.milestones %>% subset(Practice=="Food")
+
+pie.type.food <-
+  pie.type %>% subset(Practice=="Food")
 
 
 # ---- 4.2 Food-specific Dim_Initiative ----
@@ -555,7 +621,9 @@ Dim_Initiative_Food <-
 # ---- 4.3 Food-specific Dim_Initiative_Indicator_Type ----
 
 Dim_Initiative_Indicator_Food <-
-  dim.initiative.indicators.food %>%
+  left_join(dim.initiative.indicators.food,
+            pie.type.food[,c("Initiative.indicator.key","pie.type","amount.achieved","amount.remaining")],
+            by="Initiative.indicator.key") %>%
   transmute(Indicator_Type_Key=Initiative.indicator.key,
             Indicator_Type=Indicator.type,
             Indicator_Name=ifelse(!is.na(Indicator.name),as.character(Indicator.name),"FORTHCOMING"),
@@ -565,7 +633,12 @@ Dim_Initiative_Indicator_Food <-
             Data_Source=Source,
             Indicator_Target=Target,
             Display_Order=Display.order,
-            Indicator_Statement=Statement)
+            Indicator_Statement=Statement,
+            Indicator_Label_Abbr=Indicator.label.abbr,
+            Subcategory_Abbr=Subcategory.abbr,
+            Amount_Achieved=amount.achieved,
+            Amount_Remaining=amount.remaining,
+            Pie_Type=pie.type)
 
 
 # ---- 4.4 Food-specific Fact_Initiative_Indicators ----
@@ -590,7 +663,7 @@ Fact_Initiative_Financials_Food <-
             Initiative_Key=Initiative.key,
             Amount_Needed=Funds.needed,
             Amount_Secured=Funds.secured,
-            Amount_Anticipated=Funds.anticipated)
+            Amount_Anticipated=Funds.secured.anticipated.sum)
 
 
 # ---- 4.6 Food-specific Milestone_Group_Bridge ----
@@ -645,15 +718,20 @@ rm(FAOSTAT_FoodBalance,
    Fact_Context_Response_Food_B,
    Dim_Global_2030_Outcome1_Food_A,
    Dim_Global_2030_Outcome1_Food_B,
+   Dim_Global_2030_Outcome1_Food_C,
+   Dim_Global_2030_Outcome1_Food_D,
    Dim_Global_2030_Outcome2_Food_A,
    Dim_Global_2030_Outcome2_Food_B,
    Dim_Global_2030_Outcome3_Food_A,
    Fact_Global_2030_Outcome1_Food_A,
    Fact_Global_2030_Outcome1_Food_B,
+   Fact_Global_2030_Outcome1_Food_C,
+   Fact_Global_2030_Outcome1_Food_D,
    Fact_Global_2030_Outcome2_Food_A,
    Fact_Global_2030_Outcome2_Food_B,
    Fact_Global_2030_Outcome3_Food_A,
    dim.initiatives.food,
    dim.initiative.indicators.food,
    fact.initiative.indicators.food,
-   dim.initiative.milestones.food)
+   dim.initiative.milestones.food,
+   pie.type.food)

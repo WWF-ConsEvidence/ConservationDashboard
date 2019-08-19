@@ -394,6 +394,8 @@ Fact_Global_2030_Outcome1_Wildlife_E <-
 
 # ---- 3.2 Wildlife Outcome 2 - OVEREXPLOITATION PREVENTED ----
 
+# -- GLOBAL-SPECIFIC
+
 Dim_Global_2030_Outcome2_Wildlife_A <- 
   data.frame(Indicator_Type_Key="OUT2_WL_A",
              Indicator_Name="FORTHCOMING: CITES Illegal Trade & Exploitation Index",
@@ -406,7 +408,7 @@ Dim_Global_2030_Outcome2_Wildlife_A <-
              Panel_Label="Overexploitation Prevented",
              Display_Order=2,
              Global_Indicator="Yes",
-             US_Indicator="Yes")
+             US_Indicator="No")
 
 Fact_Global_2030_Outcome2_Wildlife_A <-
   data.frame(Year_Key=9999,
@@ -418,6 +420,33 @@ Fact_Global_2030_Outcome2_Wildlife_A <-
             Indicator_Upper_Value=NA,
             Indicator_Lower_Value=NA)
 
+# -- US-SPECIFIC PROXY 
+
+Dim_Global_2030_Outcome2_Wildlife_B <- 
+  data.frame(Indicator_Type_Key="OUT2_WL_B",
+             Indicator_Name="CITES Monitoring the Illegal Killing of Elephants Programme",
+             Indicator_Label="Illegal Killing of African Elephants*",
+             Indicator_Subcategory=NA,
+             Indicator_Unit="% PIKE",
+             Data_source="CITES / PIKE 'Trends in Africa' dataset",
+             Indicator_Target=0,
+             Indicator_Type="Outcome",
+             Panel_Label="Overexploitation Prevented",
+             Display_Order=2,
+             Global_Indicator="No",
+             US_Indicator="Yes")
+
+Fact_Global_2030_Outcome2_Wildlife_B <-
+  import('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/PIKE_Africa_2019_0819.csv') %>%
+  transmute(Year_Key=yr,
+             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],length(yr)),
+             Indicator_Type_Key=rep(Dim_Global_2030_Outcome2_Wildlife_B$Indicator_Type_Key, length(yr)),
+             Practice_Outcome_Key=rep(practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Wildlife" &
+                                                                    grepl("Overexploitation",practice_outcome_key_ref$practice_outcome)], length(yr)),
+             Indicator_Value=`PIKE estimate`,
+             Indicator_Upper_Value=`PIKE estimate` + se,
+             Indicator_Lower_Value=`PIKE estimate` - se)
+
 
 # ---- 3.3 Consolidated Wildlife-specific Global 2030 Outcome tables ----
 
@@ -427,7 +456,8 @@ Dim_Global_2030_Outcome_Wildlife <-
                    Dim_Global_2030_Outcome1_Wildlife_C,
                    Dim_Global_2030_Outcome1_Wildlife_D,
                    Dim_Global_2030_Outcome1_Wildlife_E,
-                   Dim_Global_2030_Outcome2_Wildlife_A)
+                   Dim_Global_2030_Outcome2_Wildlife_A,
+                   Dim_Global_2030_Outcome2_Wildlife_B)
 
 Fact_Global_2030_Outcome_Wildlife <-
   rbind.data.frame(Fact_Global_2030_Outcome1_Wildlife_A,
@@ -435,7 +465,8 @@ Fact_Global_2030_Outcome_Wildlife <-
                    Fact_Global_2030_Outcome1_Wildlife_C,
                    Fact_Global_2030_Outcome1_Wildlife_D,
                    Fact_Global_2030_Outcome1_Wildlife_E,
-                   Fact_Global_2030_Outcome2_Wildlife_A)
+                   Fact_Global_2030_Outcome2_Wildlife_A,
+                   Fact_Global_2030_Outcome2_Wildlife_B)
 
 
 #
@@ -449,21 +480,19 @@ Fact_Global_2030_Outcome_Wildlife <-
 # ---- 4.1 Load data ----
 
 dim.initiatives.wildlife <- 
-  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_reporting_dim_2019_0715.xlsx',sheetName="Sheet1") %>%
-  subset(.,Practice=="Wildlife") 
+  dim.initiatives %>% subset(Practice=="Wildlife") 
 
 dim.initiative.indicators.wildlife <-
-  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_indicators_dim_2019_0715.xlsx',sheetName="Sheet1") %>%
-  subset(.,Practice=="Wildlife")
+  dim.initiative.indicators %>% subset(Practice=="Wildlife")
 
 fact.initiative.indicators.wildlife <-
-  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_indicators_fact_2019_0715.xlsx',sheetName="Sheet1") %>%
-  left_join(.,dim.initiatives.wildlife[,c("Initiative.key","Practice")], by="Initiative.key") %>%
-  subset(.,Practice=="Wildlife")
+  fact.initiative.indicators %>% subset(Practice=="Wildlife")
 
 dim.initiative.milestones.wildlife <-
-  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_milestones_2019_0715.xlsx',sheetName="Sheet1") %>%
-  subset(.,Practice=="Wildlife")
+  dim.initiative.milestones %>% subset(Practice=="Wildlife")
+
+pie.type.wildlife <-
+  pie.type %>% subset(Practice=="Wildlife")
 
 
 # ---- 4.2 Wildlife-specific Dim_Initiative ----
@@ -483,7 +512,9 @@ Dim_Initiative_Wildlife <-
 # ---- 4.3 Wildlife-specific Dim_Initiative_Indicator_Type ----
 
 Dim_Initiative_Indicator_Wildlife <-
-  dim.initiative.indicators.wildlife %>%
+  left_join(dim.initiative.indicators.wildlife,
+            pie.type.wildlife[,c("Initiative.indicator.key","pie.type","amount.achieved","amount.remaining")],
+            by="Initiative.indicator.key") %>%
   transmute(Indicator_Type_Key=Initiative.indicator.key,
             Indicator_Type=Indicator.type,
             Indicator_Name=ifelse(!is.na(Indicator.name),as.character(Indicator.name),"FORTHCOMING"),
@@ -493,7 +524,12 @@ Dim_Initiative_Indicator_Wildlife <-
             Data_Source=Source,
             Indicator_Target=Target,
             Display_Order=Display.order,
-            Indicator_Statement=Statement)
+            Indicator_Statement=Statement,
+            Indicator_Label_Abbr=Indicator.label.abbr,
+            Subcategory_Abbr=Subcategory.abbr,
+            Amount_Achieved=amount.achieved,
+            Amount_Remaining=amount.remaining,
+            Pie_Type=pie.type)
 
 
 # ---- 4.4 Wildlife-specific Fact_Initiative_Indicators ----
@@ -519,7 +555,7 @@ Fact_Initiative_Financials_Wildlife <-
             Initiative_Key=Initiative.key,
             Amount_Needed=Funds.needed,
             Amount_Secured=Funds.secured,
-            Amount_Anticipated=Funds.anticipated)
+            Amount_Anticipated=Funds.secured.anticipated.sum)
 
 
 # ---- 4.6 Wildlife-specific Milestone_Group_Bridge ----
@@ -566,13 +602,16 @@ rm(Dim_Context_State_Wildlife_A,
    Dim_Global_2030_Outcome1_Wildlife_D,
    Dim_Global_2030_Outcome1_Wildlife_E,
    Dim_Global_2030_Outcome2_Wildlife_A,
+   Dim_Global_2030_Outcome2_Wildlife_B,
    Fact_Global_2030_Outcome1_Wildlife_A,
    Fact_Global_2030_Outcome1_Wildlife_B,
    Fact_Global_2030_Outcome1_Wildlife_C,
    Fact_Global_2030_Outcome1_Wildlife_D,
    Fact_Global_2030_Outcome1_Wildlife_E,
    Fact_Global_2030_Outcome2_Wildlife_A,
+   Fact_Global_2030_Outcome2_Wildlife_B,
    dim.initiatives.wildlife,
    dim.initiative.indicators.wildlife,
    fact.initiative.indicators.wildlife,
-   dim.initiative.milestones.wildlife)
+   dim.initiative.milestones.wildlife,
+   pie.type.wildlife)

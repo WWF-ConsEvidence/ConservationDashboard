@@ -367,22 +367,19 @@ Fact_Global_2030_Outcome_FW <-
 # ---- 4.1 Load data ----
 
 dim.initiatives.fw <- 
-  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_reporting_dim_2019_0715.xlsx',sheetName="Sheet1") %>%
-  subset(.,Practice=="Freshwater") 
+  dim.initiatives %>% subset(Practice=="Freshwater") 
 
 dim.initiative.indicators.fw <-
-  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_indicators_dim_2019_0715.xlsx',sheetName="Sheet1") %>%
-  subset(.,Practice=="Freshwater")
+  dim.initiative.indicators %>% subset(Practice=="Freshwater")
 
 fact.initiative.indicators.fw <-
-  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_indicators_fact_2019_0715.xlsx',sheetName="Sheet1") %>%
-  left_join(.,dim.initiatives.fw[,c("Initiative.key","Practice")], by="Initiative.key") %>%
-  subset(.,Practice=="Freshwater")
+  fact.initiative.indicators %>% subset(Practice=="Freshwater")
 
 dim.initiative.milestones.fw <-
-  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_milestones_2019_0715.xlsx',sheetName="Sheet1") %>%
-  subset(.,Practice=="Freshwater")
+  dim.initiative.milestones %>% subset(Practice=="Freshwater")
 
+pie.type.fw <-
+  pie.type %>% subset(Practice=="Freshwater")
 
 # ---- 4.2 Freshwater-specific Dim_Initiative ----
 
@@ -401,7 +398,9 @@ Dim_Initiative_FW <-
 # ---- 4.3 Freshwater-specific Dim_Initiative_Indicator_Type ----
 
 Dim_Initiative_Indicator_FW <-
-  dim.initiative.indicators.fw %>%
+  left_join(dim.initiative.indicators.fw,
+            pie.type.fw[,c("Initiative.indicator.key","pie.type","amount.achieved","amount.remaining")],
+            by="Initiative.indicator.key") %>%
   transmute(Indicator_Type_Key=Initiative.indicator.key,
             Indicator_Type=Indicator.type,
             Indicator_Name=ifelse(!is.na(Indicator.name),as.character(Indicator.name),"FORTHCOMING"),
@@ -411,7 +410,12 @@ Dim_Initiative_Indicator_FW <-
             Data_Source=Source,
             Indicator_Target=Target,
             Display_Order=Display.order,
-            Indicator_Statement=Statement)
+            Indicator_Statement=Statement,
+            Indicator_Label_Abbr=Indicator.label.abbr,
+            Subcategory_Abbr=Subcategory.abbr,
+            Amount_Achieved=amount.achieved,
+            Amount_Remaining=amount.remaining,
+            Pie_Type=pie.type)
 
 
 # ---- 4.4 Freshwater-specific Fact_Initiative_Indicators ----
@@ -436,7 +440,7 @@ Fact_Initiative_Financials_FW <-
             Initiative_Key=Initiative.key,
             Amount_Needed=Funds.needed,
             Amount_Secured=Funds.secured,
-            Amount_Anticipated=Funds.anticipated)
+            Amount_Anticipated=Funds.secured.anticipated.sum)
 
 
 # ---- 4.6 Freshwater-specific Milestone_Group_Bridge ----
@@ -486,4 +490,5 @@ rm(Dim_Context_State_FW_A,
    dim.initiatives.fw,
    dim.initiative.indicators.fw,
    fact.initiative.indicators.fw,
-   dim.initiative.milestones.fw)
+   dim.initiative.milestones.fw,
+   pie.type.fw)

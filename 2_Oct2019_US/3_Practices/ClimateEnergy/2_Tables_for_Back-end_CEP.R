@@ -35,7 +35,7 @@
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #
 
-pacman::p_load(dplyr, xlsx, reshape2, ggplot2)
+pacman::p_load(xlsx, reshape2, ggplot2, dplyr)
 
 
 practice_key_ref <- read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/cons_dashboard_dim_tables_20180828.xlsx',
@@ -599,21 +599,19 @@ Fact_Global_2030_Outcome_CEP <-
 # ---- 4.1 Load data ----
 
 dim.initiatives.CEP <- 
-  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_reporting_dim_2019_0715.xlsx',sheetName="Sheet1") %>%
-  subset(.,Practice=="Climate & Energy") 
+  dim.initiatives %>% subset(Practice=="Climate") 
 
 dim.initiative.indicators.CEP <-
-  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_indicators_dim_2019_0715.xlsx',sheetName="Sheet1") %>%
-  subset(.,Practice=="Climate & Energy")
+  dim.initiative.indicators %>% subset(Practice=="Climate")
 
 fact.initiative.indicators.CEP <-
-  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_indicators_fact_2019_0715.xlsx',sheetName="Sheet1") %>%
-  left_join(.,dim.initiatives.CEP[,c("Initiative.key","Practice")], by="Initiative.key") %>%
-  subset(.,Practice=="Climate & Energy")
+  fact.initiative.indicators %>% subset(Practice=="Climate")
 
 dim.initiative.milestones.CEP <-
-  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_milestones_2019_0715.xlsx',sheetName="Sheet1") %>%
-  subset(.,Practice=="Climate & Energy")
+  dim.initiative.milestones %>% subset(Practice=="Climate")
+
+pie.type.CEP <-
+  pie.type %>% subset(Practice=="Climate")
 
 
 # ---- 4.2 CEP-specific Dim_Initiative ----
@@ -633,7 +631,9 @@ Dim_Initiative_CEP <-
 # ---- 4.3 CEP-specific Dim_Initiative_Indicator_Type ----
 
 Dim_Initiative_Indicator_CEP <-
-  dim.initiative.indicators.CEP %>%
+  left_join(dim.initiative.indicators.CEP,
+            pie.type.CEP[,c("Initiative.indicator.key","pie.type","amount.achieved","amount.remaining")],
+            by="Initiative.indicator.key") %>%
   transmute(Indicator_Type_Key=Initiative.indicator.key,
             Indicator_Type=Indicator.type,
             Indicator_Name=ifelse(!is.na(Indicator.name),as.character(Indicator.name),"FORTHCOMING"),
@@ -643,7 +643,13 @@ Dim_Initiative_Indicator_CEP <-
             Data_Source=Source,
             Indicator_Target=Target,
             Display_Order=Display.order,
-            Indicator_Statement=Statement)
+            Indicator_Statement=Statement,
+            Indicator_Label_Abbr=Indicator.label.abbr,
+            Subcategory_Abbr=Subcategory.abbr,
+            Amount_Achieved=amount.achieved,
+            Amount_Remaining=amount.remaining,
+            Pie_Type=pie.type)
+
 
 # ---- 4.4 CEP-specific Fact_Initiative_Indicators ----
 
@@ -667,7 +673,7 @@ Fact_Initiative_Financials_CEP <-
             Initiative_Key=Initiative.key,
             Amount_Needed=Funds.needed,
             Amount_Secured=Funds.secured,
-            Amount_Anticipated=Funds.anticipated)
+            Amount_Anticipated=Funds.secured.anticipated.sum)
 
 
 # ---- 4.6 CEP-specific Milestone_Group_Bridge ----
@@ -730,4 +736,5 @@ rm(Temp_land_sea,
    dim.initiatives.CEP,
    dim.initiative.indicators.CEP,
    fact.initiative.indicators.CEP,
-   dim.initiative.milestones.CEP)
+   dim.initiative.milestones.CEP,
+   pie.type.CEP)

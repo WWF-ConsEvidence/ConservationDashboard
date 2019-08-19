@@ -448,21 +448,19 @@ Fact_Global_2030_Outcome_Forest <-
 # ---- 4.1 Load data ----
 
 dim.initiatives.forests <- 
-  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_reporting_dim_2019_0715.xlsx',sheetName="Sheet1") %>%
-  subset(.,Practice=="Forests") 
+  dim.initiatives %>% subset(Practice=="Forests") 
 
 dim.initiative.indicators.forests <-
-  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_indicators_dim_2019_0715.xlsx',sheetName="Sheet1") %>%
-  subset(.,Practice=="Forests")
+  dim.initiative.indicators %>% subset(Practice=="Forests")
 
 fact.initiative.indicators.forests <-
-  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_indicators_fact_2019_0715.xlsx',sheetName="Sheet1") %>%
-  left_join(.,dim.initiatives.forests[,c("Initiative.key","Practice")], by="Initiative.key") %>%
-  subset(.,Practice=="Forests")
+  fact.initiative.indicators %>% subset(Practice=="Forests")
 
 dim.initiative.milestones.forests <-
-  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_milestones_2019_0715.xlsx',sheetName="Sheet1") %>%
-  subset(.,Practice=="Forests")
+  dim.initiative.milestones %>% subset(Practice=="Forests")
+
+pie.type.forests <-
+  pie.type %>% subset(Practice=="Forests")
 
 
 # ---- 4.2 Forest-specific Dim_Initiative ----
@@ -482,7 +480,9 @@ Dim_Initiative_Forest <-
 # ---- 4.3 Forest-specific Dim_Initiative_Indicator_Type ----
 
 Dim_Initiative_Indicator_Forest <-
-  dim.initiative.indicators.forests %>%
+  left_join(dim.initiative.indicators.forests,
+            pie.type.forests[,c("Initiative.indicator.key","pie.type","amount.achieved","amount.remaining")],
+            by="Initiative.indicator.key") %>%
   transmute(Indicator_Type_Key=Initiative.indicator.key,
             Indicator_Type=Indicator.type,
             Indicator_Name=ifelse(!is.na(Indicator.name),as.character(Indicator.name),"FORTHCOMING"),
@@ -492,7 +492,12 @@ Dim_Initiative_Indicator_Forest <-
             Data_Source=Source,
             Indicator_Target=Target,
             Display_Order=Display.order,
-            Indicator_Statement=Statement)
+            Indicator_Statement=Statement,
+            Indicator_Label_Abbr=Indicator.label.abbr,
+            Subcategory_Abbr=Subcategory.abbr,
+            Amount_Achieved=amount.achieved,
+            Amount_Remaining=amount.remaining,
+            Pie_Type=pie.type)
 
 
 # ---- 4.4 Forest-specific Fact_Initiative_Indicators ----
@@ -517,7 +522,7 @@ Fact_Initiative_Financials_Forest <-
             Initiative_Key=Initiative.key,
             Amount_Needed=Funds.needed,
             Amount_Secured=Funds.secured,
-            Amount_Anticipated=Funds.anticipated)
+            Amount_Anticipated=Funds.secured.anticipated.sum)
 
 
 # ---- 4.6 Forest-specific Milestone_Group_Bridge ----
@@ -575,4 +580,5 @@ rm(Dim_Context_State_Forest_A,
    dim.initiatives.forests,
    dim.initiative.indicators.forests,
    fact.initiative.indicators.forests,
-   dim.initiative.milestones.forests)
+   dim.initiative.milestones.forests,
+   pie.type.forests)

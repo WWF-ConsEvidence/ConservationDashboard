@@ -371,22 +371,19 @@ Fact_Global_2030_Outcome_Oceans <-
 # ---- 4.1 Load data ----
 
 dim.initiatives.oceans <- 
-  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_reporting_dim_2019_0715.xlsx',sheetName="Sheet1") %>%
-  subset(.,Practice=="Oceans") 
+  dim.initiatives %>% subset(Practice=="Oceans") 
 
 dim.initiative.indicators.oceans <-
-  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_indicators_dim_2019_0715.xlsx',sheetName="Sheet1") %>%
-  subset(.,Practice=="Oceans")
+  dim.initiative.indicators %>% subset(Practice=="Oceans")
 
 fact.initiative.indicators.oceans <-
-  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_indicators_fact_2019_0715.xlsx',sheetName="Sheet1") %>%
-  left_join(.,dim.initiatives.oceans[,c("Initiative.key","Practice")], by="Initiative.key") %>%
-  subset(.,Practice=="Oceans")
+  fact.initiative.indicators %>% subset(Practice=="Oceans")
 
 dim.initiative.milestones.oceans <-
-  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_milestones_2019_0715.xlsx',sheetName="Sheet1") %>%
-  subset(.,Practice=="Oceans")
+  dim.initiative.milestones %>% subset(Practice=="Oceans")
 
+pie.type.oceans <-
+  pie.type %>% subset(Practice=="Oceans")
 
 
 # ---- 4.2 Oceans-specific Dim_Initiative ----
@@ -406,7 +403,9 @@ Dim_Initiative_Oceans <-
 # ---- 4.3 Oceans-specific Dim_Initiative_Indicator_Type ----
 
 Dim_Initiative_Indicator_Oceans <-
-  dim.initiative.indicators.oceans %>%
+  left_join(dim.initiative.indicators.oceans,
+            pie.type.oceans[,c("Initiative.indicator.key","pie.type","amount.achieved","amount.remaining")],
+            by="Initiative.indicator.key") %>%
   transmute(Indicator_Type_Key=Initiative.indicator.key,
             Indicator_Type=Indicator.type,
             Indicator_Name=ifelse(!is.na(Indicator.name),as.character(Indicator.name),"FORTHCOMING"),
@@ -416,7 +415,12 @@ Dim_Initiative_Indicator_Oceans <-
             Data_Source=Source,
             Indicator_Target=Target,
             Display_Order=Display.order,
-            Indicator_Statement=Statement)
+            Indicator_Statement=Statement,
+            Indicator_Label_Abbr=Indicator.label.abbr,
+            Subcategory_Abbr=Subcategory.abbr,
+            Amount_Achieved=amount.achieved,
+            Amount_Remaining=amount.remaining,
+            Pie_Type=pie.type)
 
 
 # ---- 4.4 Oceans-specific Fact_Initiative_Indicators ----
@@ -442,7 +446,7 @@ Fact_Initiative_Financials_Oceans <-
             Initiative_Key=Initiative.key,
             Amount_Needed=Funds.needed,
             Amount_Secured=Funds.secured,
-            Amount_Anticipated=Funds.anticipated)
+            Amount_Anticipated=Funds.secured.anticipated.sum)
 
 
 # ---- 4.6 Oceans-specific Milestone_Group_Bridge ----
@@ -494,4 +498,5 @@ rm(GBR,
    dim.initiatives.oceans,
    dim.initiative.indicators.oceans,
    fact.initiative.indicators.oceans,
-   dim.initiative.milestones.oceans)
+   dim.initiative.milestones.oceans,
+   pie.type.oceans)
