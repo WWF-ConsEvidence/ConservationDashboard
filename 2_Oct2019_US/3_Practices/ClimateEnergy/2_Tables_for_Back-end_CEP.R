@@ -632,36 +632,42 @@ Dim_Initiative_CEP <-
 
 Dim_Initiative_Indicator_CEP <-
   left_join(dim.initiative.indicators.CEP,
-            pie.type.CEP[,c("Initiative.indicator.key","pie.type","amount.achieved","amount.remaining")],
+            pie.type.CEP[,c("Initiative.indicator.key","pie.type","amount.achieved","amount.remaining","max.year.value")],
             by="Initiative.indicator.key") %>%
-  transmute(Indicator_Type_Key=Initiative.indicator.key,
+  transmute(Indicator_Type_Key=new.key,
             Indicator_Type=Indicator.type,
             Indicator_Name=ifelse(!is.na(Indicator.name),as.character(Indicator.name),"FORTHCOMING"),
             Indicator_Label=ifelse(!is.na(Indicator.label),as.character(Indicator.label),"Not Yet Identified"),
             Indicator_Subcategory=Subcategory,
             Indicator_Unit=Units,
             Data_Source=Source,
-            Indicator_Target=Target,
+            Indicator_Target=as.numeric(Target),
             Display_Order=Display.order,
             Indicator_Statement=Statement,
-            Indicator_Label_Abbr=Indicator.label.abbr,
+            Indicator_Label_Abbr=toupper(Indicator.label.abbr),
             Subcategory_Abbr=Subcategory.abbr,
             Amount_Achieved=amount.achieved,
             Amount_Remaining=amount.remaining,
-            Pie_Type=pie.type)
+            Pie_Type=pie.type,
+            Indicator_Label_Caps=toupper(Indicator_Label),
+            Indicator_Latest=max.year.value)
 
 
 # ---- 4.4 CEP-specific Fact_Initiative_Indicators ----
 
 Fact_Initiative_Indicator_CEP <-
-  fact.initiative.indicators.CEP %>%
+  left_join(fact.initiative.indicators.CEP,pie.type.CEP[,c("Initiative.indicator.key","target.year","Target")],by="Initiative.indicator.key") %>%
+  left_join(dim.initiative.indicators.CEP[,c("Initiative.indicator.key","Units","new.key")],by="Initiative.indicator.key") %>%
   transmute(Year_Key=ifelse(!is.na(Year),Year,9999),
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Climate & Energy"],length(Year_Key)),
             Initiative_Key=Initiative.key,
-            Indicator_Type_Key=Initiative.indicator.key,
+            Indicator_Type_Key=new.key,
             Indicator_Value=Value,
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)
+            Indicator_Lower_Value=NA,
+            Value_Trend=ifelse(grepl("reduction",Units,ignore.case=T)==T,-(Value),Value),
+            Indicator_Target=ifelse(!is.na(Target) & Year==target.year,Target,NA),
+            Target_Trend=ifelse(grepl("reduction",Units,ignore.case=T)==T,-(Indicator_Target),Indicator_Target))
 
 
 # ---- 4.5 CEP-specific Fact_Initiative_Financials ----
@@ -673,7 +679,8 @@ Fact_Initiative_Financials_CEP <-
             Initiative_Key=Initiative.key,
             Amount_Needed=Funds.needed,
             Amount_Secured=Funds.secured,
-            Amount_Anticipated=Funds.secured.anticipated.sum)
+            Amount_Anticipated=Funds.anticipated,
+            Amount_Remaining=Funds.needed-Funds.secured-Funds.anticipated)
 
 
 # ---- 4.6 CEP-specific Milestone_Group_Bridge ----

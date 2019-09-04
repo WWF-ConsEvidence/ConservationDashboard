@@ -23,7 +23,7 @@
 
 # ---- 1.1 Libraries, reference tables ----
 
-pacman::p_load(rio, dplyr)
+pacman::p_load(rio, stringi, xlsx, dplyr)
 
 
 practice_key_ref <- read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/cons_dashboard_dim_tables_20180828.xlsx',
@@ -39,7 +39,10 @@ dim.initiatives <-
   import('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_reporting_dim_2019_0715.xlsx')
 
 dim.initiative.indicators <-
-  import('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_indicators_dim_2019_0715.xlsx')
+  import('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_indicators_dim_2019_0715.xlsx') %>%
+  mutate(new.key=ifelse(grepl("OUT_",Initiative.indicator.key)==T,as.numeric(paste("10",stri_extract_last_regex(Initiative.indicator.key, "\\d{4}"),sep="")),
+                        ifelse(grepl("PATH_",Initiative.indicator.key)==T,as.numeric(paste("20",stri_extract_last_regex(Initiative.indicator.key, "\\d{4}"),sep="")),
+                               NA)))
 
 fact.initiative.indicators <-
   import('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_indicators_fact_2019_0715.xlsx') %>%
@@ -56,18 +59,21 @@ dim.initiative.milestones <-
 #
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #
-
+left_join(fact.initiative.indicators,dim.initiative.indicators[,c("Initiative.indicator.key","Target")],by="Initiative.indicator.key") %>% group_by(Initiative.indicator.key) %>%
+  summarise(Target=unique(Target),
+            target.year=max(Year))
 
 # ---- 2.1 Calculate pie.type info ---- 
 
 pie.type <-
-  fact.initiative.indicators %>%
+  left_join(fact.initiative.indicators,dim.initiative.indicators[,c("Initiative.indicator.key","Target")],by="Initiative.indicator.key") %>%
   group_by(Initiative.indicator.key,Initiative.key,Practice) %>%
   summarise(has.data=ifelse(length(Year[!is.na(Value)])>0, "Yes", "No"),
             max.year=ifelse(has.data=="Yes", max(Year[!is.na(Value)]), NA),
             min.year=ifelse(has.data=="Yes", min(Year[!is.na(Value)]), NA),
             max.year.value=ifelse(has.data=="Yes", Value[Year==max.year], NA),
             min.year.value=ifelse(has.data=="Yes", Value[Year==min.year], NA),
+            target.year=ifelse(!is.na(unique(Target)),max(Year),NA),
             trending=ifelse(has.data=="Yes", ifelse(max.year.value>min.year.value, 1, 
                                                     ifelse(max.year.value<min.year.value, -1, 
                                                            ifelse(max.year.value==min.year.value, 0, NA))),
