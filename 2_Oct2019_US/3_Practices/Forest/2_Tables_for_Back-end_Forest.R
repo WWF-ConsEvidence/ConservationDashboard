@@ -35,15 +35,6 @@
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #
 
-pacman::p_load(dplyr, xlsx, reshape2)
-
-
-practice_key_ref <- read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/cons_dashboard_dim_tables_20180828.xlsx',
-                              sheetName='Dim_Practice')
-
-practice_outcome_key_ref <- read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/cons_dashboard_dim_tables_20180828.xlsx',
-                                      sheetName='Dim_Practice_Outcome')
-
 
 #
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -78,7 +69,8 @@ Fact_Context_State_Forest_A <-
             Indicator_Type_Key=rep(Dim_Context_State_Forest_A$Indicator_Type_Key,length(Year_Key)),
             Indicator_Value=Value/1000,
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)
+            Indicator_Lower_Value=NA,
+            Value_First_Last=ifelse(Year_Key==max(Year_Key) | Year_Key==min(Year_Key),Indicator_Value,NA))
 
 # -- FOREST EXTENT - TEMPERATE
 
@@ -102,7 +94,8 @@ Fact_Context_State_Forest_B <-
             Indicator_Type_Key=rep(Dim_Context_State_Forest_B$Indicator_Type_Key,length(Year_Key)),
             Indicator_Value=Value/1000,
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)
+            Indicator_Lower_Value=NA,
+            Value_First_Last=ifelse(Year_Key==max(Year_Key) | Year_Key==min(Year_Key),Indicator_Value,NA))
 
 # -- FOREST EXTENT - TROPICAL/SUB-TROPICAL
 
@@ -128,7 +121,29 @@ Fact_Context_State_Forest_C <-
             Indicator_Type_Key=rep(Dim_Context_State_Forest_C$Indicator_Type_Key,length(Year_Key)),
             Indicator_Value=Value/1000,
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)
+            Indicator_Lower_Value=NA,
+            Value_First_Last=ifelse(Year_Key==max(Year_Key) | Year_Key==min(Year_Key),Indicator_Value,NA))
+
+
+# Add Panel-specific measures
+
+Dim_Context_State_Forest_A <-
+  Dim_Context_State_Forest_A %>%
+  mutate(Panel_Label_Upper=toupper(Panel_Label),
+         Panel_Min_Year=min(unique(rbind(Fact_Context_State_Forest_A$Year_Key,Fact_Context_State_Forest_B$Year_Key,Fact_Context_State_Forest_C$Year_Key))),
+         Panel_Max_Year=max(unique(rbind(Fact_Context_State_Forest_A$Year_Key,Fact_Context_State_Forest_B$Year_Key,Fact_Context_State_Forest_C$Year_Key))))
+
+Dim_Context_State_Forest_B <-
+  Dim_Context_State_Forest_B %>%
+  mutate(Panel_Label_Upper=toupper(Panel_Label),
+         Panel_Min_Year=min(unique(rbind(Fact_Context_State_Forest_A$Year_Key,Fact_Context_State_Forest_B$Year_Key,Fact_Context_State_Forest_C$Year_Key))),
+         Panel_Max_Year=max(unique(rbind(Fact_Context_State_Forest_A$Year_Key,Fact_Context_State_Forest_B$Year_Key,Fact_Context_State_Forest_C$Year_Key))))
+
+Dim_Context_State_Forest_C <-
+  Dim_Context_State_Forest_C %>%
+  mutate(Panel_Label_Upper=toupper(Panel_Label),
+         Panel_Min_Year=min(unique(rbind(Fact_Context_State_Forest_A$Year_Key,Fact_Context_State_Forest_B$Year_Key,Fact_Context_State_Forest_C$Year_Key))),
+         Panel_Max_Year=max(unique(rbind(Fact_Context_State_Forest_A$Year_Key,Fact_Context_State_Forest_B$Year_Key,Fact_Context_State_Forest_C$Year_Key))))
 
 
 # ---- 2.2 Context - Threat ----
@@ -155,7 +170,8 @@ Fact_Context_Threat_Forest_A <-
             Indicator_Type_Key=rep(Dim_Context_Threat_Forest_A$Indicator_Type_Key,length(Year_Key)),
             Indicator_Value=Value,
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)
+            Indicator_Lower_Value=NA,
+            Value_First_Last=ifelse(Year_Key==max(Year_Key) | Year_Key==min(Year_Key),Indicator_Value,NA))
 
 # -- FOREST LOSS - FRAGMENTATION
 
@@ -178,7 +194,22 @@ Fact_Context_Threat_Forest_B <-
             Indicator_Type_Key=rep(Dim_Context_Threat_Forest_B$Indicator_Type_Key,length(Year_Key)),
             Indicator_Value=Value,
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)
+            Indicator_Lower_Value=NA,
+            Value_First_Last=ifelse(Year_Key==max(Year_Key) | Year_Key==min(Year_Key),Indicator_Value,NA))
+
+# Add Panel-specific measures
+
+Dim_Context_Threat_Forest_A <-
+  Dim_Context_Threat_Forest_A %>%
+  mutate(Panel_Label_Upper=toupper(Panel_Label),
+         Panel_Min_Year=min(unique(rbind(Fact_Context_Threat_Forest_A$Year_Key,Fact_Context_Threat_Forest_B$Year_Key))),
+         Panel_Max_Year=max(unique(rbind(Fact_Context_Threat_Forest_A$Year_Key,Fact_Context_Threat_Forest_B$Year_Key))))
+
+Dim_Context_Threat_Forest_B <-
+  Dim_Context_Threat_Forest_B %>%
+  mutate(Panel_Label_Upper=toupper(Panel_Label),
+         Panel_Min_Year=min(unique(rbind(Fact_Context_Threat_Forest_A$Year_Key,Fact_Context_Threat_Forest_B$Year_Key))),
+         Panel_Max_Year=max(unique(rbind(Fact_Context_Threat_Forest_A$Year_Key,Fact_Context_Threat_Forest_B$Year_Key))))
 
 
 # ---- 2.3 Context - Response ----
@@ -204,7 +235,8 @@ Fact_Context_Response_Forest_A <-
             Indicator_Type_Key=rep(Dim_Context_Response_Forest_A$Indicator_Type_Key,length(Year_Key)),
             Indicator_Value=Land_AREA_MHA,
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)
+            Indicator_Lower_Value=NA,
+            Value_First_Last=ifelse(Year_Key==max(Year_Key) | Year_Key==min(Year_Key),Indicator_Value,NA))
 
 # FOREST PROTECTION - FSC Coverage
 
@@ -222,12 +254,28 @@ Dim_Context_Response_Forest_B <-
 
 Fact_Context_Response_Forest_B <-
   read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/FSC_area_2019_0711.xlsx',sheetName="FSC_area_2017_0915") %>%
+  filter(!is.na(Year)) %>%
   transmute(Year_Key=Year,
-             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Forests"],length(Year_Key)),
-             Indicator_Type_Key=rep(Dim_Context_Response_Forest_B$Indicator_Type_Key,length(Year_Key)),
-             Indicator_Value=Value,
-             Indicator_Upper_Value=NA,
-             Indicator_Lower_Value=NA)
+            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Forests"],length(Year_Key)),
+            Indicator_Type_Key=rep(Dim_Context_Response_Forest_B$Indicator_Type_Key,length(Year_Key)),
+            Indicator_Value=Value,
+            Indicator_Upper_Value=NA,
+            Indicator_Lower_Value=NA,
+            Value_First_Last=ifelse(Year_Key==max(Year_Key) | Year_Key==min(Year_Key),Indicator_Value,NA))
+
+# Add Panel-specific measures
+
+Dim_Context_Response_Forest_A <-
+  Dim_Context_Response_Forest_A %>%
+  mutate(Panel_Label_Upper=toupper(Panel_Label),
+         Panel_Min_Year=min(unique(rbind(Fact_Context_Response_Forest_A$Year_Key,Fact_Context_Response_Forest_B$Year_Key))),
+         Panel_Max_Year=max(unique(rbind(Fact_Context_Response_Forest_A$Year_Key,Fact_Context_Response_Forest_B$Year_Key))))
+
+Dim_Context_Response_Forest_B <-
+  Dim_Context_Response_Forest_B %>%
+  mutate(Panel_Label_Upper=toupper(Panel_Label),
+         Panel_Min_Year=min(unique(rbind(Fact_Context_Response_Forest_A$Year_Key,Fact_Context_Response_Forest_B$Year_Key))),
+         Panel_Max_Year=max(unique(rbind(Fact_Context_Response_Forest_A$Year_Key,Fact_Context_Response_Forest_B$Year_Key))))
 
 
 # ---- 2.4 Consolidated Forest-specific Global Context tables ----
@@ -286,8 +334,15 @@ Fact_Global_2030_Outcome1_Forest_A <-
                                                                    grepl("Manage",practice_outcome_key_ref$practice_outcome)], length(1)),
             Indicator_Value=NA,
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)
+            Indicator_Lower_Value=NA,
+            Indicator_Target=NA)
 
+# Add Indicator_Latest_Year and Indicator_Latest_Value based on Fact table
+
+Dim_Global_2030_Outcome1_Forest_A <- 
+  Dim_Global_2030_Outcome1_Forest_A %>%
+  mutate(Indicator_Latest_Year=max(Fact_Global_2030_Outcome1_Forest_A$Year_Key,na.rm=T),
+         Indicator_Latest_Value=Fact_Global_2030_Outcome1_Forest_A$Indicator_Value[Fact_Global_2030_Outcome1_Forest_A$Year_Key==Indicator_Latest_Year])
 
 
 # ---- 3.2 Forest Outcome 2 - HALT DEFORESTATION ----
@@ -316,16 +371,29 @@ Fact_Global_2030_Outcome2_Forest_A <-
                                                                    grepl("Deforestation",practice_outcome_key_ref$practice_outcome)], length(Year_Key)),
             Indicator_Value=Value,
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA) %>%
-  rbind.data.frame(.,
+            Indicator_Lower_Value=NA,
+            Indicator_Target=NA)
+
+# Add Indicator_Latest_Year and Indicator_Latest_Value based on Fact table
+
+Dim_Global_2030_Outcome2_Forest_A <- 
+  Dim_Global_2030_Outcome2_Forest_A %>%
+  mutate(Indicator_Latest_Year=max(Fact_Global_2030_Outcome2_Forest_A$Year_Key,na.rm=T),
+         Indicator_Latest_Value=Fact_Global_2030_Outcome2_Forest_A$Indicator_Value[Fact_Global_2030_Outcome2_Forest_A$Year_Key==Indicator_Latest_Year])
+
+# Add target value to Fact table
+
+Fact_Global_2030_Outcome2_Forest_A <-
+  rbind.data.frame(Fact_Global_2030_Outcome2_Forest_A,
                    data.frame(Year_Key=2030,
                               Practice_Key=practice_key_ref$id[practice_key_ref$practice_name=="Forests"],
                               Indicator_Type_Key=Dim_Global_2030_Outcome2_Forest_A$Indicator_Type_Key,
                               Practice_Outcome_Key=practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Forests" &
                                                                                  grepl("Deforestation",practice_outcome_key_ref$practice_outcome)],
-                              Indicator_Value=Dim_Global_2030_Outcome2_Forest_A$Indicator_Target,
+                              Indicator_Value=NA,
                               Indicator_Upper_Value=NA,
-                              Indicator_Lower_Value=NA))
+                              Indicator_Lower_Value=NA,
+                              Indicator_Target=Dim_Global_2030_Outcome2_Forest_A$Indicator_Target))
 
 
 # ---- 3.3 Forest Outcome 3 - FOREST RESTORATION ----
@@ -349,6 +417,7 @@ Dim_Global_2030_Outcome3_Forest_A <-
 Fact_Global_2030_Outcome3_Forest_A <-
   read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/BonnChallenge_commitments_2019_0710.xlsx', 
             sheetName="Sheet1") %>%
+  filter(!is.na(Commitment_Year)) %>%
   group_by(Commitment_Year) %>%
   summarise(Indicator_Value=sum(Committed_Area)) %>%
   transmute(Year_Key=Commitment_Year,
@@ -358,15 +427,30 @@ Fact_Global_2030_Outcome3_Forest_A <-
                                                                    grepl("Restoration",practice_outcome_key_ref$practice_outcome)], length(Year_Key)),
             Indicator_Value=cumsum(Indicator_Value),
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA) %>%
-  rbind.data.frame(.,data.frame(Year_Key=2030,
-                                Practice_Key=practice_key_ref$id[practice_key_ref$practice_name=="Forests"],
-                                Indicator_Type_Key=Dim_Global_2030_Outcome3_Forest_A$Indicator_Type_Key,
-                                Practice_Outcome_Key=practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Forests" &
-                                                                                   grepl("Restoration",practice_outcome_key_ref$practice_outcome)],
-                                Indicator_Value=Dim_Global_2030_Outcome3_Forest_A$Indicator_Target,
-                                Indicator_Upper_Value=NA,
-                                Indicator_Lower_Value=NA))
+            Indicator_Lower_Value=NA,
+            Indicator_Target=NA)
+
+# Add Indicator_Latest_Year and Indicator_Latest_Value based on Fact table
+
+Dim_Global_2030_Outcome3_Forest_A <- 
+  Dim_Global_2030_Outcome3_Forest_A %>%
+  mutate(Indicator_Latest_Year=max(Fact_Global_2030_Outcome3_Forest_A$Year_Key,na.rm=T),
+         Indicator_Latest_Value=Fact_Global_2030_Outcome3_Forest_A$Indicator_Value[Fact_Global_2030_Outcome3_Forest_A$Year_Key==Indicator_Latest_Year])
+
+# Add target value to Fact table
+
+Fact_Global_2030_Outcome3_Forest_A <-
+  rbind.data.frame(Fact_Global_2030_Outcome3_Forest_A,
+                   data.frame(Year_Key=2030,
+                              Practice_Key=practice_key_ref$id[practice_key_ref$practice_name=="Forests"],
+                              Indicator_Type_Key=Dim_Global_2030_Outcome3_Forest_A$Indicator_Type_Key,
+                              Practice_Outcome_Key=practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Forests" &
+                                                                                 grepl("Restoration",practice_outcome_key_ref$practice_outcome)],
+                              Indicator_Value=NA,
+                              Indicator_Upper_Value=NA,
+                              Indicator_Lower_Value=NA,
+                              Indicator_Target=Dim_Global_2030_Outcome3_Forest_A$Indicator_Target))
+
 
 # -- FUNDED
 
@@ -385,14 +469,37 @@ Dim_Global_2030_Outcome3_Forest_B <-
              US_Indicator="Yes")
 
 Fact_Global_2030_Outcome3_Forest_B <-
-  data.frame(Year_Key=c(2017,2030),
-            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Forests"],2),
-            Indicator_Type_Key=rep(Dim_Global_2030_Outcome3_Forest_B$Indicator_Type_Key, 2),
-            Practice_Outcome_Key=rep(practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Forests" &
-                                                                   grepl("Restoration",practice_outcome_key_ref$practice_outcome)], 2),
-            Indicator_Value=c(NA,Dim_Global_2030_Outcome3_Forest_B$Indicator_Target),
+  data.frame(Year_Key=2017,
+            Practice_Key=practice_key_ref$id[practice_key_ref$practice_name=="Forests"],
+            Indicator_Type_Key=Dim_Global_2030_Outcome3_Forest_B$Indicator_Type_Key,
+            Practice_Outcome_Key=practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Forests" &
+                                                                   grepl("Restoration",practice_outcome_key_ref$practice_outcome)],
+            Indicator_Value=NA,
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)
+            Indicator_Lower_Value=NA,
+            Indicator_Target=NA)
+
+# Add Indicator_Latest_Year and Indicator_Latest_Value based on Fact table
+
+Dim_Global_2030_Outcome3_Forest_B <- 
+  Dim_Global_2030_Outcome3_Forest_B %>%
+  mutate(Indicator_Latest_Year=max(Fact_Global_2030_Outcome3_Forest_B$Year_Key,na.rm=T),
+         Indicator_Latest_Value=Fact_Global_2030_Outcome3_Forest_B$Indicator_Value[Fact_Global_2030_Outcome3_Forest_B$Year_Key==Indicator_Latest_Year])
+
+# Add target value to Fact table
+
+Fact_Global_2030_Outcome3_Forest_B <-
+  rbind.data.frame(Fact_Global_2030_Outcome3_Forest_B,
+                   data.frame(Year_Key=2030,
+                              Practice_Key=practice_key_ref$id[practice_key_ref$practice_name=="Forests"],
+                              Indicator_Type_Key=Dim_Global_2030_Outcome3_Forest_B$Indicator_Type_Key,
+                              Practice_Outcome_Key=practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Forests" &
+                                                                                 grepl("Restoration",practice_outcome_key_ref$practice_outcome)],
+                              Indicator_Value=NA,
+                              Indicator_Upper_Value=NA,
+                              Indicator_Lower_Value=NA,
+                              Indicator_Target=Dim_Global_2030_Outcome3_Forest_B$Indicator_Target))
+
 
 # -- RESTORED
 
@@ -411,14 +518,36 @@ Dim_Global_2030_Outcome3_Forest_C <-
              US_Indicator="Yes")
 
 Fact_Global_2030_Outcome3_Forest_C <-
-  data.frame(Year_Key=c(2017,2030),
-            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Forests"],2),
-            Indicator_Type_Key=rep(Dim_Global_2030_Outcome3_Forest_C$Indicator_Type_Key, 2),
-            Practice_Outcome_Key=rep(practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Forests" &
-                                                                   grepl("Restoration",practice_outcome_key_ref$practice_outcome)], 2),
-            Indicator_Value=c(NA,Dim_Global_2030_Outcome3_Forest_C$Indicator_Target),
+  data.frame(Year_Key=2017,
+            Practice_Key=practice_key_ref$id[practice_key_ref$practice_name=="Forests"],
+            Indicator_Type_Key=Dim_Global_2030_Outcome3_Forest_C$Indicator_Type_Key,
+            Practice_Outcome_Key=practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Forests" &
+                                                                   grepl("Restoration",practice_outcome_key_ref$practice_outcome)],
+            Indicator_Value=NA,
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)
+            Indicator_Lower_Value=NA,
+            Indicator_Target=NA)
+
+# Add Indicator_Latest_Year and Indicator_Latest_Value based on Fact table
+
+Dim_Global_2030_Outcome3_Forest_C <- 
+  Dim_Global_2030_Outcome3_Forest_C %>%
+  mutate(Indicator_Latest_Year=max(Fact_Global_2030_Outcome3_Forest_C$Year_Key,na.rm=T),
+         Indicator_Latest_Value=Fact_Global_2030_Outcome3_Forest_C$Indicator_Value[Fact_Global_2030_Outcome3_Forest_C$Year_Key==Indicator_Latest_Year])
+
+# Add target value to Fact table
+
+Fact_Global_2030_Outcome3_Forest_C <-
+  rbind.data.frame(Fact_Global_2030_Outcome3_Forest_C,
+                   data.frame(Year_Key=2030,
+                              Practice_Key=practice_key_ref$id[practice_key_ref$practice_name=="Forests"],
+                              Indicator_Type_Key=Dim_Global_2030_Outcome3_Forest_C$Indicator_Type_Key,
+                              Practice_Outcome_Key=practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Forests" &
+                                                                                 grepl("Restoration",practice_outcome_key_ref$practice_outcome)],
+                              Indicator_Value=NA,
+                              Indicator_Upper_Value=NA,
+                              Indicator_Lower_Value=NA,
+                              Indicator_Target=Dim_Global_2030_Outcome3_Forest_C$Indicator_Target))
 
 
 # ---- 3.4 Consolidated Forest-specific Global 2030 Outcome tables ----

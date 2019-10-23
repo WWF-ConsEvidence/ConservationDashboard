@@ -35,14 +35,6 @@
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #
 
-pacman::p_load(dplyr, xlsx, reshape2)
-
-
-practice_key_ref <- read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/cons_dashboard_dim_tables_20180828.xlsx',
-                              sheetName='Dim_Practice')
-
-practice_outcome_key_ref <- read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/cons_dashboard_dim_tables_20180828.xlsx',
-                                      sheetName='Dim_Practice_Outcome')
 
 #
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -76,7 +68,8 @@ Fact_Context_State_Wildlife_A <-
             Indicator_Type_Key=rep(Dim_Context_State_Wildlife_A$Indicator_Type_Key,length(Year_Key)),
             Indicator_Value=Value,
             Indicator_Upper_Value=Upper,
-            Indicator_Lower_Value=Lower)
+            Indicator_Lower_Value=Lower,
+            Value_First_Last=ifelse(Year_Key==max(Year_Key) | Year_Key==min(Year_Key),Indicator_Value,NA))
 
 
 # -- GLOBAL BIODIVERSITY - RED LIST INDEX
@@ -104,7 +97,22 @@ Fact_Context_State_Wildlife_B <-
             Indicator_Type_Key=rep(Dim_Context_State_Wildlife_B$Indicator_Type_Key,length(Year_Key)),
             Indicator_Value=Est,
             Indicator_Upper_Value=Upper,
-            Indicator_Lower_Value=Lower)
+            Indicator_Lower_Value=Lower,
+            Value_First_Last=ifelse(Year_Key==max(Year_Key) | Year_Key==min(Year_Key),Indicator_Value,NA))
+
+# Add Panel-specific measures
+
+Dim_Context_State_Wildlife_A <-
+  Dim_Context_State_Wildlife_A %>%
+  mutate(Panel_Label_Upper=toupper(Panel_Label),
+         Panel_Min_Year=min(unique(rbind(Fact_Context_State_Wildlife_A$Year_Key,Fact_Context_State_Wildlife_B$Year_Key))),
+         Panel_Max_Year=max(unique(rbind(Fact_Context_State_Wildlife_A$Year_Key,Fact_Context_State_Wildlife_B$Year_Key))))
+
+Dim_Context_State_Wildlife_B <-
+  Dim_Context_State_Wildlife_B %>%
+  mutate(Panel_Label_Upper=toupper(Panel_Label),
+         Panel_Min_Year=min(unique(rbind(Fact_Context_State_Wildlife_A$Year_Key,Fact_Context_State_Wildlife_B$Year_Key))),
+         Panel_Max_Year=max(unique(rbind(Fact_Context_State_Wildlife_A$Year_Key,Fact_Context_State_Wildlife_B$Year_Key))))
 
 
 # ---- 2.2 Context - Threat ----
@@ -125,13 +133,22 @@ Dim_Context_Threat_Wildlife_A <-
 
 Fact_Context_Threat_Wildlife_A <-
   read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/GFW_treeloss_bydriver_2019_0723.xlsx', sheetName="Sheet1") %>%
-  subset(.,Geography=="World") %>%
+  subset(.,Geography=="World" & Loss_type=="Total Loss") %>%
   transmute(Year_Key=Year,
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],length(Year_Key)),
             Indicator_Type_Key=rep(Dim_Context_Threat_Wildlife_A$Indicator_Type_Key,length(Year_Key)),
             Indicator_Value=Value,
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)
+            Indicator_Lower_Value=NA,
+            Value_First_Last=ifelse(Year_Key==max(Year_Key) | Year_Key==min(Year_Key),Indicator_Value,NA))
+
+# Add Panel-specific measures
+
+Dim_Context_Threat_Wildlife_A <-
+  Dim_Context_Threat_Wildlife_A %>%
+  mutate(Panel_Label_Upper=toupper(Panel_Label),
+         Panel_Min_Year=min(Fact_Context_Threat_Wildlife_A$Year_Key,na.rm=T),
+         Panel_Max_Year=max(Fact_Context_Threat_Wildlife_A$Year_Key,na.rm=T))
 
 
 # ---- 2.3 Context - Response ----
@@ -157,7 +174,8 @@ Fact_Context_Response_Wildlife_A <-
             Indicator_Type_Key=rep(Dim_Context_Response_Wildlife_A$Indicator_Type_Key,length(Year_Key)),
             Indicator_Value=TOTAL_MHA,
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)
+            Indicator_Lower_Value=NA,
+            Value_First_Last=ifelse(Year_Key==max(Year_Key) | Year_Key==min(Year_Key),Indicator_Value,NA))
 
 # -- HABITAT PROTECTION - COMMUNITY CONSERVED
 
@@ -181,7 +199,22 @@ Fact_Context_Response_Wildlife_B <-
             Indicator_Type_Key=rep(Dim_Context_Response_Wildlife_B$Indicator_Type_Key,length(STATUS_YR)),
             Indicator_Value=AREA_MHA_TIME,
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)
+            Indicator_Lower_Value=NA,
+            Value_First_Last=ifelse(Year_Key==max(Year_Key) | Year_Key==min(Year_Key),Indicator_Value,NA))
+
+# Add Panel-specific measures
+
+Dim_Context_Response_Wildlife_A <-
+  Dim_Context_Response_Wildlife_A %>%
+  mutate(Panel_Label_Upper=toupper(Panel_Label),
+         Panel_Min_Year=min(unique(rbind(Fact_Context_Response_Wildlife_A$Year_Key,Fact_Context_Response_Wildlife_B$Year_Key))),
+         Panel_Max_Year=max(unique(rbind(Fact_Context_Response_Wildlife_A$Year_Key,Fact_Context_Response_Wildlife_B$Year_Key))))
+
+Dim_Context_Response_Wildlife_B <-
+  Dim_Context_Response_Wildlife_B %>%
+  mutate(Panel_Label_Upper=toupper(Panel_Label),
+         Panel_Min_Year=min(unique(rbind(Fact_Context_Response_Wildlife_A$Year_Key,Fact_Context_Response_Wildlife_B$Year_Key))),
+         Panel_Max_Year=max(unique(rbind(Fact_Context_Response_Wildlife_A$Year_Key,Fact_Context_Response_Wildlife_B$Year_Key))))
 
 
 # ---- 2.4 Consolidated Wildlife-specific Global Context tables ----
@@ -237,16 +270,30 @@ Fact_Global_2030_Outcome1_Wildlife_A <-
                                                                    grepl("Habitats",practice_outcome_key_ref$practice_outcome)], length(Year_Key)),
             Indicator_Value=TOTAL_PERCENT,
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA) %>%
-  rbind.data.frame(.,
+            Indicator_Lower_Value=NA,
+            Indicator_Target=NA)
+
+# Add Indicator_Latest_Year and Indicator_Latest_Value based on Fact table
+
+Dim_Global_2030_Outcome1_Wildlife_A <- 
+  Dim_Global_2030_Outcome1_Wildlife_A %>%
+  mutate(Indicator_Latest_Year=max(Fact_Global_2030_Outcome1_Wildlife_A$Year_Key,na.rm=T),
+         Indicator_Latest_Value=Fact_Global_2030_Outcome1_Wildlife_A$Indicator_Value[Fact_Global_2030_Outcome1_Wildlife_A$Year_Key==Indicator_Latest_Year])
+
+# Add target value to Fact table
+
+Fact_Global_2030_Outcome1_Wildlife_A <-
+  rbind.data.frame(Fact_Global_2030_Outcome1_Wildlife_A,
                    data.frame(Year_Key=2030,
                               Practice_Key=practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],
                               Indicator_Type_Key=Dim_Global_2030_Outcome1_Wildlife_A$Indicator_Type_Key,
                               Practice_Outcome_Key=practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Wildlife" &
                                                                                   grepl("Habitats",practice_outcome_key_ref$practice_outcome)],
-                              Indicator_Value=30,
+                              Indicator_Value=NA,
                               Indicator_Upper_Value=NA,
-                              Indicator_Lower_Value=NA))
+                              Indicator_Lower_Value=NA,
+                              Indicator_Target=Dim_Global_2030_Outcome1_Wildlife_A$Indicator_Target))
+
 
 # -- BIOLOGICAL IMPORTANCE
 
@@ -273,16 +320,29 @@ Fact_Global_2030_Outcome1_Wildlife_B <-
                                                                    grepl("Habitats",practice_outcome_key_ref$practice_outcome)], length(Year_Key)),
             Indicator_Value=PA_in_KBA_percent,
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)  %>%
-  rbind.data.frame(.,
+            Indicator_Lower_Value=NA,
+            Indicator_Target=NA)
+
+# Add Indicator_Latest_Year and Indicator_Latest_Value based on Fact table
+
+Dim_Global_2030_Outcome1_Wildlife_B <- 
+  Dim_Global_2030_Outcome1_Wildlife_B %>%
+  mutate(Indicator_Latest_Year=max(Fact_Global_2030_Outcome1_Wildlife_B$Year_Key,na.rm=T),
+         Indicator_Latest_Value=Fact_Global_2030_Outcome1_Wildlife_B$Indicator_Value[Fact_Global_2030_Outcome1_Wildlife_B$Year_Key==Indicator_Latest_Year])
+
+# Add target value to Fact table
+
+Fact_Global_2030_Outcome1_Wildlife_B <-
+  rbind.data.frame(Fact_Global_2030_Outcome1_Wildlife_B,
                    data.frame(Year_Key=2030,
                               Practice_Key=practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],
                               Indicator_Type_Key=Dim_Global_2030_Outcome1_Wildlife_B$Indicator_Type_Key,
                               Practice_Outcome_Key=practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Wildlife" &
                                                                                  grepl("Habitats",practice_outcome_key_ref$practice_outcome)],
-                              Indicator_Value=Dim_Global_2030_Outcome1_Wildlife_B$Indicator_Target,
+                              Indicator_Value=NA,
                               Indicator_Upper_Value=NA,
-                              Indicator_Lower_Value=NA))
+                              Indicator_Lower_Value=NA,
+                              Indicator_Target=Dim_Global_2030_Outcome1_Wildlife_B$Indicator_Target))
 
 # -- CONNECTEDNESS
 
@@ -308,16 +368,30 @@ Fact_Global_2030_Outcome1_Wildlife_C <-
                                                                     grepl("Habitats",practice_outcome_key_ref$practice_outcome)], length(1)),
              Indicator_Value=(9.9/14.7)*100,
              Indicator_Upper_Value=NA,
-             Indicator_Lower_Value=NA)  %>%
-  rbind.data.frame(.,
+             Indicator_Lower_Value=NA,
+             Indicator_Target=NA)
+
+# Add Indicator_Latest_Year and Indicator_Latest_Value based on Fact table
+
+Dim_Global_2030_Outcome1_Wildlife_C <- 
+  Dim_Global_2030_Outcome1_Wildlife_C %>%
+  mutate(Indicator_Latest_Year=max(Fact_Global_2030_Outcome1_Wildlife_C$Year_Key,na.rm=T),
+         Indicator_Latest_Value=Fact_Global_2030_Outcome1_Wildlife_C$Indicator_Value[Fact_Global_2030_Outcome1_Wildlife_C$Year_Key==Indicator_Latest_Year])
+
+# Add target value to Fact table
+
+Fact_Global_2030_Outcome1_Wildlife_C <-
+  rbind.data.frame(Fact_Global_2030_Outcome1_Wildlife_C,
                    data.frame(Year_Key=2030,
                               Practice_Key=practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],
                               Indicator_Type_Key=Dim_Global_2030_Outcome1_Wildlife_C$Indicator_Type_Key,
                               Practice_Outcome_Key=practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Wildlife" &
                                                                                  grepl("Habitats",practice_outcome_key_ref$practice_outcome)],
-                              Indicator_Value=Dim_Global_2030_Outcome1_Wildlife_C$Indicator_Target,
+                              Indicator_Value=NA,
                               Indicator_Upper_Value=NA,
-                              Indicator_Lower_Value=NA))
+                              Indicator_Lower_Value=NA,
+                              Indicator_Target=Dim_Global_2030_Outcome1_Wildlife_C$Indicator_Target))
+
 
 # -- EFFECTIVENESS - ASSESSED
 
@@ -344,16 +418,30 @@ Fact_Global_2030_Outcome1_Wildlife_D <-
                                                                    grepl("Habitats",practice_outcome_key_ref$practice_outcome)], length(Year_Key)),
             Indicator_Value=100*(METT_meetsthreshold_Mha/4327.028912), # 2016 total cumulative PA coverage, since METT database was last updated 2016
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)  %>%
-  rbind.data.frame(.,
+            Indicator_Lower_Value=NA,
+            Indicator_Target=NA)
+
+# Add Indicator_Latest_Year and Indicator_Latest_Value based on Fact table
+
+Dim_Global_2030_Outcome1_Wildlife_D <- 
+  Dim_Global_2030_Outcome1_Wildlife_D %>%
+  mutate(Indicator_Latest_Year=max(Fact_Global_2030_Outcome1_Wildlife_D$Year_Key,na.rm=T),
+         Indicator_Latest_Value=Fact_Global_2030_Outcome1_Wildlife_D$Indicator_Value[Fact_Global_2030_Outcome1_Wildlife_D$Year_Key==Indicator_Latest_Year])
+
+# Add target value to Fact table
+
+Fact_Global_2030_Outcome1_Wildlife_D <-
+  rbind.data.frame(Fact_Global_2030_Outcome1_Wildlife_D,
                    data.frame(Year_Key=2030,
                               Practice_Key=practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],
                               Indicator_Type_Key=Dim_Global_2030_Outcome1_Wildlife_D$Indicator_Type_Key,
                               Practice_Outcome_Key=practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Wildlife" &
                                                                                  grepl("Habitats",practice_outcome_key_ref$practice_outcome)],
-                              Indicator_Value=Dim_Global_2030_Outcome1_Wildlife_D$Indicator_Target,
+                              Indicator_Value=NA,
                               Indicator_Upper_Value=NA,
-                              Indicator_Lower_Value=NA))
+                              Indicator_Lower_Value=NA,
+                              Indicator_Target=Dim_Global_2030_Outcome1_Wildlife_D$Indicator_Target))
+
 
 # -- EFFECTIVENESS - MEETS THRESHOLD
 
@@ -380,16 +468,29 @@ Fact_Global_2030_Outcome1_Wildlife_E <-
                                                                    grepl("Habitats",practice_outcome_key_ref$practice_outcome)], length(Year_Key)),
             Indicator_Value=METT_mettsthreshold_percent,
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)  %>%
-  rbind.data.frame(.,
+            Indicator_Lower_Value=NA,
+            Indicator_Target=NA)
+
+# Add Indicator_Latest_Year and Indicator_Latest_Value based on Fact table
+
+Dim_Global_2030_Outcome1_Wildlife_E <- 
+  Dim_Global_2030_Outcome1_Wildlife_E %>%
+  mutate(Indicator_Latest_Year=max(Fact_Global_2030_Outcome1_Wildlife_E$Year_Key,na.rm=T),
+         Indicator_Latest_Value=Fact_Global_2030_Outcome1_Wildlife_E$Indicator_Value[Fact_Global_2030_Outcome1_Wildlife_E$Year_Key==Indicator_Latest_Year])
+
+# Add target value to Fact table
+
+Fact_Global_2030_Outcome1_Wildlife_E <-
+  rbind.data.frame(Fact_Global_2030_Outcome1_Wildlife_E,
                    data.frame(Year_Key=2030,
                               Practice_Key=practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],
                               Indicator_Type_Key=Dim_Global_2030_Outcome1_Wildlife_E$Indicator_Type_Key,
                               Practice_Outcome_Key=practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Wildlife" &
                                                                                  grepl("Habitats",practice_outcome_key_ref$practice_outcome)],
-                              Indicator_Value=Dim_Global_2030_Outcome1_Wildlife_E$Indicator_Target,
+                              Indicator_Value=NA,
                               Indicator_Upper_Value=NA,
-                              Indicator_Lower_Value=NA))
+                              Indicator_Lower_Value=NA,
+                              Indicator_Target=Dim_Global_2030_Outcome1_Wildlife_E$Indicator_Target))
 
 
 # ---- 3.2 Wildlife Outcome 2 - OVEREXPLOITATION PREVENTED ----
@@ -418,7 +519,16 @@ Fact_Global_2030_Outcome2_Wildlife_A <-
                                                                    grepl("Overexploitation",practice_outcome_key_ref$practice_outcome)], length(1)),
             Indicator_Value=NA,
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)
+            Indicator_Lower_Value=NA,
+            Indicator_Target=NA)
+
+# Add Indicator_Latest_Year and Indicator_Latest_Value based on Fact table
+
+Dim_Global_2030_Outcome2_Wildlife_A <- 
+  Dim_Global_2030_Outcome2_Wildlife_A %>%
+  mutate(Indicator_Latest_Year=max(Fact_Global_2030_Outcome2_Wildlife_A$Year_Key,na.rm=T),
+         Indicator_Latest_Value=Fact_Global_2030_Outcome2_Wildlife_A$Indicator_Value[Fact_Global_2030_Outcome2_Wildlife_A$Year_Key==Indicator_Latest_Year])
+
 
 # -- US-SPECIFIC PROXY 
 
@@ -439,13 +549,35 @@ Dim_Global_2030_Outcome2_Wildlife_B <-
 Fact_Global_2030_Outcome2_Wildlife_B <-
   import('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/PIKE_Africa_2019_0819.csv') %>%
   transmute(Year_Key=yr,
-             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],length(yr)),
-             Indicator_Type_Key=rep(Dim_Global_2030_Outcome2_Wildlife_B$Indicator_Type_Key, length(yr)),
-             Practice_Outcome_Key=rep(practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Wildlife" &
-                                                                    grepl("Overexploitation",practice_outcome_key_ref$practice_outcome)], length(yr)),
-             Indicator_Value=`PIKE estimate`*100,
-             Indicator_Upper_Value=(`PIKE estimate`*100) + (se*100),
-             Indicator_Lower_Value=(`PIKE estimate`*100) - (se*100))
+            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],length(yr)),
+            Indicator_Type_Key=rep(Dim_Global_2030_Outcome2_Wildlife_B$Indicator_Type_Key, length(yr)),
+            Practice_Outcome_Key=rep(practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Wildlife" &
+                                                                   grepl("Overexploitation",practice_outcome_key_ref$practice_outcome)], length(yr)),
+            Indicator_Value=`PIKE estimate`*100,
+            Indicator_Upper_Value=(`PIKE estimate`*100) + (se*100),
+            Indicator_Lower_Value=(`PIKE estimate`*100) - (se*100),
+            Indicator_Target=NA)
+
+# Add Indicator_Latest_Year and Indicator_Latest_Value based on Fact table
+
+Dim_Global_2030_Outcome2_Wildlife_B <- 
+  Dim_Global_2030_Outcome2_Wildlife_B %>%
+  mutate(Indicator_Latest_Year=max(Fact_Global_2030_Outcome2_Wildlife_B$Year_Key,na.rm=T),
+         Indicator_Latest_Value=Fact_Global_2030_Outcome2_Wildlife_B$Indicator_Value[Fact_Global_2030_Outcome2_Wildlife_B$Year_Key==Indicator_Latest_Year])
+
+# Add target value to Fact table
+
+Fact_Global_2030_Outcome2_Wildlife_B <-
+  rbind.data.frame(Fact_Global_2030_Outcome2_Wildlife_B,
+                   data.frame(Year_Key=2030,
+                              Practice_Key=practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],
+                              Indicator_Type_Key=Dim_Global_2030_Outcome2_Wildlife_B$Indicator_Type_Key,
+                              Practice_Outcome_Key=practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Wildlife" &
+                                                                                 grepl("Overexploitation",practice_outcome_key_ref$practice_outcome)],
+                              Indicator_Value=NA,
+                              Indicator_Upper_Value=NA,
+                              Indicator_Lower_Value=NA,
+                              Indicator_Target=Dim_Global_2030_Outcome2_Wildlife_B$Indicator_Target))
 
 
 # ---- 3.3 Consolidated Wildlife-specific Global 2030 Outcome tables ----

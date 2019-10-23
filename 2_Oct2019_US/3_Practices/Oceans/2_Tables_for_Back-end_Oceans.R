@@ -35,14 +35,6 @@
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #
 
-pacman::p_load(dplyr, xlsx)
-
-
-practice_key_ref <- read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/cons_dashboard_dim_tables_20180828.xlsx',
-                              sheetName='Dim_Practice')
-
-practice_outcome_key_ref <- read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/cons_dashboard_dim_tables_20180828.xlsx',
-                                      sheetName='Dim_Practice_Outcome')
 
 #
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -94,7 +86,8 @@ Fact_Context_State_Oceans_A <-
             Indicator_Type_Key=rep(Dim_Context_State_Oceans_A$Indicator_Type_Key,length(Year_Key)),
             Indicator_Value=Area,
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)
+            Indicator_Lower_Value=NA,
+            Value_First_Last=ifelse(Year_Key==max(Year_Key) | Year_Key==min(Year_Key),Indicator_Value,NA))
 
 # -- COASTAL ECOSYSTEMS - GBR CORAL COVER
 
@@ -120,7 +113,22 @@ Fact_Context_State_Oceans_B <-
             Indicator_Type_Key=rep(Dim_Context_State_Oceans_B$Indicator_Type_Key,length(Year_Key)),
             Indicator_Value=Mean,
             Indicator_Upper_Value=Mean+Std.dev,
-            Indicator_Lower_Value=Mean-Std.dev)
+            Indicator_Lower_Value=Mean-Std.dev,
+            Value_First_Last=ifelse(Year_Key==max(Year_Key) | Year_Key==min(Year_Key),Indicator_Value,NA))
+
+# Add Panel-specific measures
+
+Dim_Context_State_Oceans_A <-
+  Dim_Context_State_Oceans_A %>%
+  mutate(Panel_Label_Upper=toupper(Panel_Label),
+         Panel_Min_Year=min(unique(rbind(Fact_Context_State_Oceans_A$Year_Key,Fact_Context_State_Oceans_B$Year_Key))),
+         Panel_Max_Year=max(unique(rbind(Fact_Context_State_Oceans_A$Year_Key,Fact_Context_State_Oceans_B$Year_Key))))
+
+Dim_Context_State_Oceans_B <-
+  Dim_Context_State_Oceans_B %>%
+  mutate(Panel_Label_Upper=toupper(Panel_Label),
+         Panel_Min_Year=min(unique(rbind(Fact_Context_State_Oceans_A$Year_Key,Fact_Context_State_Oceans_B$Year_Key))),
+         Panel_Max_Year=max(unique(rbind(Fact_Context_State_Oceans_A$Year_Key,Fact_Context_State_Oceans_B$Year_Key))))
 
 
 # ---- 2.2 Context - Threat ----
@@ -146,7 +154,8 @@ Fact_Context_Threat_Oceans_A <-
             Indicator_Type_Key=rep(Dim_Context_Threat_Oceans_A$Indicator_Type_Key,length(Year_Key)),
             Indicator_Value=Percent.overfished,
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)
+            Indicator_Lower_Value=NA,
+            Value_First_Last=ifelse(Year_Key==max(Year_Key) | Year_Key==min(Year_Key),Indicator_Value,NA))
 
 # -- THREATS TO MARINE LIFE - CORAL REEF LOSS
 
@@ -168,7 +177,23 @@ Fact_Context_Threat_Oceans_B <-
             Indicator_Type_Key=rep(Dim_Context_Threat_Oceans_B$Indicator_Type_Key,length(1)),
             Indicator_Value=NA,
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)
+            Indicator_Lower_Value=NA) %>%
+  mutate(Value_First_Last=ifelse(Year_Key==max(Year_Key) | Year_Key==min(Year_Key),Indicator_Value,NA))
+
+# Add Panel-specific measures
+
+Dim_Context_Threat_Oceans_A <-
+  Dim_Context_Threat_Oceans_A %>%
+  mutate(Panel_Label_Upper=toupper(Panel_Label),
+         Panel_Min_Year=min(Fact_Context_Threat_Oceans_A$Year_Key),
+         Panel_Max_Year=max(Fact_Context_Threat_Oceans_A$Year_Key))
+
+Dim_Context_Threat_Oceans_B <-
+  Dim_Context_Threat_Oceans_B %>%
+  mutate(Panel_Label_Upper=toupper(Panel_Label),
+         Panel_Min_Year=min(Fact_Context_Threat_Oceans_A$Year_Key),
+         Panel_Max_Year=max(Fact_Context_Threat_Oceans_A$Year_Key))
+
 
 # ---- 2.3 Context - Response ----
 
@@ -193,7 +218,8 @@ Fact_Context_Response_Oceans_A <-
             Indicator_Type_Key=rep(Dim_Context_Response_Oceans_A$Indicator_Type_Key,length(Year_Key)),
             Indicator_Value=EEZ_AREA_MHA,
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)
+            Indicator_Lower_Value=NA,
+            Value_First_Last=ifelse(Year_Key==max(Year_Key) | Year_Key==min(Year_Key),Indicator_Value,NA))
 
 # -- MARINE PROTECTION - AREA COMMITTED
 
@@ -215,7 +241,22 @@ Fact_Context_Response_Oceans_B <-
             Indicator_Type_Key=rep(Dim_Context_Response_Oceans_B$Indicator_Type_Key,length(1)),
             Indicator_Value=NA,
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)
+            Indicator_Lower_Value=NA) %>%
+  mutate(Value_First_Last=ifelse(Year_Key==max(Year_Key) | Year_Key==min(Year_Key),Indicator_Value,NA))
+
+# Add Panel-specific measures
+
+Dim_Context_Response_Oceans_A <-
+  Dim_Context_Response_Oceans_A %>%
+  mutate(Panel_Label_Upper=toupper(Panel_Label),
+         Panel_Min_Year=min(Fact_Context_Response_Oceans_A$Year_Key),
+         Panel_Max_Year=max(Fact_Context_Response_Oceans_A$Year_Key))
+
+Dim_Context_Response_Oceans_B <-
+  Dim_Context_Response_Oceans_B %>%
+  mutate(Panel_Label_Upper=toupper(Panel_Label),
+         Panel_Min_Year=min(Fact_Context_Response_Oceans_A$Year_Key),
+         Panel_Max_Year=max(Fact_Context_Response_Oceans_A$Year_Key))
 
 
 # ---- 2.4 Consolidated Oceans-specific Global Context tables ----
@@ -273,16 +314,29 @@ Fact_Global_2030_Outcome1_Oceans_A <-
                                                                    grepl("Ecosystems",practice_outcome_key_ref$practice_outcome)], length(Year_Key)),
             Indicator_Value=MPA_METT_percent,
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)  %>%
-  rbind.data.frame(.,
+            Indicator_Lower_Value=NA,
+            Indicator_Target=NA)
+
+# Add Indicator_Latest_Year and Indicator_Latest_Value based on Fact table
+
+Dim_Global_2030_Outcome1_Oceans_A <- 
+  Dim_Global_2030_Outcome1_Oceans_A %>%
+  mutate(Indicator_Latest_Year=max(Fact_Global_2030_Outcome1_Oceans_A$Year_Key,na.rm=T),
+         Indicator_Latest_Value=Fact_Global_2030_Outcome1_Oceans_A$Indicator_Value[Fact_Global_2030_Outcome1_Oceans_A$Year_Key==Indicator_Latest_Year])
+
+# Add target value to Fact table
+
+Fact_Global_2030_Outcome1_Oceans_A <- 
+  rbind.data.frame(Fact_Global_2030_Outcome1_Oceans_A,
                    data.frame(Year_Key=2030,
                               Practice_Key=practice_key_ref$id[practice_key_ref$practice_name=="Oceans"],
                               Indicator_Type_Key=Dim_Global_2030_Outcome1_Oceans_A$Indicator_Type_Key,
                               Practice_Outcome_Key=practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Oceans" &
                                                                                  grepl("Ecosystems",practice_outcome_key_ref$practice_outcome)],
-                              Indicator_Value=Dim_Global_2030_Outcome1_Oceans_A$Indicator_Target,
+                              Indicator_Value=NA,
                               Indicator_Upper_Value=NA,
-                              Indicator_Lower_Value=NA))
+                              Indicator_Lower_Value=NA,
+                              Indicator_Target=Dim_Global_2030_Outcome1_Oceans_A$Indicator_Target))
 
 # EFFECTIVELY MANAGED - MEETS THRESHOLD
 
@@ -303,22 +357,35 @@ Dim_Global_2030_Outcome1_Oceans_B <-
 Fact_Global_2030_Outcome1_Oceans_B <-
   read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/METT/METT_MPA.csv') %>%
   transmute(Year_Key=2018,
-             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Oceans"],length(Year_Key)),
-             Indicator_Type_Key=rep(Dim_Global_2030_Outcome1_Oceans_B$Indicator_Type_Key, length(Year_Key)),
-             Practice_Outcome_Key=rep(practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Oceans" &
-                                                                    grepl("Ecosystems",practice_outcome_key_ref$practice_outcome)], length(Year_Key)),
-             Indicator_Value=MPA_threshold_percent,
-             Indicator_Upper_Value=NA,
-             Indicator_Lower_Value=NA) %>%
-  rbind.data.frame(.,
+            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Oceans"],length(Year_Key)),
+            Indicator_Type_Key=rep(Dim_Global_2030_Outcome1_Oceans_B$Indicator_Type_Key, length(Year_Key)),
+            Practice_Outcome_Key=rep(practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Oceans" &
+                                                                   grepl("Ecosystems",practice_outcome_key_ref$practice_outcome)], length(Year_Key)),
+            Indicator_Value=MPA_threshold_percent,
+            Indicator_Upper_Value=NA,
+            Indicator_Lower_Value=NA,
+            Indicator_Target=NA)
+
+# Add Indicator_Latest_Year and Indicator_Latest_Value based on Fact table
+
+Dim_Global_2030_Outcome1_Oceans_B <- 
+  Dim_Global_2030_Outcome1_Oceans_B %>%
+  mutate(Indicator_Latest_Year=max(Fact_Global_2030_Outcome1_Oceans_B$Year_Key,na.rm=T),
+         Indicator_Latest_Value=Fact_Global_2030_Outcome1_Oceans_B$Indicator_Value[Fact_Global_2030_Outcome1_Oceans_B$Year_Key==Indicator_Latest_Year])
+
+# Add target value to Fact table
+
+Fact_Global_2030_Outcome1_Oceans_B <-
+  rbind.data.frame(Fact_Global_2030_Outcome1_Oceans_B,
                    data.frame(Year_Key=2030,
                               Practice_Key=practice_key_ref$id[practice_key_ref$practice_name=="Oceans"],
                               Indicator_Type_Key=Dim_Global_2030_Outcome1_Oceans_B$Indicator_Type_Key,
                               Practice_Outcome_Key=practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Oceans" &
                                                                                  grepl("Ecosystems",practice_outcome_key_ref$practice_outcome)],
-                              Indicator_Value=Dim_Global_2030_Outcome1_Oceans_B$Indicator_Target,
+                              Indicator_Value=NA,
                               Indicator_Upper_Value=NA,
-                              Indicator_Lower_Value=NA))
+                              Indicator_Lower_Value=NA,
+                              Indicator_Target=Dim_Global_2030_Outcome1_Oceans_B$Indicator_Target))
 
 
 # ---- 3.2 Oceans Outcome 2 - SUSTAINABLE FISHERIES ----
@@ -345,7 +412,15 @@ Fact_Global_2030_Outcome2_Oceans_A <-
                                                                    grepl("Fisheries",practice_outcome_key_ref$practice_outcome)], length(1)),
             Indicator_Value=NA,
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)
+            Indicator_Lower_Value=NA,
+            Indicator_Target=NA)
+
+# Add Indicator_Latest_Year and Indicator_Latest_Value based on Fact table
+
+Dim_Global_2030_Outcome2_Oceans_A <- 
+  Dim_Global_2030_Outcome2_Oceans_A %>%
+  mutate(Indicator_Latest_Year=max(Fact_Global_2030_Outcome2_Oceans_A$Year_Key,na.rm=T),
+         Indicator_Latest_Value=Fact_Global_2030_Outcome2_Oceans_A$Indicator_Value[Fact_Global_2030_Outcome2_Oceans_A$Year_Key==Indicator_Latest_Year])
 
 
 # ---- 3.3 Consolidated Oceans-specific Global 2030 Outcome tables ----

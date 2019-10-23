@@ -23,7 +23,7 @@
 
 # ---- 1.1 Libraries, reference tables ----
 
-pacman::p_load(rio, stringi, xlsx, dplyr)
+pacman::p_load(rio, stringi, xlsx, reshape2, ggplot2, dplyr)
 
 
 practice_key_ref <- read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/cons_dashboard_dim_tables_20180828.xlsx',
@@ -98,6 +98,8 @@ pie.type <-
                                                  pie.type=="Yes Data - Yes Target - Bad Trend") & Desired.trend=="Down" & max.year.value!=0, 
                                               (min.year.value-max.year.value)/(min.year.value-Target),
                                               ifelse(pie.type=="Yes Data - No Target", max.year.value, NA))))),
+         amount.achieved=ifelse(amount.achieved>=1,1,amount.achieved),
          amount.remaining=ifelse(pie.type=="No Data - Yes Target", 1, 
                                  ifelse(pie.type=="Yes Data - No Target", NA,
                                         ifelse(!is.na(amount.achieved),1-abs(amount.achieved),NA))))
+

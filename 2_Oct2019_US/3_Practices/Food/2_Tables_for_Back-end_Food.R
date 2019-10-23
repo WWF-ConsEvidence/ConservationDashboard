@@ -35,15 +35,6 @@
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #
 
-pacman::p_load(xlsx, dplyr)
-
-
-practice_key_ref <- read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/cons_dashboard_dim_tables_20180828.xlsx',
-                              sheetName='Dim_Practice')
-
-practice_outcome_key_ref <- read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/cons_dashboard_dim_tables_20180828.xlsx',
-                                      sheetName='Dim_Practice_Outcome')
-
 
 #
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -80,7 +71,8 @@ Fact_Context_State_Food_A <-
             Indicator_Type_Key=rep(Dim_Context_State_Food_A$Indicator_Type_Key,length(Year_Key)),
             Indicator_Value=Value,
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)
+            Indicator_Lower_Value=NA,
+            Value_First_Last=ifelse(Year_Key==max(Year_Key) | Year_Key==min(Year_Key),Indicator_Value,NA))
 
 # -- FOOD SUPPLY - PROTEIN
 
@@ -104,7 +96,8 @@ Fact_Context_State_Food_B <-
             Indicator_Type_Key=rep(Dim_Context_State_Food_B$Indicator_Type_Key,length(Year_Key)),
             Indicator_Value=Value,
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)
+            Indicator_Lower_Value=NA,
+            Value_First_Last=ifelse(Year_Key==max(Year_Key) | Year_Key==min(Year_Key),Indicator_Value,NA))
 
 # -- FOOD SUPPLY - FAT
 
@@ -128,7 +121,28 @@ Fact_Context_State_Food_C <-
             Indicator_Type_Key=rep(Dim_Context_State_Food_C$Indicator_Type_Key,length(Year_Key)),
             Indicator_Value=Value,
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)
+            Indicator_Lower_Value=NA,
+            Value_First_Last=ifelse(Year_Key==max(Year_Key) | Year_Key==min(Year_Key),Indicator_Value,NA))
+
+# Add Panel-specific measures
+
+Dim_Context_State_Food_A <-
+  Dim_Context_State_Food_A %>%
+  mutate(Panel_Label_Upper=toupper(Panel_Label),
+         Panel_Min_Year=min(unique(rbind(Fact_Context_State_Food_A$Year_Key,Fact_Context_State_Food_B$Year_Key,Fact_Context_State_Food_C$Year_Key))),
+         Panel_Max_Year=max(unique(rbind(Fact_Context_State_Food_A$Year_Key,Fact_Context_State_Food_B$Year_Key,Fact_Context_State_Food_C$Year_Key))))
+
+Dim_Context_State_Food_B <-
+  Dim_Context_State_Food_B %>%
+  mutate(Panel_Label_Upper=toupper(Panel_Label),
+         Panel_Min_Year=min(unique(rbind(Fact_Context_State_Food_A$Year_Key,Fact_Context_State_Food_B$Year_Key,Fact_Context_State_Food_C$Year_Key))),
+         Panel_Max_Year=max(unique(rbind(Fact_Context_State_Food_A$Year_Key,Fact_Context_State_Food_B$Year_Key,Fact_Context_State_Food_C$Year_Key))))
+
+Dim_Context_State_Food_C <-
+  Dim_Context_State_Food_C %>%
+  mutate(Panel_Label_Upper=toupper(Panel_Label),
+         Panel_Min_Year=min(unique(rbind(Fact_Context_State_Food_A$Year_Key,Fact_Context_State_Food_B$Year_Key,Fact_Context_State_Food_C$Year_Key))),
+         Panel_Max_Year=max(unique(rbind(Fact_Context_State_Food_A$Year_Key,Fact_Context_State_Food_B$Year_Key,Fact_Context_State_Food_C$Year_Key))))
 
 
 # ---- 2.2 Context - Threat ----
@@ -161,7 +175,8 @@ Fact_Context_Threat_Food_A <-
             Indicator_Type_Key=rep(Dim_Context_Threat_Food_A$Indicator_Type_Key,length(Year_Key)),
             Indicator_Value=Value,
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)
+            Indicator_Lower_Value=NA,
+            Value_First_Last=ifelse(Year_Key==max(Year_Key) | Year_Key==min(Year_Key),Indicator_Value,NA))
 
 # -- LAND USE - MEADOWS & PASTURE
 
@@ -188,7 +203,8 @@ Fact_Context_Threat_Food_B <-
             Indicator_Type_Key=rep(Dim_Context_Threat_Food_B$Indicator_Type_Key,length(Year_Key)),
             Indicator_Value=Value,
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)
+            Indicator_Lower_Value=NA,
+            Value_First_Last=ifelse(Year_Key==max(Year_Key) | Year_Key==min(Year_Key),Indicator_Value,NA))
 
 # -- LAND USE - FOREST
 
@@ -215,7 +231,8 @@ Fact_Context_Threat_Food_C <-
             Indicator_Type_Key=rep(Dim_Context_Threat_Food_C$Indicator_Type_Key,length(Year_Key)),
             Indicator_Value=Value,
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)
+            Indicator_Lower_Value=NA,
+            Value_First_Last=ifelse(Year_Key==max(Year_Key) | Year_Key==min(Year_Key),Indicator_Value,NA))
 
 # -- LAND USE - OTHER
 
@@ -242,7 +259,35 @@ Fact_Context_Threat_Food_D <-
             Indicator_Type_Key=rep(Dim_Context_Threat_Food_D$Indicator_Type_Key,length(Year_Key)),
             Indicator_Value=Value,
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)
+            Indicator_Lower_Value=NA,
+            Value_First_Last=ifelse(Year_Key==max(Year_Key) | Year_Key==min(Year_Key),Indicator_Value,NA))
+
+# Add Panel-specific measures
+
+Dim_Context_Threat_Food_A <-
+  Dim_Context_Threat_Food_A %>%
+  mutate(Panel_Label_Upper=toupper(Panel_Label),
+         Panel_Min_Year=min(unique(rbind(Fact_Context_Threat_Food_A$Year_Key,Fact_Context_Threat_Food_B$Year_Key,Fact_Context_Threat_Food_C$Year_Key,Fact_Context_Threat_Food_D$Year_Key))),
+         Panel_Max_Year=max(unique(rbind(Fact_Context_Threat_Food_A$Year_Key,Fact_Context_Threat_Food_B$Year_Key,Fact_Context_Threat_Food_C$Year_Key,Fact_Context_Threat_Food_D$Year_Key))))
+
+Dim_Context_Threat_Food_B <-
+  Dim_Context_Threat_Food_B %>%
+  mutate(Panel_Label_Upper=toupper(Panel_Label),
+         Panel_Min_Year=min(unique(rbind(Fact_Context_Threat_Food_A$Year_Key,Fact_Context_Threat_Food_B$Year_Key,Fact_Context_Threat_Food_C$Year_Key,Fact_Context_Threat_Food_D$Year_Key))),
+         Panel_Max_Year=max(unique(rbind(Fact_Context_Threat_Food_A$Year_Key,Fact_Context_Threat_Food_B$Year_Key,Fact_Context_Threat_Food_C$Year_Key,Fact_Context_Threat_Food_D$Year_Key))))
+
+Dim_Context_Threat_Food_C <-
+  Dim_Context_Threat_Food_C %>%
+  mutate(Panel_Label_Upper=toupper(Panel_Label),
+         Panel_Min_Year=min(unique(rbind(Fact_Context_Threat_Food_A$Year_Key,Fact_Context_Threat_Food_B$Year_Key,Fact_Context_Threat_Food_C$Year_Key,Fact_Context_Threat_Food_D$Year_Key))),
+         Panel_Max_Year=max(unique(rbind(Fact_Context_Threat_Food_A$Year_Key,Fact_Context_Threat_Food_B$Year_Key,Fact_Context_Threat_Food_C$Year_Key,Fact_Context_Threat_Food_D$Year_Key))))
+
+Dim_Context_Threat_Food_D <-
+  Dim_Context_Threat_Food_D %>%
+  mutate(Panel_Label_Upper=toupper(Panel_Label),
+         Panel_Min_Year=min(unique(rbind(Fact_Context_Threat_Food_A$Year_Key,Fact_Context_Threat_Food_B$Year_Key,Fact_Context_Threat_Food_C$Year_Key,Fact_Context_Threat_Food_D$Year_Key))),
+         Panel_Max_Year=max(unique(rbind(Fact_Context_Threat_Food_A$Year_Key,Fact_Context_Threat_Food_B$Year_Key,Fact_Context_Threat_Food_C$Year_Key,Fact_Context_Threat_Food_D$Year_Key))))
+
 
 # ---- 2.3 Context - Response ----
 
@@ -271,7 +316,8 @@ Fact_Context_Response_Food_A <-
             Indicator_Type_Key=rep(Dim_Context_Response_Food_A$Indicator_Type_Key,length(Year_Key)),
             Indicator_Value=Agriculture..MtCO2e./1000,
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)
+            Indicator_Lower_Value=NA,
+            Value_First_Last=ifelse(Year_Key==max(Year_Key) | Year_Key==min(Year_Key),Indicator_Value,NA))
 
 # -- EMISSIONS & EFFICIENCY - EFFICIENCY
 
@@ -300,7 +346,23 @@ Fact_Context_Response_Food_B <-
             Indicator_Type_Key=rep(Dim_Context_Response_Food_B$Indicator_Type_Key,length(Year_Key)),
             Indicator_Value=Annual.kcal/(Agriculture..MtCO2e.*1000000),
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)
+            Indicator_Lower_Value=NA,
+            Value_First_Last=ifelse(Year_Key==max(Year_Key) | Year_Key==min(Year_Key),Indicator_Value,NA))
+
+# Add Panel-specific measures
+
+Dim_Context_Response_Food_A <-
+  Dim_Context_Response_Food_A %>%
+  mutate(Panel_Label_Upper=toupper(Panel_Label),
+         Panel_Min_Year=min(unique(rbind(Fact_Context_Response_Food_A$Year_Key,Fact_Context_Response_Food_B$Year_Key))),
+         Panel_Max_Year=max(unique(rbind(Fact_Context_Response_Food_A$Year_Key,Fact_Context_Response_Food_B$Year_Key))))
+
+Dim_Context_Response_Food_B <-
+  Dim_Context_Response_Food_B %>%
+  mutate(Panel_Label_Upper=toupper(Panel_Label),
+         Panel_Min_Year=min(unique(rbind(Fact_Context_Response_Food_A$Year_Key,Fact_Context_Response_Food_B$Year_Key))),
+         Panel_Max_Year=max(unique(rbind(Fact_Context_Response_Food_A$Year_Key,Fact_Context_Response_Food_B$Year_Key))))
+
 
 
 # plotting.food.response.b <- 
@@ -382,7 +444,16 @@ Fact_Global_2030_Outcome1_Food_A <-
                                                                    grepl("Production",practice_outcome_key_ref$practice_outcome)], length(1)),
             Indicator_Value=NA,
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)
+            Indicator_Lower_Value=NA,
+            Indicator_Target=NA)
+
+# Add Indicator_Latest_Year and Indicator_Latest_Value based on Fact table
+
+Dim_Global_2030_Outcome1_Food_A <- 
+  Dim_Global_2030_Outcome1_Food_A %>%
+  mutate(Indicator_Latest_Year=max(Fact_Global_2030_Outcome1_Food_A$Year_Key,na.rm=T),
+         Indicator_Latest_Value=Fact_Global_2030_Outcome1_Food_A$Indicator_Value[Fact_Global_2030_Outcome1_Food_A$Year_Key==Indicator_Latest_Year])
+
 
 # -- SUSTAINABLE AGRICULTURE -- GLOBAL-SPECIFIC
 
@@ -408,7 +479,16 @@ Fact_Global_2030_Outcome1_Food_B <-
                                                                    grepl("Production",practice_outcome_key_ref$practice_outcome)], length(1)),
             Indicator_Value=NA,
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)
+            Indicator_Lower_Value=NA,
+            Indicator_Target=NA)
+
+# Add Indicator_Latest_Year and Indicator_Latest_Value based on Fact table
+
+Dim_Global_2030_Outcome1_Food_B <- 
+  Dim_Global_2030_Outcome1_Food_B %>%
+  mutate(Indicator_Latest_Year=max(Fact_Global_2030_Outcome1_Food_B$Year_Key,na.rm=T),
+         Indicator_Latest_Value=Fact_Global_2030_Outcome1_Food_B$Indicator_Value[Fact_Global_2030_Outcome1_Food_B$Year_Key==Indicator_Latest_Year])
+
 
 # -- TERRESTRIAL HABITAT CONVERSION -- US-SPECIFIC 
 
@@ -436,16 +516,29 @@ Fact_Global_2030_Outcome1_Food_C <-
                                                                    grepl("Production",practice_outcome_key_ref$practice_outcome)], length(Year_Key)),
             Indicator_Value=Value,
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA) %>%
-  rbind.data.frame(.,
+            Indicator_Lower_Value=NA,
+            Indicator_Target=NA)
+
+# Add Indicator_Latest_Year and Indicator_Latest_Value based on Fact table
+
+Dim_Global_2030_Outcome1_Food_C <- 
+  Dim_Global_2030_Outcome1_Food_C %>%
+  mutate(Indicator_Latest_Year=max(Fact_Global_2030_Outcome1_Food_C$Year_Key,na.rm=T),
+         Indicator_Latest_Value=Fact_Global_2030_Outcome1_Food_C$Indicator_Value[Fact_Global_2030_Outcome1_Food_C$Year_Key==Indicator_Latest_Year])
+
+# Add target value to Fact table
+
+Fact_Global_2030_Outcome1_Food_C <-
+  rbind.data.frame(Fact_Global_2030_Outcome1_Food_C,
                    data.frame(Year_Key=2030,
                               Practice_Key=practice_key_ref$id[practice_key_ref$practice_name=="Food"],
                               Indicator_Type_Key=Dim_Global_2030_Outcome1_Food_C$Indicator_Type_Key,
                               Practice_Outcome_Key=practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Food" &
                                                                                  grepl("Production",practice_outcome_key_ref$practice_outcome)],
-                              Indicator_Value=Dim_Global_2030_Outcome1_Food_C$Indicator_Target,
+                              Indicator_Value=NA,
                               Indicator_Upper_Value=NA,
-                              Indicator_Lower_Value=NA))
+                              Indicator_Lower_Value=NA,
+                              Indicator_Target=Dim_Global_2030_Outcome1_Food_C$Indicator_Target))
 
 
 # -- MANGROVE HABITAT CONVERSION -- US-SPECIFIC
@@ -472,7 +565,15 @@ Fact_Global_2030_Outcome1_Food_D <-
                                                                     grepl("Production",practice_outcome_key_ref$practice_outcome)], length(1)),
              Indicator_Value=NA,
              Indicator_Upper_Value=NA,
-             Indicator_Lower_Value=NA)
+             Indicator_Lower_Value=NA,
+             Indicator_Target=NA)
+
+# Add Indicator_Latest_Year and Indicator_Latest_Value based on Fact table
+
+Dim_Global_2030_Outcome1_Food_D <- 
+  Dim_Global_2030_Outcome1_Food_D %>%
+  mutate(Indicator_Latest_Year=max(Fact_Global_2030_Outcome1_Food_D$Year_Key,na.rm=T),
+         Indicator_Latest_Value=Fact_Global_2030_Outcome1_Food_D$Indicator_Value[Fact_Global_2030_Outcome1_Food_D$Year_Key==Indicator_Latest_Year])
 
 
 # ---- 3.2 Food Outcome 2 - FOOD LOSS & WASTE ----
@@ -494,14 +595,36 @@ Dim_Global_2030_Outcome2_Food_A <-
              US_Indicator="Yes")
 
 Fact_Global_2030_Outcome2_Food_A <-
-  data.frame(Year_Key=c(2011,2030),
-            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Food"],2),
-            Indicator_Type_Key=rep(Dim_Global_2030_Outcome2_Food_A$Indicator_Type_Key, 2),
-            Practice_Outcome_Key=rep(practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Food" &
-                                                                   grepl("Waste",practice_outcome_key_ref$practice_outcome)], 2),
-            Indicator_Value=c(0,50),
+  data.frame(Year_Key=2011,
+            Practice_Key=practice_key_ref$id[practice_key_ref$practice_name=="Food"],
+            Indicator_Type_Key=Dim_Global_2030_Outcome2_Food_A$Indicator_Type_Key,
+            Practice_Outcome_Key=practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Food" &
+                                                                   grepl("Waste",practice_outcome_key_ref$practice_outcome)],
+            Indicator_Value=0,
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)
+            Indicator_Lower_Value=NA,
+            Indicator_Target=NA) 
+
+# Add Indicator_Latest_Year and Indicator_Latest_Value based on Fact table
+
+Dim_Global_2030_Outcome2_Food_A <- 
+  Dim_Global_2030_Outcome2_Food_A %>%
+  mutate(Indicator_Latest_Year=max(Fact_Global_2030_Outcome2_Food_A$Year_Key,na.rm=T),
+         Indicator_Latest_Value=Fact_Global_2030_Outcome2_Food_A$Indicator_Value[Fact_Global_2030_Outcome2_Food_A$Year_Key==Indicator_Latest_Year])
+
+# Add target value to Fact table
+
+Fact_Global_2030_Outcome2_Food_A <-
+  rbind.data.frame(Fact_Global_2030_Outcome2_Food_A,
+                   data.frame(Year_Key=2030,
+                              Practice_Key=practice_key_ref$id[practice_key_ref$practice_name=="Food"],
+                              Indicator_Type_Key=Dim_Global_2030_Outcome2_Food_A$Indicator_Type_Key,
+                              Practice_Outcome_Key=practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Food" &
+                                                                                 grepl("Waste",practice_outcome_key_ref$practice_outcome)],
+                              Indicator_Value=NA,
+                              Indicator_Upper_Value=NA,
+                              Indicator_Lower_Value=NA,
+                              Indicator_Target=Dim_Global_2030_Outcome2_Food_A$Indicator_Target))
 
 # -- WASTE
 
@@ -520,14 +643,36 @@ Dim_Global_2030_Outcome2_Food_B <-
              US_Indicator="Yes")
 
 Fact_Global_2030_Outcome2_Food_B <-
-  data.frame(Year_Key=c(2011,2030),
-            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Food"],2),
-            Indicator_Type_Key=rep(Dim_Global_2030_Outcome2_Food_B$Indicator_Type_Key, 2),
-            Practice_Outcome_Key=rep(practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Food" &
-                                                                   grepl("Waste",practice_outcome_key_ref$practice_outcome)], 2),
-            Indicator_Value=c(0,50),
+  data.frame(Year_Key=2011,
+            Practice_Key=practice_key_ref$id[practice_key_ref$practice_name=="Food"],
+            Indicator_Type_Key=Dim_Global_2030_Outcome2_Food_B$Indicator_Type_Key,
+            Practice_Outcome_Key=practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Food" &
+                                                                   grepl("Waste",practice_outcome_key_ref$practice_outcome)],
+            Indicator_Value=0,
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)
+            Indicator_Lower_Value=NA,
+            Indicator_Target=NA)
+
+# Add Indicator_Latest_Year and Indicator_Latest_Value based on Fact table
+
+Dim_Global_2030_Outcome2_Food_B <- 
+  Dim_Global_2030_Outcome2_Food_B %>%
+  mutate(Indicator_Latest_Year=max(Fact_Global_2030_Outcome2_Food_B$Year_Key,na.rm=T),
+         Indicator_Latest_Value=Fact_Global_2030_Outcome2_Food_B$Indicator_Value[Fact_Global_2030_Outcome2_Food_B$Year_Key==Indicator_Latest_Year])
+
+# Add target value to Fact table
+
+Fact_Global_2030_Outcome2_Food_B <-
+  rbind.data.frame(Fact_Global_2030_Outcome2_Food_B,
+                   data.frame(Year_Key=2011,
+                              Practice_Key=practice_key_ref$id[practice_key_ref$practice_name=="Food"],
+                              Indicator_Type_Key=Dim_Global_2030_Outcome2_Food_B$Indicator_Type_Key,
+                              Practice_Outcome_Key=practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Food" &
+                                                                                 grepl("Waste",practice_outcome_key_ref$practice_outcome)],
+                              Indicator_Value=NA,
+                              Indicator_Upper_Value=NA,
+                              Indicator_Lower_Value=NA,
+                              Indicator_Target=Dim_Global_2030_Outcome2_Food_B$Indicator_Target))
 
 
 # ---- 3.3 Food Outcome 3 - HEALTHY DIETS ----
@@ -554,7 +699,15 @@ Fact_Global_2030_Outcome3_Food_A <-
                                                                    grepl("Diets",practice_outcome_key_ref$practice_outcome)], length(1)),
             Indicator_Value=NA,
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)
+            Indicator_Lower_Value=NA,
+            Indicator_Target=NA)
+
+# Add Indicator_Latest_Year and Indicator_Latest_Value based on Fact table
+
+Dim_Global_2030_Outcome3_Food_A <- 
+  Dim_Global_2030_Outcome3_Food_A %>%
+  mutate(Indicator_Latest_Year=max(Fact_Global_2030_Outcome3_Food_A$Year_Key,na.rm=T),
+         Indicator_Latest_Value=Fact_Global_2030_Outcome3_Food_A$Indicator_Value[Fact_Global_2030_Outcome3_Food_A$Year_Key==Indicator_Latest_Year])
 
 
 # ---- 3.4 Consolidated Food-specific Global 2030 Outcome tables ----

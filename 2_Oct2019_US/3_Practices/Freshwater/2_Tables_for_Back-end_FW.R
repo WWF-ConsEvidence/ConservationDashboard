@@ -35,14 +35,6 @@
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #
 
-pacman::p_load(dplyr, xlsx, reshape2)
-
-
-practice_key_ref <- read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/cons_dashboard_dim_tables_20180828.xlsx',
-                              sheetName='Dim_Practice')
-
-practice_outcome_key_ref <- read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/cons_dashboard_dim_tables_20180828.xlsx',
-                                      sheetName='Dim_Practice_Outcome')
 
 #
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -79,7 +71,16 @@ Fact_Context_State_FW_A <-
             Indicator_Type_Key=rep(Dim_Context_State_FW_A$Indicator_Type_Key,length(Year_Key)),
             Indicator_Value=LPI_final,
             Indicator_Upper_Value=CI_high,
-            Indicator_Lower_Value=CI_low)
+            Indicator_Lower_Value=CI_low,
+            Value_First_Last=ifelse(Year_Key==max(Year_Key) | Year_Key==min(Year_Key),Indicator_Value,NA))
+
+# Add Panel-specific measures
+
+Dim_Context_State_FW_A <-
+  Dim_Context_State_FW_A %>%
+  mutate(Panel_Label_Upper=toupper(Panel_Label),
+         Panel_Min_Year=min(Fact_Context_State_FW_A$Year_Key,na.rm=T),
+         Panel_Max_Year=max(Fact_Context_State_FW_A$Year_Key,na.rm=T))
 
 
 # ---- 2.2 Context - Threat ----
@@ -104,7 +105,8 @@ Fact_Context_Threat_FW_A <-
             Indicator_Type_Key=rep(Dim_Context_Threat_FW_A$Indicator_Type_Key,length(1)),
             Indicator_Value=(9971600/11720000)*100,
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)
+            Indicator_Lower_Value=NA) %>%
+  mutate(Value_First_Last=ifelse(Year_Key==max(Year_Key) | Year_Key==min(Year_Key),Indicator_Value,NA))
 
 # # -- WATER INFRASTRUCTURE DEVELOPMENT - TOTAL LENGTH
 # 
@@ -125,6 +127,16 @@ Fact_Context_Threat_FW_A <-
 #              Indicator_Value=11720000,
 #              Indicator_Upper_Value=NA,
 #              Indicator_Lower_Value=NA)
+
+
+# Add Panel-specific measures
+
+Dim_Context_Threat_FW_A <-
+  Dim_Context_Threat_FW_A %>%
+  mutate(Panel_Label_Upper=toupper(Panel_Label),
+         Panel_Min_Year=min(Fact_Context_Threat_FW_A$Year_Key,na.rm=T),
+         Panel_Max_Year=max(Fact_Context_Threat_FW_A$Year_Key,na.rm=T))
+
 
 # ---- 2.3 Context - Response ----
 
@@ -151,7 +163,16 @@ Fact_Context_Response_FW_A <-
             Indicator_Type_Key=rep(Dim_Context_Response_FW_A$Indicator_Type_Key,length(Year_Key)),
             Indicator_Value=Value,
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)
+            Indicator_Lower_Value=NA,
+            Value_First_Last=ifelse(Year_Key==max(Year_Key) | Year_Key==min(Year_Key),Indicator_Value,NA))
+
+# Add Panel-specific measures
+
+Dim_Context_Response_FW_A <-
+  Dim_Context_Response_FW_A %>%
+  mutate(Panel_Label_Upper=toupper(Panel_Label),
+         Panel_Min_Year=min(Fact_Context_Response_FW_A$Year_Key,na.rm=T),
+         Panel_Max_Year=max(Fact_Context_Response_FW_A$Year_Key,na.rm=T))
 
 
 # ---- 2.4 Consolidated Freshwater-specific Global Context tables ----
@@ -202,7 +223,16 @@ Fact_Global_2030_Outcome1_FW_A <-
                                                                    grepl("Habitats",practice_outcome_key_ref$practice_outcome)], length(1)),
             Indicator_Value=0,
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)
+            Indicator_Lower_Value=NA,
+            Indicator_Target=NA)
+
+# Add Indicator_Latest_Year and Indicator_Latest_Value based on Fact table
+
+Dim_Global_2030_Outcome1_FW_A <- 
+  Dim_Global_2030_Outcome1_FW_A %>%
+  mutate(Indicator_Latest_Year=max(Fact_Global_2030_Outcome1_FW_A$Year_Key,na.rm=T),
+         Indicator_Latest_Value=Fact_Global_2030_Outcome1_FW_A$Indicator_Value[Fact_Global_2030_Outcome1_FW_A$Year_Key==Indicator_Latest_Year])
+
 
 # - RIVER PROTECTION
 
@@ -221,14 +251,37 @@ Dim_Global_2030_Outcome1_FW_B <-
              US_Indicator="Yes")
 
 Fact_Global_2030_Outcome1_FW_B <-
-  data.frame(Year_Key=c(2017,2030),
-             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Freshwater"],2),
-             Indicator_Type_Key=rep(Dim_Global_2030_Outcome1_FW_B$Indicator_Type_Key, 2),
-             Practice_Outcome_Key=rep(practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Freshwater" &
-                                                                    grepl("Habitats",practice_outcome_key_ref$practice_outcome)], 2),
-             Indicator_Value=c(16.0,Dim_Global_2030_Outcome1_FW_B$Indicator_Target),
+  data.frame(Year_Key=2017,
+             Practice_Key=practice_key_ref$id[practice_key_ref$practice_name=="Freshwater"],
+             Indicator_Type_Key=Dim_Global_2030_Outcome1_FW_B$Indicator_Type_Key,
+             Practice_Outcome_Key=practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Freshwater" &
+                                                                    grepl("Habitats",practice_outcome_key_ref$practice_outcome)],
+             Indicator_Value=16.0,
              Indicator_Upper_Value=NA,
-             Indicator_Lower_Value=NA)
+             Indicator_Lower_Value=NA,
+             Indicator_Target=NA)
+
+# Add Indicator_Latest_Year and Indicator_Latest_Value based on Fact table
+
+Dim_Global_2030_Outcome1_FW_B <- 
+  Dim_Global_2030_Outcome1_FW_B %>%
+  mutate(Indicator_Latest_Year=max(Fact_Global_2030_Outcome1_FW_B$Year_Key,na.rm=T),
+         Indicator_Latest_Value=Fact_Global_2030_Outcome1_FW_B$Indicator_Value[Fact_Global_2030_Outcome1_FW_B$Year_Key==Indicator_Latest_Year])
+
+# Add target value to Fact table
+
+Fact_Global_2030_Outcome1_FW_B <-
+  rbind.data.frame(Fact_Global_2030_Outcome1_FW_B,
+                   data.frame(Year_Key=2030,
+                              Practice_Key=practice_key_ref$id[practice_key_ref$practice_name=="Freshwater"],
+                              Indicator_Type_Key=Dim_Global_2030_Outcome1_FW_B$Indicator_Type_Key,
+                              Practice_Outcome_Key=practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Freshwater" &
+                                                                                 grepl("Habitats",practice_outcome_key_ref$practice_outcome)],
+                              Indicator_Value=NA,
+                              Indicator_Upper_Value=NA,
+                              Indicator_Lower_Value=NA,
+                              Indicator_Target=Dim_Global_2030_Outcome1_FW_B$Indicator_Target))
+
 
 # -- RAMSAR-PROTECTED HABITAT
 
@@ -247,27 +300,32 @@ Dim_Global_2030_Outcome1_FW_C <-
              US_Indicator="Yes")
 
 Fact_Global_2030_Outcome1_FW_C <-
-  read.csv('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/Ramsar_sitedata_dl_2019_0710.csv') %>%
-  select(.,c("Designation.date","Area..ha.")) %>%
-  mutate(Date=as.character(Designation.date),
+  import('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/Ramsar_sitedata_dl_2019_0710.csv') %>%
+  select(.,c("Designation date","Area (ha)")) %>%
+  mutate(Date=as.character(`Designation date`),
          Year=as.numeric(substr(Date,(nchar(Date)-4)+1,nchar(Date)))) %>%
   group_by(Year) %>%
-  summarise(Area=sum(Area..ha.)) %>%
+  summarise(Area=sum(`Area (ha)`)) %>%
   transmute(Year_Key=Year,
-             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Freshwater"],length(Year_Key)),
-             Indicator_Type_Key=rep(Dim_Global_2030_Outcome1_FW_C$Indicator_Type_Key, length(Year_Key)),
-             Practice_Outcome_Key=rep(practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Freshwater" &
-                                                                    grepl("Habitats",practice_outcome_key_ref$practice_outcome)], length(Year_Key)),
-             Indicator_Value=cumsum(Area)/1000000,
-             Indicator_Upper_Value=NA,
-             Indicator_Lower_Value=NA)
+            Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Freshwater"],length(Year_Key)),
+            Indicator_Type_Key=rep(Dim_Global_2030_Outcome1_FW_C$Indicator_Type_Key, length(Year_Key)),
+            Practice_Outcome_Key=rep(practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Freshwater" &
+                                                                   grepl("Habitats",practice_outcome_key_ref$practice_outcome)], length(Year_Key)),
+            Indicator_Value=cumsum(Area)/1000000,
+            Indicator_Upper_Value=NA,
+            Indicator_Lower_Value=NA,
+            Indicator_Target=NA)
 
 # Target value for this indicator is "double protected habitat from 2017 baseline", so we will calculate the target and 
 # append the Dim table, using the Ramsar data source imported for the Fact table
+# --Also, add Indicator_Latest_Year and Indicator_Latest_Value based on Fact table
 
-Dim_Global_2030_Outcome1_FW_C$Indicator_Target <- 
-  2*Fact_Global_2030_Outcome1_FW_C$Indicator_Value[Fact_Global_2030_Outcome1_FW_C$Year_Key==2017 &
-                                                     !is.na(Fact_Global_2030_Outcome1_FW_C$Year_Key)]
+Dim_Global_2030_Outcome1_FW_C <- 
+  Dim_Global_2030_Outcome1_FW_C %>%
+  mutate(Indicator_Target=2*Fact_Global_2030_Outcome1_FW_C$Indicator_Value[Fact_Global_2030_Outcome1_FW_C$Year_Key==2017 &
+                                                                             !is.na(Fact_Global_2030_Outcome1_FW_C$Year_Key)],
+         Indicator_Latest_Year=max(Fact_Global_2030_Outcome1_FW_C$Year_Key,na.rm=T),
+         Indicator_Latest_Value=Fact_Global_2030_Outcome1_FW_C$Indicator_Value[Fact_Global_2030_Outcome1_FW_C$Year_Key==Indicator_Latest_Year])
 
 # Add target value to Fact table
 
@@ -278,9 +336,10 @@ Fact_Global_2030_Outcome1_FW_C <-
                               Indicator_Type_Key=Dim_Global_2030_Outcome1_FW_C$Indicator_Type_Key,
                               Practice_Outcome_Key=practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Freshwater" &
                                                                                  grepl("Habitats",practice_outcome_key_ref$practice_outcome)],
-                              Indicator_Value=Dim_Global_2030_Outcome1_FW_C$Indicator_Target,
+                              Indicator_Value=NA,
                               Indicator_Upper_Value=NA,
-                              Indicator_Lower_Value=NA))
+                              Indicator_Lower_Value=NA,
+                              Indicator_Target=Dim_Global_2030_Outcome1_FW_C$Indicator_Target))
 
 
 # ---- 3.2 Freshwater Outcome 2 - CLEAN FLOWING RIVERS ----
@@ -309,7 +368,15 @@ Fact_Global_2030_Outcome2_FW_A <-
                                                                    grepl("Rivers",practice_outcome_key_ref$practice_outcome)], length(1)),
             Indicator_Value=9971600,
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)
+            Indicator_Lower_Value=NA,
+            Indicator_Target=NA)
+
+# Add Indicator_Latest_Year and Indicator_Latest_Value based on Fact table
+
+Dim_Global_2030_Outcome2_FW_A <- 
+  Dim_Global_2030_Outcome2_FW_A %>%
+  mutate(Indicator_Latest_Year=max(Fact_Global_2030_Outcome2_FW_A$Year_Key,na.rm=T),
+         Indicator_Latest_Value=Fact_Global_2030_Outcome2_FW_A$Indicator_Value[Fact_Global_2030_Outcome2_FW_A$Year_Key==Indicator_Latest_Year])
 
 
 # -- QUALITY
@@ -336,7 +403,15 @@ Fact_Global_2030_Outcome2_FW_B <-
                                                                     grepl("Rivers",practice_outcome_key_ref$practice_outcome)], length(1)),
              Indicator_Value=NA,
              Indicator_Upper_Value=NA,
-             Indicator_Lower_Value=NA)
+             Indicator_Lower_Value=NA,
+             Indicator_Target=NA)
+
+# Add Indicator_Latest_Year and Indicator_Latest_Value based on Fact table
+
+Dim_Global_2030_Outcome2_FW_B <- 
+  Dim_Global_2030_Outcome2_FW_B %>%
+  mutate(Indicator_Latest_Year=max(Fact_Global_2030_Outcome2_FW_B$Year_Key,na.rm=T),
+         Indicator_Latest_Value=Fact_Global_2030_Outcome2_FW_B$Indicator_Value[Fact_Global_2030_Outcome2_FW_B$Year_Key==Indicator_Latest_Year])
 
 
 # ---- 3.3 Consolidated Freshwater-specific Global 2030 Outcome tables ----

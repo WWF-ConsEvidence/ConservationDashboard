@@ -35,16 +35,6 @@
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #
 
-pacman::p_load(xlsx, reshape2, ggplot2, dplyr)
-
-
-practice_key_ref <- read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/cons_dashboard_dim_tables_20180828.xlsx',
-                              sheetName='Dim_Practice')
-
-practice_outcome_key_ref <- read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/cons_dashboard_dim_tables_20180828.xlsx',
-                                      sheetName='Dim_Practice_Outcome')
-
-
 plot.theme <- theme(plot.title=element_text(hjust=0.5),
                     plot.margin=margin(t=5,r=20,b=5,l=5,unit="pt"),
                     axis.ticks=element_blank(),
@@ -108,8 +98,16 @@ Fact_Context_State_CEP_A <-
             Indicator_Type_Key=rep(Dim_Context_State_CEP_A$Indicator_Type_Key,length(Year_Key)),
             Indicator_Value=Annual_Anomaly - Temp_scaling_factor, 
             Indicator_Upper_Value=Annual_Unc + Annual_Anomaly - Temp_scaling_factor,
-            Indicator_Lower_Value=-Annual_Unc + Annual_Anomaly - Temp_scaling_factor)
+            Indicator_Lower_Value=-Annual_Unc + Annual_Anomaly - Temp_scaling_factor,
+            Value_First_Last=ifelse(Year_Key==max(Year_Key) | Year_Key==min(Year_Key),Indicator_Value,NA))
 
+# Add Panel-specific measures
+
+Dim_Context_State_CEP_A <-
+  Dim_Context_State_CEP_A %>%
+  mutate(Panel_Label_Upper=toupper(Panel_Label),
+         Panel_Min_Year=min(Fact_Context_State_CEP_A$Year_Key,na.rm=T),
+         Panel_Max_Year=max(Fact_Context_State_CEP_A$Year_Key,na.rm=T))
 
 # ggplot(Fact_Context_State_CEP_A, aes(x=Year_Key,y=Indicator_Value,
 #                                      ymin=Indicator_Lower_Value,
@@ -157,7 +155,8 @@ Fact_Context_Threat_CEP_A <-
             Indicator_Type_Key=rep(Dim_Context_Threat_CEP_A$Indicator_Type_Key,length(Year_Key)),
             Indicator_Value=Coal/Total_energy, 
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)
+            Indicator_Lower_Value=NA,
+            Value_First_Last=ifelse(Year_Key==max(Year_Key) | Year_Key==min(Year_Key),Indicator_Value,NA))
 
 # -- FOSSIL FUEL CONSUMPTION - NATURAL GAS
 
@@ -180,7 +179,8 @@ Fact_Context_Threat_CEP_B <-
             Indicator_Type_Key=rep(Dim_Context_Threat_CEP_B$Indicator_Type_Key,length(Year_Key)),
             Indicator_Value=Gas/Total_energy, 
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)
+            Indicator_Lower_Value=NA,
+            Value_First_Last=ifelse(Year_Key==max(Year_Key) | Year_Key==min(Year_Key),Indicator_Value,NA))
 
 # -- FOSSIL FUEL CONSUMPTION - OIL
 
@@ -203,8 +203,28 @@ Fact_Context_Threat_CEP_C <-
             Indicator_Type_Key=rep(Dim_Context_Threat_CEP_C$Indicator_Type_Key,length(Year_Key)),
             Indicator_Value=Oil/Total_energy, 
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)
+            Indicator_Lower_Value=NA,
+            Value_First_Last=ifelse(Year_Key==max(Year_Key) | Year_Key==min(Year_Key),Indicator_Value,NA))
 
+# Add Panel-specific measures
+
+Dim_Context_Threat_CEP_A <-
+  Dim_Context_Threat_CEP_A %>%
+  mutate(Panel_Label_Upper=toupper(Panel_Label),
+         Panel_Min_Year=min(unique(rbind(Fact_Context_Threat_CEP_A$Year_Key,Fact_Context_Threat_CEP_B$Year_Key,Fact_Context_Threat_CEP_C$Year_Key))),
+         Panel_Max_Year=max(unique(rbind(Fact_Context_Threat_CEP_A$Year_Key,Fact_Context_Threat_CEP_B$Year_Key,Fact_Context_Threat_CEP_C$Year_Key))))
+
+Dim_Context_Threat_CEP_B <-
+  Dim_Context_Threat_CEP_B %>%
+  mutate(Panel_Label_Upper=toupper(Panel_Label),
+         Panel_Min_Year=min(unique(rbind(Fact_Context_Threat_CEP_A$Year_Key,Fact_Context_Threat_CEP_B$Year_Key,Fact_Context_Threat_CEP_C$Year_Key))),
+         Panel_Max_Year=max(unique(rbind(Fact_Context_Threat_CEP_A$Year_Key,Fact_Context_Threat_CEP_B$Year_Key,Fact_Context_Threat_CEP_C$Year_Key))))
+
+Dim_Context_Threat_CEP_C <-
+  Dim_Context_Threat_CEP_C %>%
+  mutate(Panel_Label_Upper=toupper(Panel_Label),
+         Panel_Min_Year=min(unique(rbind(Fact_Context_Threat_CEP_A$Year_Key,Fact_Context_Threat_CEP_B$Year_Key,Fact_Context_Threat_CEP_C$Year_Key))),
+         Panel_Max_Year=max(unique(rbind(Fact_Context_Threat_CEP_A$Year_Key,Fact_Context_Threat_CEP_B$Year_Key,Fact_Context_Threat_CEP_C$Year_Key))))
 
 # ggplot(rbind.data.frame(Fact_Context_Threat_CEP_A,Fact_Context_Threat_CEP_B,Fact_Context_Threat_CEP_C),
 #        aes(x=Year_Key,y=Indicator_Value)) +
@@ -241,7 +261,8 @@ Fact_Context_Response_CEP_A <-
             Indicator_Type_Key=rep(Dim_Context_Response_CEP_A$Indicator_Type_Key,length(Year_Key)),
             Indicator_Value=Median, 
             Indicator_Upper_Value=Upper,
-            Indicator_Lower_Value=Lower)
+            Indicator_Lower_Value=Lower,
+            Value_First_Last=ifelse(Year_Key==max(Year_Key) | Year_Key==min(Year_Key),Indicator_Value,NA))
 
 # -- EMISSIONS GAP - 2 DEGREE C PATHWAY
 
@@ -264,7 +285,8 @@ Fact_Context_Response_CEP_B <-
             Indicator_Type_Key=rep(Dim_Context_Response_CEP_B$Indicator_Type_Key,length(Year_Key)),
             Indicator_Value=Median, 
             Indicator_Upper_Value=Upper,
-            Indicator_Lower_Value=Lower)
+            Indicator_Lower_Value=Lower,
+            Value_First_Last=ifelse(Year_Key==max(Year_Key) | Year_Key==min(Year_Key),Indicator_Value,NA))
 
 # -- EMISSIONS GAP - 2 DEGREE C PATHWAY
 
@@ -287,8 +309,28 @@ Fact_Context_Response_CEP_C <-
             Indicator_Type_Key=rep(Dim_Context_Response_CEP_C$Indicator_Type_Key,length(Year_Key)),
             Indicator_Value=Median, 
             Indicator_Upper_Value=Upper,
-            Indicator_Lower_Value=Lower)
+            Indicator_Lower_Value=Lower,
+            Value_First_Last=ifelse(Year_Key==max(Year_Key) | Year_Key==min(Year_Key),Indicator_Value,NA))
 
+# Add Panel-specific measures
+
+Dim_Context_Response_CEP_A <-
+  Dim_Context_Response_CEP_A %>%
+  mutate(Panel_Label_Upper=toupper(Panel_Label),
+         Panel_Min_Year=min(unique(rbind(Fact_Context_Response_CEP_A$Year_Key,Fact_Context_Response_CEP_B$Year_Key,Fact_Context_Response_CEP_C$Year_Key))),
+         Panel_Max_Year=max(unique(rbind(Fact_Context_Response_CEP_A$Year_Key,Fact_Context_Response_CEP_B$Year_Key,Fact_Context_Response_CEP_C$Year_Key))))
+
+Dim_Context_Response_CEP_B <-
+  Dim_Context_Response_CEP_B %>%
+  mutate(Panel_Label_Upper=toupper(Panel_Label),
+         Panel_Min_Year=min(unique(rbind(Fact_Context_Response_CEP_A$Year_Key,Fact_Context_Response_CEP_B$Year_Key,Fact_Context_Response_CEP_C$Year_Key))),
+         Panel_Max_Year=max(unique(rbind(Fact_Context_Response_CEP_A$Year_Key,Fact_Context_Response_CEP_B$Year_Key,Fact_Context_Response_CEP_C$Year_Key))))
+
+Dim_Context_Response_CEP_C <-
+  Dim_Context_Response_CEP_C %>%
+  mutate(Panel_Label_Upper=toupper(Panel_Label),
+         Panel_Min_Year=min(unique(rbind(Fact_Context_Response_CEP_A$Year_Key,Fact_Context_Response_CEP_B$Year_Key,Fact_Context_Response_CEP_C$Year_Key))),
+         Panel_Max_Year=max(unique(rbind(Fact_Context_Response_CEP_A$Year_Key,Fact_Context_Response_CEP_B$Year_Key,Fact_Context_Response_CEP_C$Year_Key))))
 
 # ggplot(rbind.data.frame(Fact_Context_Response_CEP_A,Fact_Context_Response_CEP_B,Fact_Context_Response_CEP_C),
 #        aes(x=Year_Key,y=Indicator_Value, ymin=Indicator_Lower_Value, ymax=Indicator_Upper_Value)) +
@@ -359,13 +401,19 @@ Fact_Global_2030_Outcome1_CEP_A <-
                                                                    grepl("Mitigation",practice_outcome_key_ref$practice_outcome)], length(Year_Key)),
             Indicator_Value=Total.GHG.Emissions.Including.Land.Use.Change.and.Forestry..MtCO.e../1000,
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA)
+            Indicator_Lower_Value=NA,
+            Indicator_Target=NA)
 
 # Target value for this indicator is "at least 40% decrease in emissions from 2010 baseline", so we will calculate the target and 
-# append the Dim table, using the CAIT data source imported for the Fact table
+# append the Dim table, using the CAIT data source imported for the Fact table.  
+# -- Also add Indicator_Latest_Year and Indicator_Latest_Value based on Fact table
 
-Dim_Global_2030_Outcome1_CEP_A$Indicator_Target <- 
-  0.6*Fact_Global_2030_Outcome1_CEP_A$Indicator_Value[Fact_Global_2030_Outcome1_CEP_A$Year_Key==2010]
+Dim_Global_2030_Outcome1_CEP_A <- 
+  Dim_Global_2030_Outcome1_CEP_A %>%
+  mutate(Indicator_Target=0.6*Fact_Global_2030_Outcome1_CEP_A$Indicator_Value[Fact_Global_2030_Outcome1_CEP_A$Year_Key==2010],
+         Indicator_Latest_Year=max(Fact_Global_2030_Outcome1_CEP_A$Year_Key,na.rm=T),
+         Indicator_Latest_Value=Fact_Global_2030_Outcome1_CEP_A$Indicator_Value[Fact_Global_2030_Outcome1_CEP_A$Year_Key==Indicator_Latest_Year])
+  
 
 # Add target value to Fact table
 
@@ -376,9 +424,10 @@ Fact_Global_2030_Outcome1_CEP_A <-
                               Indicator_Type_Key=Dim_Global_2030_Outcome1_CEP_A$Indicator_Type_Key,
                               Practice_Outcome_Key=practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Climate & Energy" &
                                                                                  grepl("Mitigation",practice_outcome_key_ref$practice_outcome)],
-                              Indicator_Value=Dim_Global_2030_Outcome1_CEP_A$Indicator_Target,
+                              Indicator_Value=NA,
                               Indicator_Upper_Value=NA,
-                              Indicator_Lower_Value=NA))
+                              Indicator_Lower_Value=NA,
+                              Indicator_Target=Dim_Global_2030_Outcome1_CEP_A$Indicator_Target))
 
 
 # ---- 3.2 CEP Outcome 2 - ENERGY ----
@@ -411,15 +460,30 @@ Fact_Global_2030_Outcome2_CEP_A <-
                                                                    grepl("Energy",practice_outcome_key_ref$practice_outcome)], length(Year_Key)),
             Indicator_Value=Value,
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA) %>%
-  rbind.data.frame(.,data.frame(Year_Key=2030,
-                                Practice_Key=practice_key_ref$id[practice_key_ref$practice_name=="Climate & Energy"],
-                                Indicator_Type_Key=Dim_Global_2030_Outcome2_CEP_A$Indicator_Type_Key,
-                                Practice_Outcome_Key=practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Climate & Energy" &
-                                                                                   grepl("Energy",practice_outcome_key_ref$practice_outcome)],
-                                Indicator_Value=Dim_Global_2030_Outcome2_CEP_A$Indicator_Target,
-                                Indicator_Upper_Value=NA,
-                                Indicator_Lower_Value=NA))
+            Indicator_Lower_Value=NA,
+            Indicator_Target=NA)
+
+# Add Indicator_Latest_Year and Indicator_Latest_Value based on Fact table
+
+Dim_Global_2030_Outcome2_CEP_A <- 
+  Dim_Global_2030_Outcome2_CEP_A %>%
+  mutate(Indicator_Latest_Year=max(Fact_Global_2030_Outcome2_CEP_A$Year_Key,na.rm=T),
+         Indicator_Latest_Value=Fact_Global_2030_Outcome2_CEP_A$Indicator_Value[Fact_Global_2030_Outcome2_CEP_A$Year_Key==Indicator_Latest_Year])
+
+# Add target value to Fact table
+
+Fact_Global_2030_Outcome2_CEP_A <-
+  rbind.data.frame(Fact_Global_2030_Outcome2_CEP_A,
+                   data.frame(Year_Key=2030,
+                              Practice_Key=practice_key_ref$id[practice_key_ref$practice_name=="Climate & Energy"],
+                              Indicator_Type_Key=Dim_Global_2030_Outcome2_CEP_A$Indicator_Type_Key,
+                              Practice_Outcome_Key=practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Climate & Energy" &
+                                                                                 grepl("Energy",practice_outcome_key_ref$practice_outcome)],
+                              Indicator_Value=NA,
+                              Indicator_Upper_Value=NA,
+                              Indicator_Lower_Value=NA,
+                              Indicator_Target=Dim_Global_2030_Outcome2_CEP_A$Indicator_Target))
+
 
 # -- ENERGY INTENSITY
 
@@ -448,15 +512,30 @@ Fact_Global_2030_Outcome2_CEP_B <-
                                                                    grepl("Energy",practice_outcome_key_ref$practice_outcome)], length(Year_Key)),
             Indicator_Value=Value,
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA) %>%
-  rbind.data.frame(.,data.frame(Year_Key=2030,
-                                Practice_Key=practice_key_ref$id[practice_key_ref$practice_name=="Climate & Energy"],
-                                Indicator_Type_Key=Dim_Global_2030_Outcome2_CEP_B$Indicator_Type_Key,
-                                Practice_Outcome_Key=practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Climate & Energy" &
-                                                                                   grepl("Energy",practice_outcome_key_ref$practice_outcome)],
-                                Indicator_Value=Dim_Global_2030_Outcome2_CEP_B$Indicator_Target,
-                                Indicator_Upper_Value=NA,
-                                Indicator_Lower_Value=NA))
+            Indicator_Lower_Value=NA,
+            Indicator_Target=NA)
+
+# Add Indicator_Latest_Year and Indicator_Latest_Value based on Fact table
+
+Dim_Global_2030_Outcome2_CEP_B <- 
+  Dim_Global_2030_Outcome2_CEP_B %>%
+  mutate(Indicator_Latest_Year=max(Fact_Global_2030_Outcome2_CEP_B$Year_Key,na.rm=T),
+         Indicator_Latest_Value=Fact_Global_2030_Outcome2_CEP_B$Indicator_Value[Fact_Global_2030_Outcome2_CEP_B$Year_Key==Indicator_Latest_Year])
+
+# Add target value to Fact table
+
+Fact_Global_2030_Outcome2_CEP_B <-
+  rbind.data.frame(Fact_Global_2030_Outcome2_CEP_B,
+                   data.frame(Year_Key=2030,
+                              Practice_Key=practice_key_ref$id[practice_key_ref$practice_name=="Climate & Energy"],
+                              Indicator_Type_Key=Dim_Global_2030_Outcome2_CEP_B$Indicator_Type_Key,
+                              Practice_Outcome_Key=practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Climate & Energy" &
+                                                                                 grepl("Energy",practice_outcome_key_ref$practice_outcome)],
+                              Indicator_Value=NA,
+                              Indicator_Upper_Value=NA,
+                              Indicator_Lower_Value=NA,
+                              Indicator_Target=Dim_Global_2030_Outcome2_CEP_B$Indicator_Target))
+
 
 # -- UNIVERSAL ENERGY
 
@@ -484,15 +563,29 @@ Fact_Global_2030_Outcome2_CEP_C <-
                                                                    grepl("Energy",practice_outcome_key_ref$practice_outcome)], length(Year_Key)),
             Indicator_Value=Value,
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA) %>%
-  rbind.data.frame(.,data.frame(Year_Key=2030,
-                                Practice_Key=practice_key_ref$id[practice_key_ref$practice_name=="Climate & Energy"],
-                                Indicator_Type_Key=Dim_Global_2030_Outcome2_CEP_C$Indicator_Type_Key,
-                                Practice_Outcome_Key=practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Climate & Energy" &
-                                                                                   grepl("Energy",practice_outcome_key_ref$practice_outcome)],
-                                Indicator_Value=Dim_Global_2030_Outcome2_CEP_C$Indicator_Target,
-                                Indicator_Upper_Value=NA,
-                                Indicator_Lower_Value=NA))
+            Indicator_Lower_Value=NA,
+            Indicator_Target=NA)
+
+# Add Indicator_Latest_Year and Indicator_Latest_Value based on Fact table
+
+Dim_Global_2030_Outcome2_CEP_C <- 
+  Dim_Global_2030_Outcome2_CEP_C %>%
+  mutate(Indicator_Latest_Year=max(Fact_Global_2030_Outcome2_CEP_C$Year_Key,na.rm=T),
+         Indicator_Latest_Value=Fact_Global_2030_Outcome2_CEP_C$Indicator_Value[Fact_Global_2030_Outcome2_CEP_C$Year_Key==Indicator_Latest_Year])
+
+# Add target value to Fact table
+
+Fact_Global_2030_Outcome2_CEP_C <-
+  rbind.data.frame(Fact_Global_2030_Outcome2_CEP_C,
+                   data.frame(Year_Key=2030,
+                              Practice_Key=practice_key_ref$id[practice_key_ref$practice_name=="Climate & Energy"],
+                              Indicator_Type_Key=Dim_Global_2030_Outcome2_CEP_C$Indicator_Type_Key,
+                              Practice_Outcome_Key=practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Climate & Energy" &
+                                                                                 grepl("Energy",practice_outcome_key_ref$practice_outcome)],
+                              Indicator_Value=NA,
+                              Indicator_Upper_Value=NA,
+                              Indicator_Lower_Value=NA,
+                              Indicator_Target=Dim_Global_2030_Outcome2_CEP_C$Indicator_Target))
 
 # -- COAL PLANT PIPELINE
 
@@ -520,15 +613,29 @@ Fact_Global_2030_Outcome2_CEP_D <-
                                                                    grepl("Energy",practice_outcome_key_ref$practice_outcome)], length(Year_Key)),
             Indicator_Value=Capacity,
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA) %>%
-  rbind.data.frame(.,data.frame(Year_Key=2030,
-                                Practice_Key=practice_key_ref$id[practice_key_ref$practice_name=="Climate & Energy"],
-                                Indicator_Type_Key=Dim_Global_2030_Outcome2_CEP_D$Indicator_Type_Key,
-                                Practice_Outcome_Key=practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Climate & Energy" &
-                                                                                   grepl("Energy",practice_outcome_key_ref$practice_outcome)],
-                                Indicator_Value=Dim_Global_2030_Outcome2_CEP_D$Indicator_Target,
-                                Indicator_Upper_Value=NA,
-                                Indicator_Lower_Value=NA))
+            Indicator_Lower_Value=NA,
+            Indicator_Target=NA)
+
+# Add Indicator_Latest_Year and Indicator_Latest_Value based on Fact table
+
+Dim_Global_2030_Outcome2_CEP_D <- 
+  Dim_Global_2030_Outcome2_CEP_D %>%
+  mutate(Indicator_Latest_Year=max(Fact_Global_2030_Outcome2_CEP_D$Year_Key,na.rm=T),
+         Indicator_Latest_Value=Fact_Global_2030_Outcome2_CEP_D$Indicator_Value[Fact_Global_2030_Outcome2_CEP_D$Year_Key==Indicator_Latest_Year])
+
+# Add target value to Fact table
+
+Fact_Global_2030_Outcome2_CEP_D <-
+  rbind.data.frame(Fact_Global_2030_Outcome2_CEP_D,
+                   data.frame(Year_Key=2030,
+                              Practice_Key=practice_key_ref$id[practice_key_ref$practice_name=="Climate & Energy"],
+                              Indicator_Type_Key=Dim_Global_2030_Outcome2_CEP_D$Indicator_Type_Key,
+                              Practice_Outcome_Key=practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Climate & Energy" &
+                                                                                 grepl("Energy",practice_outcome_key_ref$practice_outcome)],
+                              Indicator_Value=NA,
+                              Indicator_Upper_Value=NA,
+                              Indicator_Lower_Value=NA,
+                              Indicator_Target=Dim_Global_2030_Outcome2_CEP_D$Indicator_Target))
 
 
 # ---- 3.3 CEP Outcome 3 - ADAPTATION ----
@@ -558,15 +665,29 @@ Fact_Global_2030_Outcome3_CEP_A <-
                                                                    grepl("Adaptation",practice_outcome_key_ref$practice_outcome)], length(Year_Key)),
             Indicator_Value=cumsum(NumCountries),
             Indicator_Upper_Value=NA,
-            Indicator_Lower_Value=NA) %>%
-  rbind.data.frame(.,data.frame(Year_Key=2030,
-                                Practice_Key=practice_key_ref$id[practice_key_ref$practice_name=="Climate & Energy"],
-                                Indicator_Type_Key=Dim_Global_2030_Outcome3_CEP_A$Indicator_Type_Key,
-                                Practice_Outcome_Key=practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Climate & Energy" &
-                                                                                   grepl("Adaptation",practice_outcome_key_ref$practice_outcome)],
-                                Indicator_Value=Dim_Global_2030_Outcome3_CEP_A$Indicator_Target,
-                                Indicator_Upper_Value=NA,
-                                Indicator_Lower_Value=NA))
+            Indicator_Lower_Value=NA,
+            Indicator_Target=NA)
+
+# Add Indicator_Latest_Year and Indicator_Latest_Value based on Fact table
+
+Dim_Global_2030_Outcome3_CEP_A <- 
+  Dim_Global_2030_Outcome3_CEP_A %>%
+  mutate(Indicator_Latest_Year=max(Fact_Global_2030_Outcome3_CEP_A$Year_Key,na.rm=T),
+         Indicator_Latest_Value=Fact_Global_2030_Outcome3_CEP_A$Indicator_Value[Fact_Global_2030_Outcome3_CEP_A$Year_Key==Indicator_Latest_Year])
+
+# Add target value to Fact table
+
+Fact_Global_2030_Outcome3_CEP_A <-
+  rbind.data.frame(Fact_Global_2030_Outcome3_CEP_A,
+                   data.frame(Year_Key=2030,
+                              Practice_Key=practice_key_ref$id[practice_key_ref$practice_name=="Climate & Energy"],
+                              Indicator_Type_Key=Dim_Global_2030_Outcome3_CEP_A$Indicator_Type_Key,
+                              Practice_Outcome_Key=practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Climate & Energy" &
+                                                                                 grepl("Adaptation",practice_outcome_key_ref$practice_outcome)],
+                              Indicator_Value=NA,
+                              Indicator_Upper_Value=NA,
+                              Indicator_Lower_Value=NA,
+                              Indicator_Target=Dim_Global_2030_Outcome3_CEP_A$Indicator_Target))
 
 
 # ---- 3.4 Consolidated CEP-specific Global 2030 Outcome tables ----
