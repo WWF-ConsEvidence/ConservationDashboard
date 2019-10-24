@@ -147,8 +147,7 @@ Dim_Context_State_Food_C <-
 
 # ---- 2.2 Context - Threat ----
 
-OECDStat_LandUse <- read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/LandUse_OECDStat_dl_2019_0723.xlsx',
-                              sheetName="LandUse_OECDStat_dl_2019_0723")
+OECDStat_LandUse <- import('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/LandUse_OECDStat_dl_2019_0723.xlsx')
 
 # -- LAND USE - CROPLAND 
 
