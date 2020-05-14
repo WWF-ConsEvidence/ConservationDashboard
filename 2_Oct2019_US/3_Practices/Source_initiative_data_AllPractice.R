@@ -36,20 +36,20 @@ practice_outcome_key_ref <- read.xlsx('1_Nov2018/2_FlatDataFiles/ConsDB_Input/co
 # ---- 1.2 Initiative data ----
 
 dim.initiatives <- 
-  import('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_reporting_dim_2019_0715.xlsx')
+  import('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/May_2020_updates/fy20_initiative_reporting_dim_2020_0409.xlsx')
 
 dim.initiative.indicators <-
-  import('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_indicators_dim_2019_0715.xlsx') %>%
+  import('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/May_2020_updates/fy20_initiative_indicators_dim_2020_0409.xlsx') %>%
   mutate(new.key=ifelse(grepl("OUT_",Initiative.indicator.key)==T,as.numeric(paste("10",stri_extract_last_regex(Initiative.indicator.key, "\\d{4}"),sep="")),
                         ifelse(grepl("PATH_",Initiative.indicator.key)==T,as.numeric(paste("20",stri_extract_last_regex(Initiative.indicator.key, "\\d{4}"),sep="")),
                                NA)))
 
 fact.initiative.indicators <-
-  import('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_indicators_fact_2019_0715.xlsx') %>%
+  import('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/May_2020_updates/fy20_initiative_indicators_fact_2020_0409.xlsx') %>%
   left_join(.,dim.initiatives[,c("Initiative.key","Practice")], by="Initiative.key")
 
 dim.initiative.milestones <-
-  import('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/fy19_initiative_milestones_2019_0715.xlsx')
+  import('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/May_2020_updates/fy20_initiative_milestones_2020_0409.xlsx')
 
 
 #
@@ -91,13 +91,14 @@ pie.type <-
                                               ifelse(has.data=="Yes" & !is.na(Target) & good.bad.trend=="Bad", "Yes Data - Yes Target - Bad Trend", NA))))),
          amount.achieved=ifelse(max.year.value==0 & (is.na(Target) | Target==0), 1,
                                 ifelse(max.year.value==0 & !is.na(Target) & Target!=0, 0,
-                                ifelse((pie.type=="Yes Data - Yes Target - Good Trend" |
-                                          pie.type=="Yes Data - Yes Target - Bad Trend") & Desired.trend=="Up" & max.year.value!=0, 
+                                  ifelse(Initiative.key=="0027" & pie.type=="Yes Data - Yes Target - Good Trend", max.year.value/Target, #THIS IS SPECIFICALLY FOR TIGERS INITIATIVE -- wanted pies to reflect starting value of 0, but our data do not include baseline data, nor data from when indicator was 0
+                                    ifelse((pie.type=="Yes Data - Yes Target - Good Trend" |
+                                            pie.type=="Yes Data - Yes Target - Bad Trend") & Desired.trend=="Up" & max.year.value!=0, 
                                        (max.year.value-min.year.value)/(Target-min.year.value),
                                        ifelse((pie.type=="Yes Data - Yes Target - Good Trend" |
                                                  pie.type=="Yes Data - Yes Target - Bad Trend") & Desired.trend=="Down" & max.year.value!=0, 
                                               (min.year.value-max.year.value)/(min.year.value-Target),
-                                              ifelse(pie.type=="Yes Data - No Target", max.year.value, NA))))),
+                                              ifelse(pie.type=="Yes Data - No Target", max.year.value, NA)))))),
          amount.achieved=ifelse(amount.achieved>=1,1,amount.achieved),
          amount.remaining=ifelse(pie.type=="No Data - Yes Target", 1, 
                                  ifelse(pie.type=="Yes Data - No Target", NA,

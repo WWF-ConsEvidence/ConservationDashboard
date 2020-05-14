@@ -415,7 +415,7 @@ Dim_Global_2030_Outcome3_Forest_A <-
              US_Indicator="Yes")
 
 Fact_Global_2030_Outcome3_Forest_A <-
-  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/BonnChallenge_commitments_2019_0710.xlsx', 
+  read.xlsx('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/May_2020_updates/BonnChallenge_commitments_2020_0409.xlsx', 
             sheetName="Sheet1") %>%
   filter(!is.na(Commitment_Year)) %>%
   group_by(Commitment_Year) %>%

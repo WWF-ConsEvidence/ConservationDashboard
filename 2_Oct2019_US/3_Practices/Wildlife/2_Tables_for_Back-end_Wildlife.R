@@ -87,17 +87,13 @@ Dim_Context_State_Wildlife_B <-
              US_Indicator="Yes")
 
 Fact_Context_State_Wildlife_B <-
-  read.csv('1_Nov2018/2_FlatDataFiles/ConsDB_Input/SDG_15.5.1_RLI_dl_2018_0921.csv') %>%
-  group_by(TimePeriod) %>%
-  summarise(Est=Value[which(X.Bounds.=="MP")],
-            Upper=Value[which(X.Bounds.=="LB")],
-            Lower=Value[which(X.Bounds.=="UB")]) %>%
+  read.csv('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/May_2020_updates/SDG_15.5.1_RLI_dl_2020_0409.csv') %>%
   transmute(Year_Key=unique(TimePeriod),
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],length(Year_Key)),
             Indicator_Type_Key=rep(Dim_Context_State_Wildlife_B$Indicator_Type_Key,length(Year_Key)),
-            Indicator_Value=Est,
-            Indicator_Upper_Value=Upper,
-            Indicator_Lower_Value=Lower,
+            Indicator_Value=Value,
+            Indicator_Upper_Value=UpperBound,
+            Indicator_Lower_Value=LowerBound,
             Value_First_Last=ifelse(Year_Key==max(Year_Key) | Year_Key==min(Year_Key),Indicator_Value,NA))
 
 # Add Panel-specific measures
@@ -681,7 +677,6 @@ Fact_Initiative_Indicator_Wildlife <-
             Value_Trend=ifelse(grepl("reduction",Units,ignore.case=T)==T,-(Value),Value),
             Indicator_Target=ifelse(!is.na(Target) & Year==target.year,Target,NA),
             Target_Trend=ifelse(grepl("reduction",Units,ignore.case=T)==T,-(Indicator_Target),Indicator_Target))
-
 
 
 # ---- 4.5 Wildlife-specific Fact_Initiative_Financials ----
