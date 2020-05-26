@@ -1,15 +1,13 @@
 #
 # code:  WWF COMPS Initiative Report Shiny Data Entry App
 #
-# author: Louise Glew, louise.glew@wwf.org
+# author: Louise Glew, louise.glew@wwf.org; Kelly Claborn, clabornkelly@gmail.com
 # created: March 2020
 # modified: 
 
 
-# ---- load libraries ----
 
-# - libraries
-pacman::p_load(rio, bit64, dplyr, shiny, shinyBS, DT)
+source('COMPS/global.R',local=F)
 
 
 # ---- Define UI for initiative reporting app ----
@@ -68,10 +66,10 @@ ui <- fluidPage(
           textInput(inputId = "email",
                     label = "Initiative Lead Email"),
           textInput(inputId = "initiativestart",
-                    label = "Initiative Start Date",
+                    label = "Initiative Start Year",
                     placeholder = "Year (YYYY)"),
           textInput(inputId = "initiativeend",
-                    label = "Initiative End Date",
+                    label = "Initiative End Year",
                     placeholder = "Year (YYYY)"),
           textInput(inputId = "initiativestatement",
                     label = "Initiative Statement"),
@@ -83,13 +81,14 @@ ui <- fluidPage(
           #      <b> Barrier: </b> Implementation is delayed by external factors (e.g., political will, partners engagement). <br/>
           #      <b> Support: </b> Initiative requires leadership support to address one or more issues. <br/>
           #      <b> Contingent: </b> Contingent on achievement of preceding milestone.", placement = "bottom", trigger = "hover"),
-          textInput ("initiativejust", "Initiative Status Assessment Justification"),
+          textInput("initiativejust", "Initiative Status Assessment Justification"),
           h5 ("Guidance on initiative status justification")
         ),
         
         tabPanel(
           tags$b("Outcomes"),
           column(6,
+                 tags$br(),
                  tags$b("OUTCOME 1"),
                  tags$br(),
                  textAreaInput(inputId = "outcome1statement",
@@ -103,34 +102,65 @@ ui <- fluidPage(
                            placeholder = "A description of your indicator"),
                  textInput(inputId = "out1indicatorlabel", 
                            label = "Indicator Label"),
-                 textInput(inputId = "out1indicatorlabelabbr", 
-                           label = "Abbreviated Indicator Label"),
                  textInput(inputId = "out1indicatorunits", 
                            label= "Indicator Units"),
                  textInput(inputId = "out1indicatorsource",
                            label = "Indicator Data Source"),
+                 selectInput(inputId = "out1numtrend",
+                               label = "How many trend lines are there?",
+                               choices = c("",1,2,3)),
+                 uiOutput("out1numtrend")
+                 # h5(tags$em("You may display up to three trend lines per outcome. Please indicate the labels for disaggregation (if any) 
+                 #            you would like to display for this outcome in the boxes marked 'Trend 1', 'Trend 2', and 'Trend 3' below. 
+                 #            If no aggregation is desired, please fill in the appropriate data for your indicator in the column for 'Trend 1' in the table below.")),
+                 # textInput(inputId = "out1subcat1",
+                 #           label = "Trend 1 Label"),
+                 # column(4,numericInput(inputId = "out1subcat1year",
+                 #           label = "Trend 1 Target Year",
+                 #           value = NULL)),
+                 # column(2,numericInput(inputId = "out1subcat1target",
+                 #                       label = "Trend 1 Target Value",
+                 #                       value = NULL)),
+                 # textInput(inputId = "out1subcat2",
+                 #           label = "Trend 2 Label",
+                 #           placeholder = "Leave blank if no disaggregation"),
+                 # textInput(inputId = "out1subcat3",
+                 #           label = "Trend 3 Label",
+                 #           placeholder = "Leave blank if no disaggregation"),
+                 # DT::dataTableOutput(outputId = "outcome1data")
+                 ),
+          column(6,
+                 tags$br(),
+                 tags$b("OUTCOME 2"),
+                 tags$br(),
+                 textAreaInput(inputId = "outcome2statement",
+                               label = "Outcome Statement",
+                               placeholder = "Maximum of XX characters",
+                               width = "100%",
+                               height = "100px"),
+                 h5("<INSERT INSTRUCTIONS ON OUTCOME STATEMENTS>"),
+                 textInput(inputId ="out2indicator", 
+                           label = "Indicator Description", 
+                           placeholder = "A description of your indicator"),
+                 textInput(inputId = "out2indicatorlabel", 
+                           label = "Indicator Label"),
+                 textInput(inputId = "out2indicatorunits", 
+                           label= "Indicator Units"),
+                 textInput(inputId = "out2indicatorsource",
+                           label = "Indicator Data Source"),
                  h5(tags$em("You may display up to three trend lines per outcome. Please indicate the labels for disaggregation (if any) 
                             you would like to display for this outcome in the boxes marked 'Trend 1', 'Trend 2', and 'Trend 3' below. 
                             If no aggregation is desired, please fill in the appropriate data for your indicator in the column for 'Trend 1' in the table below.")),
-                 # selectInput(inputId = "out1numtrend",
-                 #             label = "How many trend lines would you like to display for this indicator?",
-                 #             choices = c("",1,2,3),
-                 #             selectize = T),
-                 textInput(inputId = "out1subcat1",
+                 textInput(inputId = "out2subcat1",
                            label = "Trend 1 Label",
                            placeholder = "Leave blank if no disaggregation"),
-                 textInput(inputId = "out1subcat2",
+                 textInput(inputId = "out2subcat2",
                            label = "Trend 2 Label",
                            placeholder = "Leave blank if no disaggregation"),
-                 textInput(inputId = "out1subcat3",
+                 textInput(inputId = "out2subcat3",
                            label = "Trend 3 Label",
-                           placeholder = "Leave blank if no disaggregation"),
-                 DT::dataTableOutput(outputId = "outcome1data")
-                 ),
-          column(6,
-                 tags$b("OUTCOME 2"),
-                 tags$br())
-        ),
+                           placeholder = "Leave blank if no disaggregation")
+          )),
         
         tabPanel(
           tags$b("Pathways"),
@@ -184,122 +214,100 @@ ui <- fluidPage(
 # ---- Define server logic ----
 
 server <- function(input, output, session) {
-  
-  # pre-populate data
-  initiative_dim <<- import('COMPS/responses/FY21_initiative_dim_TEST.csv', colClasses = c(initiativekey = "character"))
-  init_indicator_dim <<- import('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/May_2020_updates/fy20_initiative_indicators_dim_2020_0409.xlsx')
-  init_indicator_fact <<- import('2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019/May_2020_updates/fy20_initiative_indicators_fact_2020_0409.xlsx')
-  
-  
-  initiative_dim_data <- import('COMPS/responses/FY21_initiative_dim.csv')
-  init_indicator_dim_data <- import('COMPS/responses/FY21_init_indicator_dim.csv')
 
+  initiative_dim <<- import('COMPS/responses/FY21_initiative_dim.csv', colClasses = c(initiativekey = "character")) 
+  init_indicator_dim <<- import('COMPS/responses/FY21_init_indicator_dim.csv')
+  init_indicator_fact <<- import('COMPS/responses/FY21_init_indicator_fact.csv')
   
+
   # update initiative selection options based on selected goal
-  observe({
+  observe({ 
+    
+    initiativeoptions <- c("",sort(unique(initiative_dim$initiative[which(initiative_dim$goal==input$goal)])))
     
     updateSelectInput(session, 
                       inputId = "initiativeoptions",
-                      choices = c("",sort(initiative_dim$initiative[which(initiative_dim$goal==input$goal)])),
+                      choices = initiativeoptions,
                       selected = "")
 
   })
 
   # pre-populate text boxes based on selected initiatives
   observeEvent(input$populatereport, {
+    
+    source('COMPS/prepopulate.R',local=F)
+    
     selectedinitiative <- input$initiativeoptions
-    
-    updateTextInput(session,
-                    inputId = "initiative",
-                    value = selectedinitiative)
-    
-    updateTextInput(session,
-                    inputId = "initiativelead",
-                    value = initiative_dim$initiativelead[initiative_dim$initiative==selectedinitiative])
-    
-    updateTextInput(session,
-                    inputId = "email",
-                    value = initiative_dim$email[initiative_dim$initiative==selectedinitiative])
-    
-    updateTextInput(session,
-                    inputId = "initiativestart",
-                    value = initiative_dim$initiativestart[initiative_dim$initiative==selectedinitiative])
-    
-    updateTextInput(session,
-                    inputId = "initiativeend",
-                    value = initiative_dim$initiativeend[initiative_dim$initiative==selectedinitiative])
-    
-    updateTextInput(session,
-                    inputId = "initiativestatement",
-                    value = initiative_dim$initiativestatement[initiative_dim$initiative==selectedinitiative])
-    
-    updateTextInput(session,
-                    inputId = "outcome1statement",
-                    value = init_indicator_dim$Statement[init_indicator_dim$Initiative==selectedinitiative][1])
-    
-    updateTextInput(session,
-                    inputId ="out1indicator",
-                    value = init_indicator_dim$Indicator.name[init_indicator_dim$Initiative==selectedinitiative][1])
-    
-    updateTextInput(session,
-                    inputId = "out1indicatorlabel", 
-                    value = init_indicator_dim$Indicator.label[init_indicator_dim$Initiative==selectedinitiative][1])
-    
-    updateTextInput(session,
-                    inputId = "out1indicatorlabelabbr",
-                    value = init_indicator_dim$Indicator.label.abbr[init_indicator_dim$Initiative==selectedinitiative][1])
-    
-    # updateTextInput(session,
-    #                 inputId = "out1indicatorunits",
-    #                 value = )
-    # 
-    # updateTextInput(session,
-    #                 inputId = "out1indicatorsource",
-    #                 value = )
-    # 
-    # updateTextInput(session,
-    #                 inputId = "out1subcat1",
-    #                 value = )
+    prePopulate(selectedinitiative, session)
     
   })
- 
-  # # populate outcome and pathway data tables for selected initiative
-  # outcome1data <- data.frame(init_indicator_fact)
-  # 
-  # output$outcome1data <- DT::renderDataTable({ 
-  #  outcome1data
-  #  })
- 
-  # - define fields to be saved from form
-  initiative_dim_fields <- c("goal","initiative","initiativelead","email","initiativestart","initiativeend",
-                             "initiativestatement","initiativestatus","initiativejust","fundsneeded","fundssecured","fundsanticipated")
-  init_indicator_dim_fields <- c("goal","initiative","statement","indicatordescription","indicatorlabel","indicatorlabelabbr","indicatorunits","indicatorsource",
-                                 "indicatortype","displayorder")
-  out1_indicator_dim_fields <- c("goal","initiative","outcome1statement","out1indicator","out1indicatorlabel","out1indicatorlabelabbr",
-                                 "out1indicatorunits","out1indicatorsource","out1subcat1","out1subcat2","out1subcat3")
-  out2_indicator_dim_fields <- c("goal","initiative","outcome2statement","out2indicator","out2indicatorlabel","out2indicatorlabelabbr",
-                                 "out2indicatorunits","out2indicatorsource","out2subcat1","out2subcat2","out2subcat3")
-  path1_indicator_dim_fields <- c("goal","initiative","pathway1statement","path1indicator","path1indicatorlabel")
-  path2_indicator_dim_fields <- c("goal","initiative","pathway2statement","path2indicator","path2indicatorlabel")
+
+  
+  observe({
+    
+    selectedinitiative <- input$initiative
+    initiativekey <- as.character(initiative_dim$initiativekey[initiative_dim$initiative==input$initiative])
+    
+    outcomedata <- reactiveValues()
+    outcomedata$out1subcat1 <- data.frame(Year=init_indicator_fact$Year[init_indicator_fact$indicatorkey==paste("1",initiativekey,"01",sep="") &
+                                                                          init_indicator_fact$Year != max(init_indicator_fact$Year[
+                                                                            init_indicator_fact$indicatorkey==paste("1",initiativekey,"01",sep="")]) &
+                                                                          init_indicator_fact$timestamp==max(init_indicator_fact$timestamp[
+                                                                            which(init_indicator_fact$initiative==selectedinitiative)])],
+                                          Value=init_indicator_fact$Value[init_indicator_fact$indicatorkey==paste("1",initiativekey,"01",sep="") &
+                                                                            init_indicator_fact$Year != max(init_indicator_fact$Year[
+                                                                              init_indicator_fact$indicatorkey==paste("1",initiativekey,"01",sep="")]) &
+                                                                            init_indicator_fact$timestamp==max(init_indicator_fact$timestamp[
+                                                                              which(init_indicator_fact$initiative==selectedinitiative)])])
+    
+    
+    output$out1subcat1data <- renderDataTable({
+      datatable(outcomedata$out1subcat1,
+                editable = T, 
+                options = list(paging = FALSE,
+                               searching = FALSE, 
+                               info = FALSE),
+                rownames= FALSE)
+    }, server=T)
+    
+  })
+  
+  observeEvent(input$out1numtrend, {
+    source('COMPS/conditionalpanels.R',local=F)
+    
+    selectedinitiative <- input$initiativeoptions
+    outcome1Conditional(selectedinitiative, input, output)
+    
+  })
+
   
   # whenever a field is filled, aggregate all form data
   formData1 <- reactive({
     initiative_dim_data <- data.frame(t(as.matrix(sapply(initiative_dim_fields, function(x) input[[x]])))) %>%
       mutate(securedanticipatedsum = input$fundssecured+input$fundsanticipated,
-             initiativekey = as.character(initiative_dim$initiativekey[initiative_dim$initiative==input$initiativeoptions]),
-             displayorder = initiative_dim$displayorder[initiative_dim$initiative==input$initiativeoptions],
-             globalinitiative = initiative_dim$globalinitiative[initiative_dim$initiative==input$initiativeoptions],
-             usinitiative = initiative_dim$usinitiative[initiative_dim$initiative==input$initiativeoptions])
+             initiativekey = as.character(initiative_dim$initiativekey[initiative_dim$initiative==input$initiative]),
+             displayorder = initiative_dim$displayorder[initiative_dim$initiative==input$initiative],
+             globalinitiative = initiative_dim$globalinitiative[initiative_dim$initiative==input$initiative],
+             usinitiative = initiative_dim$usinitiative[initiative_dim$initiative==input$initiative])
     initiative_dim_data
   })
   
   formData2 <- reactive({
-    init_indicator_dim_data <- rbind.data.frame(t(as.matrix(sapply(out1_indicator_dim_fields, function(x) input[[x]], USE.NAMES = F))),
-                                                t(as.matrix(sapply(out2_indicator_dim_fields, function(x) input[[x]], USE.NAMES = F))),
-                                                t(as.matrix(sapply(path1_indicator_dim_fields, function(x) input[[x]], USE.NAMES = F))),
-                                                t(as.matrix(sapply(path2_indicator_dim_fields, function(x) input[[x]], USE.NAMES = F)))) %>%
-      mutate(indicatortype = c("Outcome","Outcome","Pathway","Pathway"),
-             displayorder = 1:4)
+    init_indicator_dim_data <- rbind.data.frame(t(as.matrix(sapply(out1_subcat1_indicator_dim_fields, function(x) input[[x]], USE.NAMES = F))),
+                                                t(as.matrix(sapply(out1_subcat2_indicator_dim_fields, function(x) input[[x]], USE.NAMES = F))),
+                                                t(as.matrix(sapply(out1_subcat3_indicator_dim_fields, function(x) input[[x]], USE.NAMES = F))),
+                                                t(as.matrix(sapply(out2_subcat1_indicator_dim_fields, function(x) input[[x]], USE.NAMES = F))),
+                                                t(as.matrix(sapply(out2_subcat2_indicator_dim_fields, function(x) input[[x]], USE.NAMES = F))),
+                                                t(as.matrix(sapply(out2_subcat3_indicator_dim_fields, function(x) input[[x]], USE.NAMES = F))),
+                                                t(as.matrix(sapply(path1_subcat1_indicator_dim_fields, function(x) input[[x]], USE.NAMES = F))),
+                                                t(as.matrix(sapply(path1_subcat2_indicator_dim_fields, function(x) input[[x]], USE.NAMES = F))),
+                                                t(as.matrix(sapply(path1_subcat3_indicator_dim_fields, function(x) input[[x]], USE.NAMES = F))),
+                                                t(as.matrix(sapply(path2_subcat1_indicator_dim_fields, function(x) input[[x]], USE.NAMES = F))),
+                                                t(as.matrix(sapply(path2_subcat2_indicator_dim_fields, function(x) input[[x]], USE.NAMES = F))),
+                                                t(as.matrix(sapply(path2_subcat3_indicator_dim_fields, function(x) input[[x]], USE.NAMES = F)))) %>%
+      mutate(indicatortype = c(rep("Outcome",6),rep("Pathway",6)),
+             displayorder = c(rep(1,3),rep(2,3),rep(3,3),rep(4,3)),
+             indicatorkey = as.numeric(paste(c(rep(1,6),rep(2,6),initiative_dim$initiativekey[initiative_dim$initiative==input$initiative],"0",c(seq(1:6),seq(1:6))))))
     colnames(init_indicator_dim_data) <- init_indicator_dim_fields
     init_indicator_dim_data
   })
@@ -309,28 +317,32 @@ server <- function(input, output, session) {
   saveData <- function(data1,data2) {
     data1 <- rbind(initiative_dim, 
                    data1 %>% mutate(timestamp = format(Sys.time(), format="%Y%m%d%H%M")))
-    # data2 <- rbind(init_indicator_dim,data2)
+    data2 <- rbind(init_indicator_dim,
+                   data2 %>% mutate(timestamp = format(Sys.time(), format="%Y%m%d%H%M")))
     
     # Write the files to the local system
     write.csv(
       x = data1,
-      file = "COMPS/responses/FY21_initiative_dim_TEST.csv", 
+      file = "COMPS/responses/FY21_initiative_dim.csv", 
       row.names = FALSE, quote = TRUE
     )
     
-    # write.csv(
-    #   x = data2,
-    #   file = "COMPS/responses/FY21_init_indicator_dim.csv", 
-    #   row.names = FALSE, quote = TRUE
-    # )
+    write.csv(
+      x = data2,
+      file = "COMPS/responses/FY21_init_indicator_dim.csv",
+      row.names = FALSE, quote = TRUE
+    )
     
   }
+  
+  # ***TO DO: BEFORE SAVING, HAVE USERS HIT A 'REFRESH' BUTTON TO ENSURE THEY ARE WRITING THEIR DATA TO NEWEST VERSION OF FILE***
   
   # When the Save button is clicked, save the form data
   observeEvent(input$save, {
     saveData(formData1(),formData2())
     output$confirmsave <- renderText({ "Saved!" })
-    initiative_dim <<- import('COMPS/responses/FY21_initiative_dim_TEST.csv', colClasses = c(initiativekey = "character"))
+    initiative_dim <<- import('COMPS/responses/FY21_initiative_dim.csv', colClasses = c(initiativekey = "character"))
+    init_indicator_dim <<- import('COMPS/responses/FY21_init_indicator_dim.csv')
   })
 
 }
@@ -338,6 +350,8 @@ server <- function(input, output, session) {
 # ---- Run the application ----
 
 shinyApp(ui = ui, server = server)
+
+
 
 
 # For hover over of categories (look at shinyBS Tooltip)
@@ -352,9 +366,3 @@ shinyApp(ui = ui, server = server)
 
 
 
-
-
-# milestones <- data.frame("milestone"=c("A","B","C","D"),
-#                         "date" =c(11/2019, 12/2020, 06/2021, 03/2020),
-#                         "status"= c("Barrier","Barrier","Progress","Support"),
-#                         "justification"=c("xyz", "abc", "def", "ghi"))
