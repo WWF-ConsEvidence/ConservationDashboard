@@ -110,24 +110,6 @@ ui <- fluidPage(
                                label = "How many trend lines are there?",
                                choices = c("",1,2,3)),
                  uiOutput("out1numtrend")
-                 # h5(tags$em("You may display up to three trend lines per outcome. Please indicate the labels for disaggregation (if any) 
-                 #            you would like to display for this outcome in the boxes marked 'Trend 1', 'Trend 2', and 'Trend 3' below. 
-                 #            If no aggregation is desired, please fill in the appropriate data for your indicator in the column for 'Trend 1' in the table below.")),
-                 # textInput(inputId = "out1subcat1",
-                 #           label = "Trend 1 Label"),
-                 # column(4,numericInput(inputId = "out1subcat1year",
-                 #           label = "Trend 1 Target Year",
-                 #           value = NULL)),
-                 # column(2,numericInput(inputId = "out1subcat1target",
-                 #                       label = "Trend 1 Target Value",
-                 #                       value = NULL)),
-                 # textInput(inputId = "out1subcat2",
-                 #           label = "Trend 2 Label",
-                 #           placeholder = "Leave blank if no disaggregation"),
-                 # textInput(inputId = "out1subcat3",
-                 #           label = "Trend 3 Label",
-                 #           placeholder = "Leave blank if no disaggregation"),
-                 # DT::dataTableOutput(outputId = "outcome1data")
                  ),
           column(6,
                  tags$br(),
@@ -170,7 +152,9 @@ ui <- fluidPage(
         
         tabPanel(
           tags$b("Milestones"),
-          datatable(milestones, editable=TRUE)
+          DT::dataTableOutput(outputId = "milestonedataoutput"),
+          actionButton(inputId = "addMilestoneData",
+                       label = "Add Row")
         ),
         
         tabPanel(
@@ -218,16 +202,19 @@ server <- function(input, output, session) {
   initiative_dim <<- import('COMPS/responses/FY21_initiative_dim.csv', colClasses = c(initiativekey = "character")) 
   init_indicator_dim <<- import('COMPS/responses/FY21_init_indicator_dim.csv')
   init_indicator_fact <<- import('COMPS/responses/FY21_init_indicator_fact.csv')
+  milestones <<- import('COMPS/responses/FY21_milestones.csv', colClasses = c(target = "character")) %>% 
+    mutate(milestonestatus = factor(milestonestatus, levels = c("","Opportunity","Progress","Barrier","Support","Contingent"), ordered = T))
   
 
   # update initiative selection options based on selected goal
-  observe({ 
+  observe ({ 
     
-    initiativeoptions <- c("",sort(unique(initiative_dim$initiative[which(initiative_dim$goal==input$goal)])))
+    initiativeoptions <- initiative_dim %>% filter(goal==input$goal) %>% 
+                             group_by(initiativekey) %>% summarise(initiative=initiative[timestamp==max(timestamp)]) 
     
     updateSelectInput(session, 
                       inputId = "initiativeoptions",
-                      choices = initiativeoptions,
+                      choices = c("",sort(initiativeoptions$initiative)),
                       selected = "")
 
   })
@@ -242,11 +229,20 @@ server <- function(input, output, session) {
     
   })
 
+  # source conditional trend line panel info (to either pre-populate or leave blank)
+  observeEvent(input$out1numtrend, {
+    source('COMPS/conditionalpanels.R',local=F)
+    
+    selectedinitiative <- input$initiativeoptions
+    outcome1Conditional(selectedinitiative, input, output)
+    
+  })
   
+  # render data tables for outcome data 
   observe({
     
-    selectedinitiative <- input$initiative
-    initiativekey <- as.character(initiative_dim$initiativekey[initiative_dim$initiative==input$initiative])
+    selectedinitiative <- input$initiativeoptions
+    initiativekey <- as.character(initiative_dim$initiativekey[initiative_dim$initiative==input$initiativeoptions])
     
     outcomedata <- reactiveValues()
     outcomedata$out1subcat1 <- data.frame(Year=init_indicator_fact$Year[init_indicator_fact$indicatorkey==paste("1",initiativekey,"01",sep="") &
@@ -272,14 +268,69 @@ server <- function(input, output, session) {
     
   })
   
-  observeEvent(input$out1numtrend, {
-    source('COMPS/conditionalpanels.R',local=F)
-    
-    selectedinitiative <- input$initiativeoptions
-    outcome1Conditional(selectedinitiative, input, output)
-    
-  })
 
+  # render data tables for milestones
+  observe({
+      
+    data <- reactiveValues()  
+    data <- milestones[which(milestones$initiative==input$initiativeoptions),c("milestone","target","milestonejust")]
+
+    
+    for (i in 1:nrow(data)) {
+      data$status[i] <- as.character(selectInput(inputId = "milestonestatus", 
+                                                 label = "", 
+                                                 choices = sort(unique(milestones$milestonestatus)), width = "100px", 
+                                                 selected = milestones$milestonestatus[milestones$initiative==input$initiativeoptions][i]))
+    }
+    
+    for (i in 1:nrow(data)) {
+      data$display[i] <- as.character(selectInput(inputId = "milestoneactive", 
+                                                 label = "", 
+                                                 choices = sort(unique(milestones$milestoneactive)), width = "100px", 
+                                                 selected = milestones$milestoneactive[milestones$initiative==input$initiativeoptions][i]))
+    }
+    
+    data <- data %>% .[,c("milestone","target","status","milestonejust","display")]
+    colnames(data) <- c("Milestone","Target","Status","Status.Justification","Display.On.FY20.Dashboard")
+    
+    output$milestonedataoutput = DT::renderDataTable(
+      data, escape = F, editable = T, selection = 'none', server = T,
+      options = list(dom = 't', paging = F, ordering = F),
+      rownames = F, 
+      callback = JS("table.rows().every(function(i, tab, row) {
+        var $this = $(this.node());
+        $this.attr('id', this.data()[0]);
+        $this.addClass('shiny-input-container');
+      });
+      Shiny.unbindAll(table.table().node());
+      Shiny.bindAll(table.table().node());")
+    )
+    
+    # milestonerow <- 
+    #   data %>% 
+    #   slice(1) %>% 
+    #   # transpose the first row of data into two columns
+    #   gather(key = "column_name", value = "value") %>%
+    #   # replace all values with ""
+    #   mutate(value = "") %>%
+    #   # reshape the data from long to wide
+    #   spread(column_name, value) %>%
+    #   # rearrange the column order to match that of data
+    #   select(colnames(data))
+    # 
+    # # store a proxy of milestone table 
+    # proxy <- dataTableProxy(outputId = "milestonedataoutput")
+    # 
+    # # each time addData is pressed, add data to proxy
+    # observeEvent(input$addMilestoneData, {
+    #   proxy %>% 
+    #     addRow(milestonerow)
+    # })
+    # 
+  })
+  
+
+  
   
   # whenever a field is filled, aggregate all form data
   formData1 <- reactive({
@@ -336,6 +387,7 @@ server <- function(input, output, session) {
   }
   
   # ***TO DO: BEFORE SAVING, HAVE USERS HIT A 'REFRESH' BUTTON TO ENSURE THEY ARE WRITING THEIR DATA TO NEWEST VERSION OF FILE***
+  # ***New window when saved?***
   
   # When the Save button is clicked, save the form data
   observeEvent(input$save, {

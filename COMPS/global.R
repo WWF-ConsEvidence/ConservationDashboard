@@ -5,12 +5,12 @@
 pacman::p_load(rio, bit64, dplyr, shiny, shinyBS, DT)
 
 
-# ---- call data frames ----
-
-milestones <- data.frame("milestone"=c("A","B","C","D"),
-                        "date" =c(11/2019, 12/2020, 06/2021, 03/2020),
-                        "status"= c("Barrier","Barrier","Progress","Support"),
-                        "justification"=c("xyz", "abc", "def", "ghi"))
+# # ---- call data frames ----
+# 
+# milestones <- data.frame("milestone"=c("A","B","C","D"),
+#                         "date" =c(11/2019, 12/2020, 06/2021, 03/2020),
+#                         "status"= c("Barrier","Barrier","Progress","Support"),
+#                         "justification"=c("xyz", "abc", "def", "ghi"))
 
 
 # ---- define fields to be saved from form ----

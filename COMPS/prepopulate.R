@@ -76,7 +76,7 @@ prePopulate <- function(selectedinitiative, session) {
                       inputId = "out1numtrend",
                       selected = length(init_indicator_dim$subcat[init_indicator_dim$initiative==selectedinitiative & 
                                                                     init_indicator_dim$displayorder==1 &
-                                                                    !is.na(init_indicator_dim$subcat)]))
+                                                                    !is.na(init_indicator_dim$indicatorlabel)]))
 
     
     # outcome 2 info
