@@ -14,6 +14,8 @@ source('COMPS/global.R',local=F)
 
 ui <- fluidPage(
   
+  useShinyjs(),
+  
   # Application title & intro
   titlePanel(tags$b("WWF Initiative Report")),
   
@@ -86,8 +88,8 @@ ui <- fluidPage(
         ),
         
         tabPanel(
-          tags$b("Outcomes"),
-          column(6,
+          tags$b("Outcome 1"),
+          column(8,
                  tags$br(),
                  tags$b("OUTCOME 1"),
                  tags$br(),
@@ -111,7 +113,14 @@ ui <- fluidPage(
                                choices = c("",1,2,3)),
                  uiOutput("out1numtrend")
                  ),
-          column(6,
+          column(4,
+                 tags$br(),
+                 h5("INSERT ANNOTATED JPEG SHOWING COMPONENTS OF OUTCOME 1 INFO ON DASHBOARD"))
+          ),
+        
+        tabPanel(
+          tags$b("Outcome 2"),
+          column(8,
                  tags$br(),
                  tags$b("OUTCOME 2"),
                  tags$br(),
@@ -130,24 +139,76 @@ ui <- fluidPage(
                            label= "Indicator Units"),
                  textInput(inputId = "out2indicatorsource",
                            label = "Indicator Data Source"),
-                 h5(tags$em("You may display up to three trend lines per outcome. Please indicate the labels for disaggregation (if any) 
-                            you would like to display for this outcome in the boxes marked 'Trend 1', 'Trend 2', and 'Trend 3' below. 
-                            If no aggregation is desired, please fill in the appropriate data for your indicator in the column for 'Trend 1' in the table below.")),
-                 textInput(inputId = "out2subcat1",
-                           label = "Trend 1 Label",
-                           placeholder = "Leave blank if no disaggregation"),
-                 textInput(inputId = "out2subcat2",
-                           label = "Trend 2 Label",
-                           placeholder = "Leave blank if no disaggregation"),
-                 textInput(inputId = "out2subcat3",
-                           label = "Trend 3 Label",
-                           placeholder = "Leave blank if no disaggregation")
-          )),
+                 selectInput(inputId = "out2numtrend",
+                             label = "How many trend lines are there?",
+                             choices = c("",1,2,3)),
+                 uiOutput("out2numtrend")
+          ),
+          column(4,
+                 tags$br(),
+                 h5("INSERT ANNOTATED JPEG SHOWING COMPONENTS OF OUTCOME 2 INFO ON DASHBOARD"))
+        ),
         
         tabPanel(
-          tags$b("Pathways"),
-          h5("PATHWAY 1"),
-          h5("PATHWAY 2")
+          tags$b("Pathway 1"),
+          column(8,
+                 tags$br(),
+                 tags$b("PATHWAY 1"),
+                 tags$br(),
+                 textAreaInput(inputId = "pathway1statement",
+                               label = "Pathway Statement",
+                               placeholder = "Maximum of XX characters",
+                               width = "100%",
+                               height = "100px"),
+                 h5("<INSERT INSTRUCTIONS ON PATHWAY STATEMENTS>"),
+                 textInput(inputId ="path1indicator", 
+                           label = "Indicator Description", 
+                           placeholder = "A description of your indicator"),
+                 textInput(inputId = "path1indicatorlabel", 
+                           label = "Indicator Label"),
+                 textInput(inputId = "path1indicatorunits", 
+                           label= "Indicator Units"),
+                 textInput(inputId = "path1indicatorsource",
+                           label = "Indicator Data Source"),
+                 selectInput(inputId = "path1numtrend",
+                             label = "How many trend lines are there?",
+                             choices = c("",1,2,3)),
+                 uiOutput("path1numtrend")
+          ),
+          column(4,
+                 tags$br(),
+                 h5("INSERT ANNOTATED JPEG SHOWING COMPONENTS OF PATHWAY 1 INFO ON DASHBOARD"))
+        ),
+        
+        tabPanel(
+          tags$b("Pathway 2"),
+          column(8,
+                 tags$br(),
+                 tags$b("PATHWAY 2"),
+                 tags$br(),
+                 textAreaInput(inputId = "pathway2statement",
+                               label = "Pathway Statement",
+                               placeholder = "Maximum of XX characters",
+                               width = "100%",
+                               height = "100px"),
+                 h5("<INSERT INSTRUCTIONS ON PATHWAY STATEMENTS>"),
+                 textInput(inputId ="path2indicator", 
+                           label = "Indicator Description", 
+                           placeholder = "A description of your indicator"),
+                 textInput(inputId = "path2indicatorlabel", 
+                           label = "Indicator Label"),
+                 textInput(inputId = "path2indicatorunits", 
+                           label= "Indicator Units"),
+                 textInput(inputId = "path2indicatorsource",
+                           label = "Indicator Data Source"),
+                 selectInput(inputId = "path2numtrend",
+                             label = "How many trend lines are there?",
+                             choices = c("",1,2,3)),
+                 uiOutput("path2numtrend")
+          ),
+          column(4,
+                 tags$br(),
+                 h5("INSERT ANNOTATED JPEG SHOWING COMPONENTS OF PATHWAY 2 INFO ON DASHBOARD"))
         ),
         
         tabPanel(
@@ -168,7 +229,9 @@ ui <- fluidPage(
                        value = NULL),
           numericInput(inputId = "fundsanticipated",
                        label = "Total Funds Anticipated", 
-                       value = NULL)
+                       value = NULL),
+          verbatimTextOutput("textOp"),
+          verbatimTextOutput("milestonerows")
         )
         
       )#tabset
@@ -199,7 +262,7 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
 
-  initiative_dim <<- import('COMPS/responses/FY21_initiative_dim.csv', colClasses = c(initiativekey = "character")) 
+  initiative_dim <<- import('COMPS/responses/FY21_initiative_dim.csv') 
   init_indicator_dim <<- import('COMPS/responses/FY21_init_indicator_dim.csv')
   init_indicator_fact <<- import('COMPS/responses/FY21_init_indicator_fact.csv')
   milestones <<- import('COMPS/responses/FY21_milestones.csv', colClasses = c(target = "character")) %>% 
@@ -229,8 +292,9 @@ server <- function(input, output, session) {
     
   })
 
-  # source conditional trend line panel info (to either pre-populate or leave blank)
+  # source conditional trend line panel info (to either pre-populate or leave blank) for outcomes and pathways
   observeEvent(input$out1numtrend, {
+    
     source('COMPS/conditionalpanels.R',local=F)
     
     selectedinitiative <- input$initiativeoptions
@@ -238,36 +302,96 @@ server <- function(input, output, session) {
     
   })
   
-  # render data tables for outcome data 
-  observe({
-    
+  observeEvent(input$out2numtrend, {
+
+    source('COMPS/conditionalpanels.R',local=F)
+
     selectedinitiative <- input$initiativeoptions
-    initiativekey <- as.character(initiative_dim$initiativekey[initiative_dim$initiative==input$initiativeoptions])
-    
-    outcomedata <- reactiveValues()
-    outcomedata$out1subcat1 <- data.frame(Year=init_indicator_fact$Year[init_indicator_fact$indicatorkey==paste("1",initiativekey,"01",sep="") &
-                                                                          init_indicator_fact$Year != max(init_indicator_fact$Year[
-                                                                            init_indicator_fact$indicatorkey==paste("1",initiativekey,"01",sep="")]) &
-                                                                          init_indicator_fact$timestamp==max(init_indicator_fact$timestamp[
-                                                                            which(init_indicator_fact$initiative==selectedinitiative)])],
-                                          Value=init_indicator_fact$Value[init_indicator_fact$indicatorkey==paste("1",initiativekey,"01",sep="") &
-                                                                            init_indicator_fact$Year != max(init_indicator_fact$Year[
-                                                                              init_indicator_fact$indicatorkey==paste("1",initiativekey,"01",sep="")]) &
-                                                                            init_indicator_fact$timestamp==max(init_indicator_fact$timestamp[
-                                                                              which(init_indicator_fact$initiative==selectedinitiative)])])
-    
-    
-    output$out1subcat1data <- renderDataTable({
-      datatable(outcomedata$out1subcat1,
-                editable = T, 
-                options = list(paging = FALSE,
-                               searching = FALSE, 
-                               info = FALSE),
-                rownames= FALSE)
-    }, server=T)
-    
+    outcome2Conditional(selectedinitiative, input, output)
+
+  })
+
+  observeEvent(input$path1numtrend, {
+
+    source('COMPS/conditionalpanels.R',local=F)
+
+    selectedinitiative <- input$initiativeoptions
+    pathway1Conditional(selectedinitiative, input, output)
+
+  })
+
+  observeEvent(input$path2numtrend, {
+
+    source('COMPS/conditionalpanels.R',local=F)
+
+    selectedinitiative <- input$initiativeoptions
+    pathway2Conditional(selectedinitiative, input, output)
+
   })
   
+  # render data tables for outcome data 
+  observe ({
+    
+    selectedinitiative <- input$initiativeoptions
+    initiativekey <- as.character(substr(initiative_dim$initiativekey[initiative_dim$initiative==selectedinitiative],2,5))
+    out1subcat1key <- as.numeric(paste("1",initiativekey,"01",sep=""))
+    out1subcat1initfact <- init_indicator_fact %>% filter(indicatorkey==out1subcat1key & Year!=max(Year[indicatorkey==out1subcat1key],na.rm=T) & 
+                                                            timestamp==max(timestamp[initiative==selectedinitiative]))
+    
+    out1subcat1data <- reactiveValues()
+    out1subcat1data <- out1subcat1initfact[,c("Year","Value")]
+    # out1subcat1data <- data.frame(Year=init_indicator_fact$Year[init_indicator_fact$indicatorkey==out1subcat1key &
+    #                                                               init_indicator_fact$Year != max(init_indicator_fact$Year[
+    #                                                                 init_indicator_fact$indicatorkey==out1subcat1key]) &
+    #                                                               init_indicator_fact$timestamp==max(init_indicator_fact$timestamp[
+    #                                                                 which(init_indicator_fact$initiative==selectedinitiative)])])
+    
+    if (nrow(out1subcat1data)==0) return (
+      out1subcat1data )
+    else {
+      for (i in 1:nrow(out1subcat1data)) {
+        out1subcat1data$Year[i] <- as.character(numericInput(inputId = paste0("out1subcat1year",i),
+                                                label = "", width = "85px",
+                                                value = init_indicator_fact$Year[i]))
+      
+        out1subcat1data$Value[i] <- as.character(numericInput(inputId = paste0("out1subcat1value",i),
+                                               label = "", width = "85px",
+                                               value = init_indicator_fact$Value[i]))
+      }
+    }
+    
+    
+    output$out1subcat1data <- renderDataTable(
+      out1subcat1data, escape = F, editable = T, selection = 'none', server = F,
+      options = list(dom = 't', pageLength = 50),
+      rownames = F, width = "200px",
+      callback = JS("table.rows().every(function(i, tab, row) {
+                    var $this = $(this.node());
+                    $this.attr('id', this.data()[0]);
+                    $this.addClass('shiny-input-container');
+    });
+                    Shiny.unbindAll(table.table().node());
+                    Shiny.bindAll(table.table().node());")
+      )
+  })
+  
+  # store a proxy of milestone table
+  out1subcat1proxy <- dataTableProxy(outputId = "out1subcat1data")
+  
+  # each time addData is pressed, add data to proxy
+  observeEvent(input$addout1subcat1Data, {
+    
+    outcomerow <-
+      data.frame(Year=as.character(numericInput(inputId = paste0("out1subcat1year",length(input$out1subcat1data_rows_all)+1),
+                                                label = "", width = "85px", value = "")),
+                 Value=as.character(numericInput(inputId = paste0("out1subcat1value",length(input$out1subcat1data_rows_all)+1),
+                                                 label = "", width = "85px", value = "")))
+    
+    # add row
+    out1subcat1proxy %>%
+      addRow(outcomerow)
+    
+  })
 
   # render data tables for milestones
   observe({
@@ -275,16 +399,30 @@ server <- function(input, output, session) {
     data <- reactiveValues()  
     data <- milestones[which(milestones$initiative==input$initiativeoptions),c("milestone","target","milestonejust")]
 
-    
     for (i in 1:nrow(data)) {
-      data$status[i] <- as.character(selectInput(inputId = "milestonestatus", 
+      data$milestone[i] <- as.character(textAreaInput(inputId = paste0("milestone",i), 
+                                                 label = "", 
+                                                 width = "250px",
+                                                 height = "100px",
+                                                 value = milestones$milestone[milestones$initiative==input$initiativeoptions][i]))
+
+      data$target[i] <- as.character(textInput(inputId = paste0("milestonetarget",i), 
+                                                  label = "", 
+                                                  width = "100px",
+                                                  value = milestones$target[milestones$initiative==input$initiativeoptions][i]))
+      
+      data$status[i] <- as.character(selectInput(inputId = paste0("milestonestatus",i), 
                                                  label = "", 
                                                  choices = sort(unique(milestones$milestonestatus)), width = "100px", 
                                                  selected = milestones$milestonestatus[milestones$initiative==input$initiativeoptions][i]))
-    }
-    
-    for (i in 1:nrow(data)) {
-      data$display[i] <- as.character(selectInput(inputId = "milestoneactive", 
+
+      data$milestonejust[i] <- as.character(textAreaInput(inputId = paste0("milestonejust",i), 
+                                               label = "", 
+                                               width = "300px",
+                                               height = "100px",
+                                               value = milestones$milestonejust[milestones$initiative==input$initiativeoptions][i]))
+      
+      data$display[i] <- as.character(selectInput(inputId = paste0("milestoneactive",i), 
                                                  label = "", 
                                                  choices = sort(unique(milestones$milestoneactive)), width = "100px", 
                                                  selected = milestones$milestoneactive[milestones$initiative==input$initiativeoptions][i]))
@@ -293,10 +431,10 @@ server <- function(input, output, session) {
     data <- data %>% .[,c("milestone","target","status","milestonejust","display")]
     colnames(data) <- c("Milestone","Target","Status","Status.Justification","Display.On.FY20.Dashboard")
     
-    output$milestonedataoutput = DT::renderDataTable(
-      data, escape = F, editable = T, selection = 'none', server = T,
-      options = list(dom = 't', paging = F, ordering = F),
-      rownames = F, 
+    output$milestonedataoutput <- DT::renderDataTable(
+      data, extensions = 'Buttons', escape = F, editable = T, selection = 'none', server = F,
+      options = list(dom = 'Bt', pageLength = 50),
+      rownames = F,
       callback = JS("table.rows().every(function(i, tab, row) {
         var $this = $(this.node());
         $this.attr('id', this.data()[0]);
@@ -305,41 +443,78 @@ server <- function(input, output, session) {
       Shiny.unbindAll(table.table().node());
       Shiny.bindAll(table.table().node());")
     )
-    
-    # milestonerow <- 
-    #   data %>% 
-    #   slice(1) %>% 
-    #   # transpose the first row of data into two columns
-    #   gather(key = "column_name", value = "value") %>%
-    #   # replace all values with ""
-    #   mutate(value = "") %>%
-    #   # reshape the data from long to wide
-    #   spread(column_name, value) %>%
-    #   # rearrange the column order to match that of data
-    #   select(colnames(data))
-    # 
-    # # store a proxy of milestone table 
-    # proxy <- dataTableProxy(outputId = "milestonedataoutput")
-    # 
-    # # each time addData is pressed, add data to proxy
-    # observeEvent(input$addMilestoneData, {
-    #   proxy %>% 
-    #     addRow(milestonerow)
-    # })
-    # 
+  
   })
   
+    
+    # store a proxy of milestone table
+    milestoneproxy <- dataTableProxy(outputId = "milestonedataoutput")
 
-  
+    # each time addData is pressed, add data to proxy
+    observeEvent(input$addMilestoneData, {
+      
+      milestonerow <- reactiveValues()
+      
+      for(i in length(input$milestonedataoutput_rows_all)+1) {
+        milestonerow <- data.frame(Milestone=as.character(textAreaInput(inputId = paste0("milestone",i),
+                                                                        label = "",
+                                                                        width = "250px",
+                                                                        height = "100px",
+                                                                        placeholder = "Insert new milestone text here")),
+                                   Target=as.character(textInput(inputId = paste0("milestonetarget",i),
+                                                                 label = "",
+                                                                 width = "100px",
+                                                                 placeholder = "MM/YYYY")),
+                                   Status=as.character(selectInput(inputId = paste0("milestonestatus",i), 
+                                                                   label = "", 
+                                                                   choices = sort(unique(milestones$milestonestatus)), width = "100px", 
+                                                                   selected = "")),
+                                   Status.Justification=as.character(textAreaInput(inputId = paste0("milestonejust",i),
+                                                                                   label = "",
+                                                                                   width = "300px",
+                                                                                   height = "100px",
+                                                                                   placeholder = "Insert status justification here")),
+                                   Display.On.FY20.Dashboard=as.character(selectInput(inputId = paste0("milestoneactive",i), 
+                                                                                      label = "", 
+                                                                                      choices = sort(unique(milestones$milestoneactive)), width = "100px", 
+                                                                                      selected = "")))
+      }
+      
+
+      # add row
+      milestoneproxy %>%
+        addRow(milestonerow)
+      
+    })
+
+  # global <- reactiveValues()
+  # 
+  # observe({
+  #   inp = c()
+  #   for(name in names(input)){
+  #    
+  #       inp <- c(inp, name)
+  # 
+  #   }
+  #   isolate(global$inputs <- inp)
+  # })
+  # 
+  # output$textOp <- renderText({
+  #   global$inputs
+  # })
+  # 
+  # output$milestonerows <- renderText({
+  #   length(input$milestonedataoutput_rows_all)
+  # })
   
   # whenever a field is filled, aggregate all form data
   formData1 <- reactive({
     initiative_dim_data <- data.frame(t(as.matrix(sapply(initiative_dim_fields, function(x) input[[x]])))) %>%
       mutate(securedanticipatedsum = input$fundssecured+input$fundsanticipated,
-             initiativekey = as.character(initiative_dim$initiativekey[initiative_dim$initiative==input$initiative]),
-             displayorder = initiative_dim$displayorder[initiative_dim$initiative==input$initiative],
-             globalinitiative = initiative_dim$globalinitiative[initiative_dim$initiative==input$initiative],
-             usinitiative = initiative_dim$usinitiative[initiative_dim$initiative==input$initiative])
+             initiativekey = as.character(initiative_dim$initiativekey[initiative_dim$initiative==input$initiativeoptions]),
+             displayorder = initiative_dim$displayorder[initiative_dim$initiative==input$initiativeoptions],
+             globalinitiative = initiative_dim$globalinitiative[initiative_dim$initiative==input$initiativeoptions],
+             usinitiative = initiative_dim$usinitiative[initiative_dim$initiative==input$initiativeoptions])
     initiative_dim_data
   })
   
@@ -358,32 +533,65 @@ server <- function(input, output, session) {
                                                 t(as.matrix(sapply(path2_subcat3_indicator_dim_fields, function(x) input[[x]], USE.NAMES = F)))) %>%
       mutate(indicatortype = c(rep("Outcome",6),rep("Pathway",6)),
              displayorder = c(rep(1,3),rep(2,3),rep(3,3),rep(4,3)),
-             indicatorkey = as.numeric(paste(c(rep(1,6),rep(2,6),initiative_dim$initiativekey[initiative_dim$initiative==input$initiative],"0",c(seq(1:6),seq(1:6))))))
+             indicatorkey = as.numeric(paste0(c(rep(1,6),rep(2,6)),substr(initiative_dim$initiativekey[initiative_dim$initiative==input$initiativeoptions],2,5),"0",c(seq(1:6),seq(1:6)))))
     colnames(init_indicator_dim_data) <- init_indicator_dim_fields
     init_indicator_dim_data
   })
   
+  formData3 <- reactive({
+    
+    # milestone_data <- data.frame(goal=rep(input$goal,length(input$milestonedataoutput_rows_all)),
+    #                              milestone=input$milestonedataoutput$Milestone[1:length(input$milestonedataoutput_rows_all)])
+    # milestone_data <- data.frame(goal=rep(input$goal,length(input$milestonedataoutput_rows_all)),
+    #                              initiative=rep(input$initiative,length(input$milestonedataoutput_rows_all)),
+    #                              milestone=as.matrix(sapply(1:length(input$milestonedataoutput_rows_all), function(x) input[[paste0("milestone",x)]])),
+    #                              target=as.matrix(sapply(1:length(input$milestonedataoutput_rows_all), function(x) input[[paste0("milestonetarget",x)]])))
+                                 # milestonestatus=as.matrix(sapply(1:length(input$milestonedataoutput_rows_all), function(x) input[[paste0("milestonestatus",x)]])),
+                                 # milestonejust=as.matrix(sapply(1:length(input$milestonedataoutput_rows_all), function(x) input[[paste0("milestonejust",x)]])),
+                                 # milestonecreation=NA,
+                                 # milestonestart=NA,
+                                 # milestoneend=NA,
+                                 # milestoneactive=as.matrix(sapply(1:length(input$milestonedataoutput_rows_all), function(x) input[[paste0("milestoneactive",x)]])))
+# 
+#       milestone_data
+
+  })
   
+
   # define'saveData' function
-  saveData <- function(data1,data2) {
+  saveData <- function(data1,data2,data3) {
+    
+    initiative_dim <<- import('COMPS/responses/FY21_initiative_dim.csv')
+    init_indicator_dim <<- import('COMPS/responses/FY21_init_indicator_dim.csv')
+    init_indicator_fact <<- import('COMPS/responses/FY21_init_indicator_fact.csv')
+    milestones <<- import('COMPS/responses/FY21_milestones.csv', colClasses = c(target = "character")) %>% 
+      mutate(milestonestatus = factor(milestonestatus, levels = c("","Opportunity","Progress","Barrier","Support","Contingent"), ordered = T))
+    
     data1 <- rbind(initiative_dim, 
                    data1 %>% mutate(timestamp = format(Sys.time(), format="%Y%m%d%H%M")))
     data2 <- rbind(init_indicator_dim,
                    data2 %>% mutate(timestamp = format(Sys.time(), format="%Y%m%d%H%M")))
+    # data3 <- rbind(milestones, data3)
     
     # Write the files to the local system
     write.csv(
       x = data1,
-      file = "COMPS/responses/FY21_initiative_dim.csv", 
+      file = "COMPS/responses/FY21_initiative_dim_TEST.csv", 
       row.names = FALSE, quote = TRUE
     )
     
     write.csv(
       x = data2,
-      file = "COMPS/responses/FY21_init_indicator_dim.csv",
+      file = "COMPS/responses/FY21_init_indicator_dim_TEST.csv",
       row.names = FALSE, quote = TRUE
     )
     
+    write.csv(
+      x = data3,
+      file = "COMPS/responses/FY21_milestones_TEST.csv",
+      row.names = FALSE, quote = TRUE
+    )
+
   }
   
   # ***TO DO: BEFORE SAVING, HAVE USERS HIT A 'REFRESH' BUTTON TO ENSURE THEY ARE WRITING THEIR DATA TO NEWEST VERSION OF FILE***
@@ -391,10 +599,8 @@ server <- function(input, output, session) {
   
   # When the Save button is clicked, save the form data
   observeEvent(input$save, {
-    saveData(formData1(),formData2())
+    saveData(formData1(),formData2(),formData3())
     output$confirmsave <- renderText({ "Saved!" })
-    initiative_dim <<- import('COMPS/responses/FY21_initiative_dim.csv', colClasses = c(initiativekey = "character"))
-    init_indicator_dim <<- import('COMPS/responses/FY21_init_indicator_dim.csv')
   })
 
 }

@@ -2,7 +2,7 @@
 
 # ---- load libraries ----
 
-pacman::p_load(rio, bit64, dplyr, shiny, shinyBS, DT)
+pacman::p_load(rio, bit64, tidyr, dplyr, shiny, shinyjs, shinyBS, DT)
 
 
 # # ---- call data frames ----
@@ -18,7 +18,7 @@ pacman::p_load(rio, bit64, dplyr, shiny, shinyBS, DT)
 initiative_dim_fields <- c("goal","initiative","initiativelead","email","initiativestart","initiativeend",
                            "initiativestatement","initiativestatus","initiativejust","fundsneeded","fundssecured","fundsanticipated")
 
-init_indicator_dim_fields <- c("goal","initiative","statement","indicatordescription","indicatorlabel","indicatorlabelabbr","indicatorunits",
+init_indicator_dim_fields <- c("goal","initiative","statement","indicatordescription","indicatorlabel","indicatorunits",
                                "indicatorsource","subcat","subcattarget","indicatortype","displayorder","indicatorkey")
 
 out1_subcat1_indicator_dim_fields <- c("goal","initiative","outcome1statement","out1indicator","out1indicatorlabel",

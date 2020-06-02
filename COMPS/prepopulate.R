@@ -74,9 +74,14 @@ prePopulate <- function(selectedinitiative, session) {
     
     updateSelectInput(session,
                       inputId = "out1numtrend",
-                      selected = length(init_indicator_dim$subcat[init_indicator_dim$initiative==selectedinitiative & 
-                                                                    init_indicator_dim$displayorder==1 &
-                                                                    !is.na(init_indicator_dim$indicatorlabel)]))
+                      selected = ifelse(length(init_indicator_dim$subcat[init_indicator_dim$initiative==selectedinitiative & 
+                                                                           init_indicator_dim$displayorder==1 &
+                                                                           (!is.na(init_indicator_dim$subcat) & init_indicator_dim$subcat!="") & 
+                                                                           init_indicator_dim$timestamp==max(init_indicator_dim$timestamp[which(init_indicator_dim$initiative==selectedinitiative)])])==0,1,
+                                        length(init_indicator_dim$subcat[init_indicator_dim$initiative==selectedinitiative & 
+                                                                           init_indicator_dim$displayorder==1 &
+                                                                           (!is.na(init_indicator_dim$subcat) & init_indicator_dim$subcat!="") & 
+                                                                           init_indicator_dim$timestamp==max(init_indicator_dim$timestamp[which(init_indicator_dim$initiative==selectedinitiative)])])))
 
     
     # outcome 2 info
@@ -117,8 +122,108 @@ prePopulate <- function(selectedinitiative, session) {
     
     updateSelectInput(session,
                       inputId = "out2numtrend",
-                      selected = length(init_indicator_dim$subcat[init_indicator_dim$initiative==selectedinitiative & 
+                      selected = ifelse(length(init_indicator_dim$subcat[init_indicator_dim$initiative==selectedinitiative & 
                                                                     init_indicator_dim$displayorder==2 &
-                                                                    !is.na(init_indicator_dim$subcat)]))
+                                                                    (!is.na(init_indicator_dim$subcat) & init_indicator_dim$subcat!="") & 
+                                                                    init_indicator_dim$timestamp==max(init_indicator_dim$timestamp[which(init_indicator_dim$initiative==selectedinitiative)])])==0,1,
+                                        length(init_indicator_dim$subcat[init_indicator_dim$initiative==selectedinitiative & 
+                                                                           init_indicator_dim$displayorder==2 &
+                                                                           (!is.na(init_indicator_dim$subcat) & init_indicator_dim$subcat!="") & 
+                                                                           init_indicator_dim$timestamp==max(init_indicator_dim$timestamp[which(init_indicator_dim$initiative==selectedinitiative)])])))
     
+    
+    # pathway 1 info
+    updateTextInput(session,
+                    inputId = "pathway1statement",
+                    value = init_indicator_dim$statement[init_indicator_dim$initiative==selectedinitiative &
+                                                           init_indicator_dim$displayorder==3 &
+                                                           substr(init_indicator_dim$indicatorkey,7,7)=="1" & 
+                                                           init_indicator_dim$timestamp==max(init_indicator_dim$timestamp[which(init_indicator_dim$initiative==selectedinitiative)])])
+    
+    updateTextInput(session,
+                    inputId ="path1indicator",
+                    value = init_indicator_dim$indicatordescription[init_indicator_dim$initiative==selectedinitiative &
+                                                                      init_indicator_dim$displayorder==3 &
+                                                                      substr(init_indicator_dim$indicatorkey,7,7)=="1" & 
+                                                                      init_indicator_dim$timestamp==max(init_indicator_dim$timestamp[which(init_indicator_dim$initiative==selectedinitiative)])])
+    
+    updateTextInput(session,
+                    inputId = "path1indicatorlabel", 
+                    value = init_indicator_dim$indicatorlabel[init_indicator_dim$initiative==selectedinitiative &
+                                                                init_indicator_dim$displayorder==3 &
+                                                                substr(init_indicator_dim$indicatorkey,7,7)=="1" & 
+                                                                init_indicator_dim$timestamp==max(init_indicator_dim$timestamp[which(init_indicator_dim$initiative==selectedinitiative)])])
+    
+    updateTextInput(session,
+                    inputId = "path1indicatorunits",
+                    value = init_indicator_dim$indicatorunits[init_indicator_dim$initiative==selectedinitiative &
+                                                                init_indicator_dim$displayorder==3 &
+                                                                substr(init_indicator_dim$indicatorkey,7,7)=="1" & 
+                                                                init_indicator_dim$timestamp==max(init_indicator_dim$timestamp[which(init_indicator_dim$initiative==selectedinitiative)])])
+    
+    updateTextInput(session,
+                    inputId = "path1indicatorsource",
+                    value = init_indicator_dim$indicatorsource[init_indicator_dim$initiative==selectedinitiative &
+                                                                 init_indicator_dim$displayorder==3 &
+                                                                 substr(init_indicator_dim$indicatorkey,7,7)=="1" & 
+                                                                 init_indicator_dim$timestamp==max(init_indicator_dim$timestamp[which(init_indicator_dim$initiative==selectedinitiative)])])
+    
+    updateSelectInput(session,
+                      inputId = "path1numtrend",
+                      selected = ifelse(length(init_indicator_dim$subcat[init_indicator_dim$initiative==selectedinitiative & 
+                                                                           init_indicator_dim$displayorder==3 &
+                                                                           (!is.na(init_indicator_dim$subcat) & init_indicator_dim$subcat!="") & 
+                                                                           init_indicator_dim$timestamp==max(init_indicator_dim$timestamp[which(init_indicator_dim$initiative==selectedinitiative)])])==0,1,
+                                        length(init_indicator_dim$subcat[init_indicator_dim$initiative==selectedinitiative & 
+                                                                           init_indicator_dim$displayorder==3 &
+                                                                           (!is.na(init_indicator_dim$subcat) & init_indicator_dim$subcat!="") & 
+                                                                           init_indicator_dim$timestamp==max(init_indicator_dim$timestamp[which(init_indicator_dim$initiative==selectedinitiative)])])))
+    
+    
+    # pathway 2 info
+    updateTextInput(session,
+                    inputId = "pathway2statement",
+                    value = init_indicator_dim$statement[init_indicator_dim$initiative==selectedinitiative &
+                                                           init_indicator_dim$displayorder==4 &
+                                                           substr(init_indicator_dim$indicatorkey,7,7)=="4" & 
+                                                           init_indicator_dim$timestamp==max(init_indicator_dim$timestamp[which(init_indicator_dim$initiative==selectedinitiative)])])
+    
+    updateTextInput(session,
+                    inputId ="path2indicator",
+                    value = init_indicator_dim$indicatordescription[init_indicator_dim$initiative==selectedinitiative &
+                                                                      init_indicator_dim$displayorder==4 &
+                                                                      substr(init_indicator_dim$indicatorkey,7,7)=="4" & 
+                                                                      init_indicator_dim$timestamp==max(init_indicator_dim$timestamp[which(init_indicator_dim$initiative==selectedinitiative)])])
+    
+    updateTextInput(session,
+                    inputId = "path2indicatorlabel", 
+                    value = init_indicator_dim$indicatorlabel[init_indicator_dim$initiative==selectedinitiative &
+                                                                init_indicator_dim$displayorder==4 &
+                                                                substr(init_indicator_dim$indicatorkey,7,7)=="4" & 
+                                                                init_indicator_dim$timestamp==max(init_indicator_dim$timestamp[which(init_indicator_dim$initiative==selectedinitiative)])])
+    
+    updateTextInput(session,
+                    inputId = "path2indicatorunits",
+                    value = init_indicator_dim$indicatorunits[init_indicator_dim$initiative==selectedinitiative &
+                                                                init_indicator_dim$displayorder==4 &
+                                                                substr(init_indicator_dim$indicatorkey,7,7)=="4" & 
+                                                                init_indicator_dim$timestamp==max(init_indicator_dim$timestamp[which(init_indicator_dim$initiative==selectedinitiative)])])
+    
+    updateTextInput(session,
+                    inputId = "path2indicatorsource",
+                    value = init_indicator_dim$indicatorsource[init_indicator_dim$initiative==selectedinitiative &
+                                                                 init_indicator_dim$displayorder==4 &
+                                                                 substr(init_indicator_dim$indicatorkey,7,7)=="4" & 
+                                                                 init_indicator_dim$timestamp==max(init_indicator_dim$timestamp[which(init_indicator_dim$initiative==selectedinitiative)])])
+    
+    updateSelectInput(session,
+                      inputId = "path2numtrend",
+                      selected = ifelse(length(init_indicator_dim$subcat[init_indicator_dim$initiative==selectedinitiative & 
+                                                                           init_indicator_dim$displayorder==4 &
+                                                                           (!is.na(init_indicator_dim$subcat) & init_indicator_dim$subcat!="") & 
+                                                                           init_indicator_dim$timestamp==max(init_indicator_dim$timestamp[which(init_indicator_dim$initiative==selectedinitiative)])])==0,1,
+                                        length(init_indicator_dim$subcat[init_indicator_dim$initiative==selectedinitiative & 
+                                                                           init_indicator_dim$displayorder==4 &
+                                                                           (!is.na(init_indicator_dim$subcat) & init_indicator_dim$subcat!="") & 
+                                                                           init_indicator_dim$timestamp==max(init_indicator_dim$timestamp[which(init_indicator_dim$initiative==selectedinitiative)])])))
 }
