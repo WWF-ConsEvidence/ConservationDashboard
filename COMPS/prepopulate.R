@@ -36,6 +36,21 @@ prePopulate <- function(selectedinitiative, session) {
                     value = initiative_dim$initiativestatement[initiative_dim$initiative==selectedinitiative & 
                                                                  initiative_dim$timestamp==max(initiative_dim$timestamp[which(initiative_dim$initiative==selectedinitiative)])])
     
+    updateNumericInput(session,
+                       inputId = "fundsneeded",
+                       value = initiative_dim$fundsneeded[initiative_dim$initiative==selectedinitiative & 
+                                                                    initiative_dim$timestamp==max(initiative_dim$timestamp[which(initiative_dim$initiative==selectedinitiative)])])
+    
+    updateNumericInput(session,
+                       inputId = "fundssecured",
+                       value = initiative_dim$fundssecured[initiative_dim$initiative==selectedinitiative & 
+                                                            initiative_dim$timestamp==max(initiative_dim$timestamp[which(initiative_dim$initiative==selectedinitiative)])])
+    
+    updateNumericInput(session,
+                       inputId = "fundsanticipated",
+                       value = initiative_dim$fundsanticipated[initiative_dim$initiative==selectedinitiative & 
+                                                            initiative_dim$timestamp==max(initiative_dim$timestamp[which(initiative_dim$initiative==selectedinitiative)])])
+    
     # outcome 1 info
     updateTextInput(session,
                     inputId = "outcome1statement",
