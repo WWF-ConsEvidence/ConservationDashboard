@@ -1,4 +1,6 @@
 
+# code: functions for each outcome and pathway, rendering a ui for the number of subcategories selected
+
 # outcome 1 conditional panels for trend data
 outcome1Conditional <- 
   function(selectedinitiative, input, output) {
@@ -12,16 +14,19 @@ outcome1Conditional <-
                                                                   substr(init_indicator_fact$indicatorkey,7,7)=="1" & 
                                                                   substr(init_indicator_fact$indicatorkey,1,1)=="1" & 
                                                                   init_indicator_fact$timestamp==max(init_indicator_fact$timestamp[
-                                                                    which(init_indicator_fact$initiative==selectedinitiative)])])),
+                                                                    which(init_indicator_fact$initiative==selectedinitiative)])]),
+                               width = 200),
                   numericInput(inputId = "out1subcat1target",
                                label = "Target Value",
                                value = init_indicator_dim$subcattarget[init_indicator_dim$initiative==selectedinitiative &
                                                                          substr(init_indicator_dim$indicatorkey,7,7)=="1" & 
                                                                          substr(init_indicator_dim$indicatorkey,1,1)=="1" & 
                                                                          init_indicator_dim$timestamp==max(init_indicator_dim$timestamp[
-                                                                           which(init_indicator_dim$initiative==selectedinitiative)])]),
-                  h5(tags$em("Current data")),
-                  DT::dataTableOutput(outputId = "out1subcat1data"),
+                                                                           which(init_indicator_dim$initiative==selectedinitiative)])],
+                               width = 200),
+                  tags$br(),
+                  h5(tags$em("Current data:")),
+                  DT::dataTableOutput(outputId = "out1subcat1data", width = 300),
                   actionButton(inputId = "addout1subcat1Data",
                                label = "Add Row"),
                   hidden(textInput("out1subcat1","")),
@@ -33,7 +38,7 @@ outcome1Conditional <-
                   hidden(numericInput("out1subcat3target","","")))) else {
                                  if(input$out1numtrend == 2) return(
                                    tagList(tags$hr(),
-                                           h5(tags$b("TREND 1")),
+                                           h4(tags$b("TREND 1")),
                                            tags$br(),
                                            textInput(inputId = "out1subcat1",
                                                      label = "Label",
@@ -48,19 +53,24 @@ outcome1Conditional <-
                                                                                                substr(init_indicator_fact$indicatorkey,7,7)=="1" & 
                                                                                                substr(init_indicator_fact$indicatorkey,1,1)=="1" & 
                                                                                                init_indicator_fact$timestamp==max(init_indicator_fact$timestamp[
-                                                                                                 which(init_indicator_fact$initiative==selectedinitiative)])])),
+                                                                                                 which(init_indicator_fact$initiative==selectedinitiative)])]),
+                                                        width = 200),
                                            numericInput(inputId = "out1subcat1target",
                                                         label = "Target Value",
                                                         value = init_indicator_dim$subcattarget[init_indicator_dim$initiative==selectedinitiative &
                                                                                                   substr(init_indicator_dim$indicatorkey,7,7)=="1" & 
                                                                                                   substr(init_indicator_dim$indicatorkey,1,1)=="1" & 
                                                                                                   init_indicator_dim$timestamp==max(init_indicator_dim$timestamp[
-                                                                                                    which(init_indicator_dim$initiative==selectedinitiative)])]),
-                                           DT::dataTableOutput(outputId = "out1subcat1data"),
+                                                                                                    which(init_indicator_dim$initiative==selectedinitiative)])],
+                                                        
+                                                        width = 200),
+                                           tags$br(),
+                                           h5(tags$em("Current data:")),
+                                           DT::dataTableOutput(outputId = "out1subcat1data", width = 300),
                                            actionButton(inputId = "addout1subcat1Data",
                                                         label = "Add Row"),
                                            tags$hr(),
-                                           h5(tags$b("TREND 2")),
+                                           h4(tags$b("TREND 2")),
                                            tags$br(),
                                            textInput(inputId = "out1subcat2",
                                                      label = "Label",
@@ -75,19 +85,26 @@ outcome1Conditional <-
                                                                                                substr(init_indicator_fact$indicatorkey,7,7)=="2" & 
                                                                                                substr(init_indicator_fact$indicatorkey,1,1)=="1" & 
                                                                                                init_indicator_fact$timestamp==max(init_indicator_fact$timestamp[
-                                                                                                 which(init_indicator_fact$initiative==selectedinitiative)])])),
+                                                                                                 which(init_indicator_fact$initiative==selectedinitiative)])]),
+                                                        width = 200),
                                            numericInput(inputId = "out1subcat2target",
                                                         label = "Target Value",
                                                         value = init_indicator_dim$subcattarget[init_indicator_dim$initiative==selectedinitiative &
                                                                                                   substr(init_indicator_dim$indicatorkey,7,7)=="2" & 
                                                                                                   substr(init_indicator_dim$indicatorkey,1,1)=="1" & 
                                                                                                   init_indicator_dim$timestamp==max(init_indicator_dim$timestamp[
-                                                                                                    which(init_indicator_dim$initiative==selectedinitiative)])]),
+                                                                                                    which(init_indicator_dim$initiative==selectedinitiative)])],
+                                                        width = 200),
+                                           tags$br(),
+                                           h5(tags$em("Current data:")),
+                                           DT::dataTableOutput(outputId = "out1subcat2data", width = 300),
+                                           actionButton(inputId = "addout1subcat2Data",
+                                                        label = "Add Row"),
                                            hidden(textInput("out1subcat3","")),
                                            hidden(numericInput("out1subcat3year","","")),
                                            hidden(numericInput("out1subcat3target","","")))) else {
                                                           tagList(tags$hr(),
-                                                                  h5(tags$b("TREND 1")),
+                                                                  h4(tags$b("TREND 1")),
                                                                   tags$br(),
                                                                   textInput(inputId = "out1subcat1",
                                                                             label = "Label",
@@ -102,19 +119,23 @@ outcome1Conditional <-
                                                                                                                       substr(init_indicator_fact$indicatorkey,7,7)=="1" & 
                                                                                                                       substr(init_indicator_fact$indicatorkey,1,1)=="1" & 
                                                                                                                       init_indicator_fact$timestamp==max(init_indicator_fact$timestamp[
-                                                                                                                        which(init_indicator_fact$initiative==selectedinitiative)])])),
+                                                                                                                        which(init_indicator_fact$initiative==selectedinitiative)])]),
+                                                                               width = 200),
                                                                   numericInput(inputId = "out1subcat1target",
                                                                                label = "Target Value",
                                                                                value = init_indicator_dim$subcattarget[init_indicator_dim$initiative==selectedinitiative &
                                                                                                                          substr(init_indicator_dim$indicatorkey,7,7)=="1" & 
                                                                                                                          substr(init_indicator_dim$indicatorkey,1,1)=="1" & 
                                                                                                                          init_indicator_dim$timestamp==max(init_indicator_dim$timestamp[
-                                                                                                                           which(init_indicator_dim$initiative==selectedinitiative)])]),
-                                                                  DT::dataTableOutput(outputId = "out1subcat1data"),
+                                                                                                                           which(init_indicator_dim$initiative==selectedinitiative)])], 
+                                                                               width = 200),
+                                                                  tags$br(),
+                                                                  h5(tags$em("Current data:")),
+                                                                  DT::dataTableOutput(outputId = "out1subcat1data", width = 300),
                                                                   actionButton(inputId = "addout1subcat1Data",
                                                                                label = "Add Row"),
                                                                   tags$hr(),
-                                                                  h5(tags$b("TREND 2")),
+                                                                  h4(tags$b("TREND 2")),
                                                                   tags$br(),
                                                                   textInput(inputId = "out1subcat2",
                                                                             label = "Label",
@@ -129,16 +150,23 @@ outcome1Conditional <-
                                                                                                                       substr(init_indicator_fact$indicatorkey,7,7)=="2" & 
                                                                                                                       substr(init_indicator_fact$indicatorkey,1,1)=="1" & 
                                                                                                                       init_indicator_fact$timestamp==max(init_indicator_fact$timestamp[
-                                                                                                                        which(init_indicator_fact$initiative==selectedinitiative)])])),
+                                                                                                                        which(init_indicator_fact$initiative==selectedinitiative)])]),
+                                                                               width = 200),
                                                                   numericInput(inputId = "out1subcat2target",
                                                                                label = "Target Value",
                                                                                value = init_indicator_dim$subcattarget[init_indicator_dim$initiative==selectedinitiative &
                                                                                                                          substr(init_indicator_dim$indicatorkey,7,7)=="2" & 
                                                                                                                          substr(init_indicator_dim$indicatorkey,1,1)=="1" & 
                                                                                                                          init_indicator_dim$timestamp==max(init_indicator_dim$timestamp[
-                                                                                                                           which(init_indicator_dim$initiative==selectedinitiative)])]),
+                                                                                                                           which(init_indicator_dim$initiative==selectedinitiative)])],
+                                                                               width = 200),
+                                                                  tags$br(),
+                                                                  h5(tags$em("Current data:")),
+                                                                  DT::dataTableOutput(outputId = "out1subcat2data", width = 300),
+                                                                  actionButton(inputId = "addout1subcat2Data",
+                                                                               label = "Add Row"),
                                                                   tags$hr(),
-                                                                  h5(tags$b("TREND 3")),
+                                                                  h4(tags$b("TREND 3")),
                                                                   tags$br(),
                                                                   textInput(inputId = "out1subcat3",
                                                                             label = "Label",
@@ -153,14 +181,22 @@ outcome1Conditional <-
                                                                                                                       substr(init_indicator_fact$indicatorkey,7,7)=="3" & 
                                                                                                                       substr(init_indicator_fact$indicatorkey,1,1)=="1" & 
                                                                                                                       init_indicator_fact$timestamp==max(init_indicator_fact$timestamp[
-                                                                                                                        which(init_indicator_fact$initiative==selectedinitiative)])])),
+                                                                                                                        which(init_indicator_fact$initiative==selectedinitiative)])]),
+                                                                               width = 200),
                                                                   numericInput(inputId = "out1subcat3target",
                                                                                label = "Target Value",
                                                                                value = init_indicator_dim$subcattarget[init_indicator_dim$initiative==selectedinitiative &
                                                                                                                          substr(init_indicator_dim$indicatorkey,7,7)=="3" & 
                                                                                                                          substr(init_indicator_dim$indicatorkey,1,1)=="1" & 
                                                                                                                          init_indicator_dim$timestamp==max(init_indicator_dim$timestamp[
-                                                                                                                           which(init_indicator_dim$initiative==selectedinitiative)])]))
+                                                                                                                           which(init_indicator_dim$initiative==selectedinitiative)])],
+                                                                               width = 200),
+                                                                  tags$br(),
+                                                                  h5(tags$em("Current data:")),
+                                                                  DT::dataTableOutput(outputId = "out1subcat3data", width = 300),
+                                                                  actionButton(inputId = "addout1subcat3Data",
+                                                                               label = "Add Row"))
+                                             
                                                         }
                                }
       }

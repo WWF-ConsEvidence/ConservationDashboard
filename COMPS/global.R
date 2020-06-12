@@ -2,7 +2,7 @@
 
 # ---- load libraries ----
 
-pacman::p_load(rio, bit64, tidyr, dplyr, shiny, shinyjs, shinyBS, DT)
+pacman::p_load(rio, bit64, tidyr, stringr, dplyr, shiny, shinyalert, shinythemes, shinyjs, shinyBS, DT)
 
 
 # # ---- call data frames ----
@@ -46,3 +46,6 @@ path2_subcat2_indicator_dim_fields <- c("goal","initiative","pathway2statement",
 path2_subcat3_indicator_dim_fields <- c("goal","initiative","pathway2statement","path2indicator","path2indicatorlabel",
                                         "path2indicatorunits","path2indicatorsource","path2subcat3","path2subcat3target")
 
+# ---- source images for added guidance ---- 
+
+Dashboard_intro <- base64enc::dataURI(file="COMPS/guidance/Dashboard_intro.png", mime="image/png")
