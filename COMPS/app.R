@@ -23,6 +23,7 @@ ui <- fluidPage(
   useShinyjs(),
   useShinyalert(),
   
+  # add 'loading' bar for whenever app is busy
   tags$head(tags$style(type="text/css", "
              #loadmessage {
                position: fixed;
@@ -88,6 +89,7 @@ ui <- fluidPage(
       tags$br(),
       width = 2),
     
+      
     # Define tabs
     mainPanel(div(tabsetPanel(id = "tabs",
         type="tabs",
@@ -460,6 +462,7 @@ ui <- fluidPage(
                        value = NULL))), class = "span7"))),
   
   
+  # Save button at bottom of app page
   tags$div(tags$br(),
     tags$hr(tags$style(HTML("hr {border-top: 1px solid #000000;}"))),
     tags$br(),
@@ -474,7 +477,7 @@ ui <- fluidPage(
     tags$br(),
     conditionalPanel(condition="$('html').hasClass('shiny-busy')",
                      tags$div("Loading...",id="loadmessage")),
-    h2("..."))) # fluid page
+    h2("...")))
 
 
 # 
