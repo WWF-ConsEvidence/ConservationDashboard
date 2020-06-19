@@ -2,12 +2,15 @@
 .Rhistory
 .RData
 .Ruserdata
+
 1_Nov2018/2_FlatDataFiles/ConsDB_Input
 1_Nov2018/2_FlatDataFiles/ConsDB_Output
 2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019
 2_Oct2019_US/2_FlatDataFiles/ConsDB_Output_2019
+
 COMPS/responses
 COMPS/guidance
-COMPS/backup
+COMPS/backups
+COMPS/rsconnect
 COMPS/.httr-oauth
 COMPS/droptoken.rds
