@@ -491,6 +491,13 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
   
+  initiative_dim <<- drop_read_csv('GitHub/ConservationDashboard/COMPS/responses/FY21_initiative_dim.csv', dtoken = token)
+  init_indicator_dim <<- drop_read_csv('GitHub/ConservationDashboard/COMPS/responses/FY21_init_indicator_dim.csv', dtoken = token)
+  init_indicator_fact <<- drop_read_csv('GitHub/ConservationDashboard/COMPS/responses/FY21_init_indicator_fact.csv', dtoken = token)
+  milestones <<- drop_read_csv('GitHub/ConservationDashboard/COMPS/responses/FY21_milestones.csv', dtoken = token) %>% 
+    mutate(milestonestatus = factor(milestonestatus, levels = c("","Opportunity","Progress","Barrier","Support","Contingent"), ordered = T),
+           target = gsub("m","",target))
+  
   # update initiative selection options based on selected goal
   observe({ 
     
