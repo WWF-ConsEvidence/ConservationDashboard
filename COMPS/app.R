@@ -435,7 +435,6 @@ ui <- fluidPage(
                                      align = "left",
                                      h5("What are the status assessment categories?")))),
           tags$hr(),
-          tags$br(),
           h5(HTML("<strong> In the table below, please: <br> 
                   (1) add any new milestones by clicking 'Add Row', <br>
                   (2) identify which milestones (up to 6) will be included on this year's Dashboard by writing 'Yes' or 'No', and <br>

@@ -510,7 +510,7 @@ pathway1Conditional <-
                                width = "25%"),
                   tags$br(),
                   h5(tags$em("Current data:")),
-                  DT::dataTableOutput(outputId = "path1subcat1data", width = ),
+                  DT::dataTableOutput(outputId = "path1subcat1data", width = "35%"),
                   actionButton(inputId = "addpath1subcat1Data",
                                label = "Add Row"),
                   hidden(textInput("path1subcat1","")),
