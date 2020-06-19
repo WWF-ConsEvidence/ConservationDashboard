@@ -8,3 +8,6 @@
 2_Oct2019_US/2_FlatDataFiles/ConsDB_Output_2019
 COMPS/responses
 COMPS/guidance
+COMPS/backup
+COMPS/.httr-oauth
+COMPS/droptoken.rds

@@ -1,16 +1,38 @@
 
+# code: global script for initiative reporting app
+
 
 # ---- load libraries ----
 
-pacman::p_load(rio, bit64, tidyr, stringr, dplyr, shiny, shinyalert, shinythemes, shinyjs, shinyBS, DT)
+library(rio)
+library(rdrop2)
+library(rsconnect)
+library(bit64)
+library(tidyr)
+library(stringr)
+library(dplyr)
+library(shiny)
+library(shinyalert)
+library(shinythemes)
+library(shinyjs)
+library(shinyBS)
+library(shinycssloaders)
+library(DT)
 
 
-# # ---- call data frames ----
-# 
-# milestones <- data.frame("milestone"=c("A","B","C","D"),
-#                         "date" =c(11/2019, 12/2020, 06/2021, 03/2020),
-#                         "status"= c("Barrier","Barrier","Progress","Support"),
-#                         "justification"=c("xyz", "abc", "def", "ghi"))
+# ---- save dropbox token for remote access on shiny.io ----
+
+token <- readRDS("droptoken.rds")
+
+
+# ---- initial import of Dropbox files ----
+
+initiative_dim <<- drop_read_csv('GitHub/ConservationDashboard/COMPS/responses/FY21_initiative_dim.csv', dtoken = token)
+init_indicator_dim <<- drop_read_csv('GitHub/ConservationDashboard/COMPS/responses/FY21_init_indicator_dim.csv', dtoken = token)
+init_indicator_fact <<- drop_read_csv('GitHub/ConservationDashboard/COMPS/responses/FY21_init_indicator_fact.csv', dtoken = token)
+milestones <<- drop_read_csv('GitHub/ConservationDashboard/COMPS/responses/FY21_milestones.csv', dtoken = token) %>% 
+  mutate(milestonestatus = factor(milestonestatus, levels = c("","Opportunity","Progress","Barrier","Support","Contingent"), ordered = T),
+         target = gsub("m","",target))
 
 
 # ---- define fields to be saved from form ----
@@ -46,6 +68,22 @@ path2_subcat2_indicator_dim_fields <- c("goal","initiative","pathway2statement",
 path2_subcat3_indicator_dim_fields <- c("goal","initiative","pathway2statement","path2indicator","path2indicatorlabel",
                                         "path2indicatorunits","path2indicatorsource","path2subcat3","path2subcat3target")
 
-# ---- source images for added guidance ---- 
+# ---- source images for added guidance ----
 
-Dashboard_intro <- base64enc::dataURI(file="COMPS/guidance/Dashboard_intro.png", mime="image/png")
+Dashboard_intro <- base64enc::dataURI(file="guidance/Dashboard_intro.PNG", mime="image/png")
+
+Outcome1_detailintro <- base64enc::dataURI(file="guidance/Outcome1_detailintro.PNG", mime="image/png")
+Outcome1_labels <- base64enc::dataURI(file="guidance/Outcome1_labels.PNG", mime="image/png")
+Outcome1_trends <- base64enc::dataURI(file="guidance/Outcome1_trends.PNG", mime="image/png")
+
+Outcome2_detailintro <- base64enc::dataURI(file="guidance/Outcome2_detailintro.PNG", mime="image/png")
+Outcome2_labels <- base64enc::dataURI(file="guidance/Outcome2_labels.PNG", mime="image/png")
+Outcome2_trends <- base64enc::dataURI(file="guidance/Outcome2_trends.PNG", mime="image/png")
+
+Pathway1_detailintro <- base64enc::dataURI(file="guidance/Pathway1_detailintro.PNG", mime="image/png")
+Pathway1_labels <- base64enc::dataURI(file="guidance/Pathway1_labels.PNG", mime="image/png")
+Pathway1_trends <- base64enc::dataURI(file="guidance/Pathway1_trends.PNG", mime="image/png")
+
+Pathway2_detailintro <- base64enc::dataURI(file="guidance/Pathway2_detailintro.PNG", mime="image/png")
+Pathway2_labels <- base64enc::dataURI(file="guidance/Pathway2_labels.PNG", mime="image/png")
+Pathway2_trends <- base64enc::dataURI(file="guidance/Pathway2_trends.PNG", mime="image/png")
