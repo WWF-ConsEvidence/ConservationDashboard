@@ -77,7 +77,7 @@ observeEvent(input[["milestonestatuscategoriesinfo"]], {
 
 # ---- character limit countdowns ----
 
-output$out1statecharcount <- reactive({ paste0(300-nchar(input$outcome1statement), ' characters remaining.' ) })
+output$out1statecharcount <- reactive({ paste0(300-nchar(input$outcome1statement), ' characters remaining.' )})
 output$out1labelcharcount <- reactive({ paste0(45-nchar(input$out1indicatorlabel), ' characters remaining.' ) })
 output$out1unitscharcount <- reactive({ paste0(50-nchar(input$out1indicatorunits), ' characters remaining.' ) })
 output$out1subcat1charcount <- reactive({ paste0(20-nchar(input$out1subcat1), ' characters remaining.' ) })
@@ -138,3 +138,19 @@ shinyjs::runjs("$('#path2indicatorunits').attr('maxlength', 50)")
 shinyjs::runjs("$('#path2subcat1').attr('maxlength', 20)")
 shinyjs::runjs("$('#path2subcat2').attr('maxlength', 20)")
 shinyjs::runjs("$('#path2subcat3').attr('maxlength', 20)")
+
+
+# ---- last updated reminders ----
+
+output$initiativeassessdate <- reactive ({ 
+  latestyear <- substr(initiative_dim$timestamp[initiative_dim$initiative==input$initiativeoptions & 
+                                                  max(initiative_dim$timestamp[which(initiative_dim$initiative==input$initiativeoptions)])],
+                       1,4)
+  latestmonth <- substr(initiative_dim$timestamp[initiative_dim$initiative==input$initiativeoptions & 
+                                                   max(initiative_dim$timestamp[which(initiative_dim$initiative==input$initiativeoptions)])],
+                        5,6)
+  latestday <- substr(initiative_dim$timestamp[initiative_dim$initiative==input$initiativeoptions & 
+                                                   max(initiative_dim$timestamp[which(initiative_dim$initiative==input$initiativeoptions)])],
+                        7,8)
+  paste0('LAST UPDATED: ',paste(latestmonth,latestday,latestyear,sep="/"))
+  })
