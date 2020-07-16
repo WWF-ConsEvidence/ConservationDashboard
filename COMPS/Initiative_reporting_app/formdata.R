@@ -1,5 +1,9 @@
-
+# 
 # code: form data for saving data to Dropbox
+# 
+# sourced in: COMPS/Initiative_reporting_app/app.R
+# 
+
 
 # initiative dim data
 formData1 <- reactive({
@@ -29,7 +33,10 @@ formData2 <- reactive({
                                               as.data.frame(t(sapply(path2_subcat3_indicator_dim_fields, function(x) input[[x]], USE.NAMES = F)))) %>%
     mutate(indicatortype = c(rep("Outcome",6),rep("Pathway",6)),
            displayorder = c(rep(1,3),rep(2,3),rep(3,3),rep(4,3)),
-           indicatorkey = as.numeric(paste0(c(rep(1,6),rep(2,6)),rv$initiativekey,"0",c(seq(1:6),seq(1:6)))))
+           indicatorkey = as.numeric(paste0(c(rep(1,6),rep(2,6)),rv$initiativekey,"0",c(seq(1:6),seq(1:6)))),
+           desiredtrend = "",
+           indicatorlabelabbr = "",
+           subcatlabelabbr = "")
   colnames(init_indicator_dim_data) <- init_indicator_dim_fields
   init_indicator_dim_data
 })

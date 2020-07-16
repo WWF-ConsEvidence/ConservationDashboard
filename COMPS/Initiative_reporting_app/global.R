@@ -31,7 +31,8 @@ initiative_dim_fields <- c("goal","initiative","initiativelead","email","initiat
                            "initiativestatement","initiativestatus","initiativejust","fundsneeded","fundssecured","fundsanticipated")
 
 init_indicator_dim_fields <- c("goal","initiative","statement","indicatordescription","indicatorlabel","indicatorunits",
-                               "indicatorsource","subcat","subcattarget","indicatortype","displayorder","indicatorkey")
+                               "indicatorsource","subcat","subcattarget","indicatortype","displayorder","indicatorkey",
+                               "desiredtrend","indicatorlabelabbr","subcatlabelabbr")
 
 out1_subcat1_indicator_dim_fields <- c("goal","initiative","outcome1statement","out1indicator","out1indicatorlabel",
                                        "out1indicatorunits","out1indicatorsource","out1subcat1","out1subcat1target")

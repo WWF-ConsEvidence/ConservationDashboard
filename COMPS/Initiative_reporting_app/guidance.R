@@ -143,14 +143,73 @@ shinyjs::runjs("$('#path2subcat3').attr('maxlength', 20)")
 # ---- last updated reminders ----
 
 output$initiativeassessdate <- reactive ({ 
-  latestyear <- substr(initiative_dim$timestamp[initiative_dim$initiative==input$initiativeoptions & 
-                                                  max(initiative_dim$timestamp[which(initiative_dim$initiative==input$initiativeoptions)])],
-                       1,4)
-  latestmonth <- substr(initiative_dim$timestamp[initiative_dim$initiative==input$initiativeoptions & 
-                                                   max(initiative_dim$timestamp[which(initiative_dim$initiative==input$initiativeoptions)])],
-                        5,6)
-  latestday <- substr(initiative_dim$timestamp[initiative_dim$initiative==input$initiativeoptions & 
-                                                   max(initiative_dim$timestamp[which(initiative_dim$initiative==input$initiativeoptions)])],
-                        7,8)
-  paste0('LAST UPDATED: ',paste(latestmonth,latestday,latestyear,sep="/"))
+  
+  initkey <- unique(initiative_dim$initiativekey[initiative_dim$initiative==input$initiativeoptions])
+  current <- initiative_dim$initiativejust[initiative_dim$initiativekey==initkey & 
+                                             initiative_dim$timestamp==max(initiative_dim$timestamp[which(initiative_dim$initiativekey==initkey)])]
+  
+  initstatus <- 
+    initiative_dim %>% 
+    group_by(initiativejust, initiativekey) %>% 
+    summarise(lastchanged = min(timestamp, na.rm = T)) 
+  
+  if(length(initkey)==1) {
+    initstatus <- initstatus %>% filter(initiativekey==initkey & initiativejust==current) }
+  
+  latestyear <- ifelse(length(initkey)==1, substr(initstatus$lastchanged, 1, 4), "")
+  latestmonth <- ifelse(length(initkey)==1, substr(initstatus$lastchanged, 5, 6), "")
+  latestday <- ifelse(length(initkey)==1, substr(initstatus$lastchanged, 7, 8), "")
+  
+  latestdate <- ifelse(length(initkey)==1, paste(latestmonth, latestday, latestyear, sep="/"), "")
+
+  paste0('INITIATIVE STATUS\nLAST UPDATED:\n', latestdate, sep=" ")
   })
+
+
+output$financialdate <- reactive ({ 
+  
+  initkey <- unique(initiative_dim$initiativekey[initiative_dim$initiative==input$initiativeoptions])
+  currentneeded <- initiative_dim$fundsneeded[initiative_dim$initiativekey==initkey & 
+                                                initiative_dim$timestamp==max(initiative_dim$timestamp[which(initiative_dim$initiativekey==initkey)])]
+  currentsecured <- initiative_dim$fundssecured[initiative_dim$initiativekey==initkey & 
+                                                  initiative_dim$timestamp==max(initiative_dim$timestamp[which(initiative_dim$initiativekey==initkey)])]
+  currentanticipated <- initiative_dim$fundsanticipated[initiative_dim$initiativekey==initkey & 
+                                                          initiative_dim$timestamp==max(initiative_dim$timestamp[which(initiative_dim$initiativekey==initkey)])]
+  
+  initfundsneeded <- 
+    initiative_dim %>% 
+    group_by(fundsneeded, initiativekey) %>% 
+    summarise(needed.lastchanged = min(timestamp, na.rm = T)) 
+  
+  initfundssecured <- 
+    initiative_dim %>% 
+    group_by(fundssecured, initiativekey) %>% 
+    summarise(secured.lastchanged = min(timestamp, na.rm = T))
+
+  initfundsanticipated <- 
+    initiative_dim %>% 
+    group_by(fundsanticipated, initiativekey) %>% 
+    summarise(anticipated.lastchanged = min(timestamp, na.rm = T))
+
+  
+  if(length(initkey)==1) {
+    initfundsneeded <- initfundsneeded %>% filter(initiativekey==initkey & fundsneeded==currentneeded)
+    initfundssecured <- initfundssecured %>% filter(initiativekey==initkey & fundssecured==currentsecured)
+    initfundsanticipated <- initfundsanticipated %>% filter(initiativekey==initkey & fundsanticipated==currentanticipated)
+  }
+  
+  
+  initfinance <- 
+    left_join(initfundsneeded, initfundssecured, by = "initiativekey") %>%
+    left_join(initfundsanticipated, by = "initiativekey") %>%
+    mutate(lastchanged = max(needed.lastchanged, secured.lastchanged, anticipated.lastchanged))
+  
+  latestyear <- ifelse(length(initkey)==1, substr(initfinance$lastchanged, 1, 4), "")
+  latestmonth <- ifelse(length(initkey)==1, substr(initfinance$lastchanged, 5, 6), "")
+  latestday <- ifelse(length(initkey)==1, substr(initfinance$lastchanged, 7, 8), "")
+  
+  latestdate <- ifelse(length(initkey==1), paste(latestmonth, latestday, latestyear, sep="/"), "")
+  
+  paste0('FINANCIAL INFORMATION\nLAST UPDATED:\n', latestdate, sep="")
+})
+

@@ -8,9 +8,13 @@
 2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019
 2_Oct2019_US/2_FlatDataFiles/ConsDB_Output_2019
 
-COMPS/responses
-COMPS/guidance
-COMPS/backups
-COMPS/rsconnect
-COMPS/.httr-oauth
-COMPS/droptoken.rds
+COMPS/Dashboard_back_end/x_Flat_data_files/Input
+COMPS/Dashboard_back-end/x_Flat_data_files/Output
+
+COMPS/Initiative_reporting_app/responses
+COMPS/Initiative_reporting_app/guidance
+COMPS/Initiative_reporting_app/rsconnect
+COMPS/Initiative_reporting_app/.httr-oauth
+COMPS/Initiative_reporting_app/droptoken.rds
+
+COMPS/Backup_flatfiles

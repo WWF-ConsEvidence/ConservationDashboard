@@ -6,6 +6,7 @@
 # modified: June 2020, Kelly Claborn
 
 
+
 source('global.R',local=F)
 
 
@@ -40,6 +41,13 @@ ui <- fluidPage(
              }"),
             tags$style(type="text/css", "
                        #initiativeassessdate {
+                        background-color: #29ABE0;
+                        color: #FFFFFF;
+                        font-size: 20px;
+                        font-style: bold;
+                       }"),
+            tags$style(type="text/css", "
+                       #financialdate {
                         background-color: #29ABE0;
                         color: #FFFFFF;
                         font-size: 20px;
@@ -88,7 +96,7 @@ ui <- fluidPage(
   sidebarLayout(sidebarPanel(h4(HTML("<strong>COMPLETING THIS REPORT:</strong>")),
       h4("After pre-populating your report, click through each tab to provide updated information where applicable."),
       tags$br(),
-      h5(HTML("<p class = 'text-success'><strong>More specifically, be sure to: </strong> <br> <br> 
+      h5(HTML("<strong>More specifically, be sure to: </strong> <br> <br> 
                  (1) update the overall initiative status assessment on the “Initiative Information” tab <br> <br>
                  (2) add any new data points for the Outcomes and Pathways <br> <br>
                  (3) update the milestones to be displayed on the FY20 Dashboard on the “Milestones” tab <br> <br>
@@ -139,10 +147,10 @@ ui <- fluidPage(
                                                   class = "btn-info")))),
           tags$hr(),
           tags$table(style = "width: 100%",
-                     tags$tr(tags$td(style = "width: 80%",
+                     tags$tr(tags$td(style = "width: 70%",
                                      align = "left",
                                      tags$b(h4("Overall Initiative Status Assessment"))),
-                             tags$td(style = "width: 20%",
+                             tags$td(style = "width: 30%",
                                      align = "center",
                                      textOutput("initiativeassessdate")))),
           tags$br(),
@@ -473,7 +481,13 @@ ui <- fluidPage(
           tags$b("Financial Information"),
           tags$b(h3("FINANCIAL INFORMATION")),
           tags$br(),
-          h4("What is the total cost budget for FY21-FY23?"),
+          tags$table(style = "width: 100%",
+                     tags$tr(tags$td(style = "width: 70%",
+                                     align = "left",
+                                     tags$b(h4("What is the total cost budget for FY21-FY23?"))),
+                             tags$td(style = "width: 30%",
+                                     align = "center",
+                                     textOutput("financialdate")))),
           tags$br(),
           numericInput(inputId = "fundsneeded",
                        label = "Total Cost Budget",
@@ -515,10 +529,10 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
   
-  initiative_dim <<- drop_read_csv('GitHub/ConservationDashboard/COMPS/responses/FY21_initiative_dim.csv', dtoken = token)
-  init_indicator_dim <<- drop_read_csv('GitHub/ConservationDashboard/COMPS/responses/FY21_init_indicator_dim.csv', dtoken = token)
-  init_indicator_fact <<- drop_read_csv('GitHub/ConservationDashboard/COMPS/responses/FY21_init_indicator_fact.csv', dtoken = token)
-  milestones <<- drop_read_csv('GitHub/ConservationDashboard/COMPS/responses/FY21_milestones.csv', dtoken = token) %>% 
+  initiative_dim <<- drop_read_csv('GitHub/ConservationDashboard/COMPS/Initiative_reporting_app/responses/FY21_initiative_dim.csv', dtoken = token)
+  init_indicator_dim <<- drop_read_csv('GitHub/ConservationDashboard/COMPS/Initiative_reporting_app/responses/FY21_init_indicator_dim.csv', dtoken = token)
+  init_indicator_fact <<- drop_read_csv('GitHub/ConservationDashboard/COMPS/Initiative_reporting_app/responses/FY21_init_indicator_fact.csv', dtoken = token)
+  milestones <<- drop_read_csv('GitHub/ConservationDashboard/COMPS/Initiative_reporting_app/responses/FY21_milestones.csv', dtoken = token) %>% 
     mutate(milestonestatus = factor(milestonestatus, levels = c("","Opportunity","Progress","Barrier","Support","Contingent"), ordered = T),
            target = gsub("m","",target))
   
@@ -548,10 +562,10 @@ server <- function(input, output, session) {
   # pre-populate text boxes based on selected initiative
   observeEvent(input[["populatereport"]], {
     
-    initiative_dim <<- drop_read_csv('GitHub/ConservationDashboard/COMPS/responses/FY21_initiative_dim.csv', dtoken = token)
-    init_indicator_dim <<- drop_read_csv('GitHub/ConservationDashboard/COMPS/responses/FY21_init_indicator_dim.csv', dtoken = token)
-    init_indicator_fact <<- drop_read_csv('GitHub/ConservationDashboard/COMPS/responses/FY21_init_indicator_fact.csv', dtoken = token)
-    milestones <<- drop_read_csv('GitHub/ConservationDashboard/COMPS/responses/FY21_milestones.csv', dtoken = token) %>% 
+    initiative_dim <<- drop_read_csv('GitHub/ConservationDashboard/COMPS/Initiative_reporting_app/responses/FY21_initiative_dim.csv', dtoken = token)
+    init_indicator_dim <<- drop_read_csv('GitHub/ConservationDashboard/COMPS/Initiative_reporting_app/responses/FY21_init_indicator_dim.csv', dtoken = token)
+    init_indicator_fact <<- drop_read_csv('GitHub/ConservationDashboard/COMPS/Initiative_reporting_app/responses/FY21_init_indicator_fact.csv', dtoken = token)
+    milestones <<- drop_read_csv('GitHub/ConservationDashboard/COMPS/Initiative_reporting_app/responses/FY21_milestones.csv', dtoken = token) %>% 
       mutate(milestonestatus = factor(milestonestatus, levels = c("","Opportunity","Progress","Barrier","Support","Contingent"), ordered = T),
              target = gsub("m","",target))
     
@@ -693,22 +707,22 @@ server <- function(input, output, session) {
     write.csv(x = data1,
       file = "responses/FY21_initiative_dim.csv", 
       row.names = FALSE, quote = TRUE)
-    drop_upload("responses/FY21_initiative_dim.csv", path = "GitHub/ConservationDashboard/COMPS/responses/", dtoken = token)
+    drop_upload("responses/FY21_initiative_dim.csv", path = "GitHub/ConservationDashboard/COMPS/responses/Initiative_reporting_app/", dtoken = token)
   
     write.csv(x = data2,
       file = "responses/FY21_init_indicator_dim.csv",
       row.names = FALSE, quote = TRUE)
-    drop_upload("responses/FY21_init_indicator_dim.csv", path = "GitHub/ConservationDashboard/COMPS/responses/", dtoken = token)
+    drop_upload("responses/FY21_init_indicator_dim.csv", path = "GitHub/ConservationDashboard/COMPS/responses/Initiative_reporting_app/", dtoken = token)
 
     write.csv(x = data3,
       file = "responses/FY21_milestones.csv",
       row.names = FALSE, quote = TRUE)
-    drop_upload("responses/FY21_milestones.csv", path = "GitHub/ConservationDashboard/COMPS/responses/", dtoken = token)
+    drop_upload("responses/FY21_milestones.csv", path = "GitHub/ConservationDashboard/COMPS/responses/Initiative_reporting_app/", dtoken = token)
 
     write.csv(x = data4,
       file = "responses/FY21_init_indicator_fact.csv",
       row.names = FALSE, quote = TRUE)
-    drop_upload("responses/FY21_init_indicator_fact.csv", path = "GitHub/ConservationDashboard/COMPS/responses/", dtoken = token)
+    drop_upload("responses/FY21_init_indicator_fact.csv", path = "GitHub/ConservationDashboard/COMPS/responses/Initiative_reporting_app/", dtoken = token)
     
   }
 
@@ -716,10 +730,10 @@ server <- function(input, output, session) {
   # when the Save button is clicked, save the form data & provide confirmation pop-up
   observeEvent(input[["save"]], {
     
-    initiative_dim <<- drop_read_csv('GitHub/ConservationDashboard/COMPS/responses/FY21_initiative_dim.csv', dtoken = token)
-    init_indicator_dim <<- drop_read_csv('GitHub/ConservationDashboard/COMPS/responses/FY21_init_indicator_dim.csv', dtoken = token)
-    init_indicator_fact <<- drop_read_csv('GitHub/ConservationDashboard/COMPS/responses/FY21_init_indicator_fact.csv', dtoken = token)
-    milestones <<- drop_read_csv('GitHub/ConservationDashboard/COMPS/responses/FY21_milestones.csv', dtoken = token)
+    initiative_dim <<- drop_read_csv('GitHub/ConservationDashboard/COMPS/Initiative_reporting_app/responses/FY21_initiative_dim.csv', dtoken = token)
+    init_indicator_dim <<- drop_read_csv('GitHub/ConservationDashboard/COMPS/Initiative_reporting_app/responses/FY21_init_indicator_dim.csv', dtoken = token)
+    init_indicator_fact <<- drop_read_csv('GitHub/ConservationDashboard/COMPS/Initiative_reporting_app/responses/FY21_init_indicator_fact.csv', dtoken = token)
+    milestones <<- drop_read_csv('GitHub/ConservationDashboard/COMPS/Initiative_reporting_app/responses/FY21_milestones.csv', dtoken = token)
     
     saveData(formData1(),formData2(),formData3(),formData4())
     shinyalert("Saved!","You may now close your window.", type = "success")
