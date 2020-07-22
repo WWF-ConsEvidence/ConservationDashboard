@@ -2,19 +2,73 @@
 .Rhistory
 .RData
 .Ruserdata
+desktop.ini
+
+
+1_Nov2018/desktop.ini
+1_Nov2018/1_CrossCutting/desktop.ini
+1_Nov2018/1_CrossCutting/LPI/desktop.ini
+1_Nov2018/1_CrossCutting/METT/desktop.ini
+1_Nov2018/1_CrossCutting/WDPA/desktop.ini
+1_Nov2018/2_FlatDataFiles/desktop.ini
+1_Nov2018/3_Practices/desktop.ini
+1_Nov2018/3_Practices/ClimateEnergy/desktop.ini
+1_Nov2018/3_Practices/Finance/desktop.ini
+1_Nov2018/3_Practices/Food/desktop.ini
+1_Nov2018/3_Practices/Forest/desktop.ini
+1_Nov2018/3_Practices/Freshwater/desktop.ini
+1_Nov2018/3_Practices/Governance/desktop.ini
+1_Nov2018/3_Practices/Markets/desktop.ini
+1_Nov2018/3_Practices/Oceans/desktop.ini
+1_Nov2018/3_Practices/Wildlife/desktop.ini
 
 1_Nov2018/2_FlatDataFiles/ConsDB_Input
 1_Nov2018/2_FlatDataFiles/ConsDB_Output
+
+
+2_Oct2019_US/desktop.ini
+2_Oct2019_US/1_CrossCutting/desktop.ini
+2_Oct2019_US/1_CrossCutting/LPI/desktop.ini
+2_Oct2019_US/1_CrossCutting/METT/desktop.ini
+2_Oct2019_US/1_CrossCutting/WDPA/desktop.ini
+2_Oct2019_US/2_FlatDataFiles/desktop.ini
+2_Oct2019_US/3_Practices/desktop.ini
+2_Oct2019_US/3_Practices/ClimateEnergy/desktop.ini
+2_Oct2019_US/3_Practices/Food/desktop.ini
+2_Oct2019_US/3_Practices/Forest/desktop.ini
+2_Oct2019_US/3_Practices/Freshwater/desktop.ini
+2_Oct2019_US/3_Practices/Oceans/desktop.ini
+2_Oct2019_US/3_Practices/Wildlife/desktop.ini
+
 2_Oct2019_US/2_FlatDataFiles/ConsDB_Input_2019
 2_Oct2019_US/2_FlatDataFiles/ConsDB_Output_2019
+
+
+COMPS/desktop.ini
+COMPS/Dashboad_back_end/desktop.ini
+COMPS/Dashboad_back_end/Practices/desktop.ini
+COMPS/Dashboad_back_end/Practices/ClimateEnergy/desktop.ini
+COMPS/Dashboad_back_end/Practices/Food/desktop.ini
+COMPS/Dashboad_back_end/Practices/Forest/desktop.ini
+COMPS/Dashboad_back_end/Practices/Freshwater/desktop.ini
+COMPS/Dashboad_back_end/Practices/Oceans/desktop.ini
+COMPS/Dashboad_back_end/Practices/Wildlife/desktop.ini
+COMPS/Dashboad_back_end/x_Flat_data_files/desktop.ini
 
 COMPS/Dashboard_back_end/x_Flat_data_files/Input
 COMPS/Dashboard_back-end/x_Flat_data_files/Output
 
-COMPS/Initiative_reporting_app/responses
-COMPS/Initiative_reporting_app/guidance
-COMPS/Initiative_reporting_app/rsconnect
-COMPS/Initiative_reporting_app/.httr-oauth
-COMPS/Initiative_reporting_app/droptoken.rds
-
+COMPS/Initiative_reporting/responses
+COMPS/Initiative_reporting/guidance
+COMPS/Initiative_reporting/rsconnect
+COMPS/Initiative_reporting/.httr-oauth
+COMPS/Initiative_reporting/droptoken.rds
 COMPS/Backup_flatfiles
+
+
+xx_Prototypes/desktop.ini
+xx_Prototypes/Ambient Monitoring/desktop.ini
+xx_Prototypes/Ambient Monitoring/Food/desktop.ini
+xx_Prototypes/Ambient Monitoring/Food/AG land use conversion/desktop.ini
+xx_Prototypes/Ambient Monitoring/Food/AG water use/desktop.ini
+xx_Prototypes/Ambient Monitoring/Food/Land use change GHGs/desktop.ini
