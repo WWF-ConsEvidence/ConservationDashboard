@@ -699,8 +699,8 @@ Dim_Initiative_Indicator_CEP <-
             Indicator_Target=as.numeric(subcattarget),
             Display_Order=displayorder,
             Indicator_Statement=statement,
-            Indicator_Label_Abbr=toupper(Indicator.label.abbr), #!!
-            Subcategory_Abbr=Subcategory.abbr, #!!
+            Indicator_Label_Abbr=toupper(Indicator.label.abbr), # MUST MANUALLY CALCULATE!!
+            Subcategory_Abbr=Subcategory.abbr, # MUST MANUALLY CALCULATE!!
             Amount_Achieved=amount.achieved,
             Amount_Remaining=amount.remaining,
             Pie_Type=pie.type,
