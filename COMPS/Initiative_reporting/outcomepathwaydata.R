@@ -3,8 +3,6 @@
 
 
 # ---- define outcome & pathway data frames ----
-
-rv$initiativekey <- as.character(substr(unique(initiative_dim$initiativekey[initiative_dim$initiative==selectedinitiative]),2,5))
   
   # OUTCOME 1
   rv$out1subcat1key <- as.numeric(paste("1",rv$initiativekey,"01",sep=""))
