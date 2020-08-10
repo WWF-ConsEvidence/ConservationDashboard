@@ -73,9 +73,9 @@ milestones <- do.call(rbind, mget(filelist.milestones))
 # ---- output to responses folder ----
 
 export(initiative.dim, '~/ShinyApps/Initiative_reporting/responses/FY21_initaitive_dim_compiled.csv')
-export(initiative.dim, '~/ShinyApps/Initiative_reporting/responses/FY21_initaitive_dim_compiled.csv')
-export(initiative.dim, '~/ShinyApps/Initiative_reporting/responses/FY21_initaitive_dim_compiled.csv')
-export(initiative.dim, '~/ShinyApps/Initiative_reporting/responses/FY21_initaitive_dim_compiled.csv')
+export(init.indicator.dim, '~/ShinyApps/Initiative_reporting/responses/FY21_init_indicator_dim_compiled.csv')
+export(init.indicator.fact, '~/ShinyApps/Initiative_reporting/responses/FY21_init_indicator_fact_compiled.csv')
+export(milestones, '~/ShinyApps/Initiative_reporting/responses/FY21_milestones_compiled.csv')
 
 
 
