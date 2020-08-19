@@ -548,7 +548,10 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
   
-  initiative_dim <<- import('responses/FY21_initiative_dim.csv', integer64 = "numeric")
+  last_file <- function(dir.nam, nam){
+    import(paste0(dir.nam, last(sort(grep(nam, list.files(dir.nam), value=T, fixed=T)))), integer64 = "numeric")}
+  
+  initiative_dim <<- last_file(dir.nam = 'responses/', nam = 'FY21_initiative_dim')
 
   # update initiative selection options based on selected goal
   observe({ 
@@ -742,7 +745,7 @@ server <- function(input, output, session) {
     
     # Write dim data to central file, to be able to pre-populate based on initiative name changes
     write.csv(x = alldata.dim,
-              file = "responses/FY21_initiative_dim.csv",
+              file = paste("responses/FY21_initiative_dim_", time.save, ".csv", sep = ""),
               row.names = FALSE, quote = TRUE)
     
     
@@ -787,7 +790,7 @@ server <- function(input, output, session) {
   # when the Save button is clicked, save the form data & provide confirmation pop-up
   observeEvent(input[["save"]], {
     
-    initiative_dim <<- import('responses/FY21_initiative_dim.csv', integer64 = "numeric")
+    initiative_dim <<- last_file(dir.nam = 'responses/', nam = 'FY21_initiative_dim')
     
     saveData(formData1(),formData2(),formData3(),formData4())
     shinyalert("Saved!","You may now close your window.", type = "success")
