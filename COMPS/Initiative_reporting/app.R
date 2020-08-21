@@ -548,10 +548,7 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
   
-  last_file <- function(dir.nam, nam){
-    import(paste0(dir.nam, last(sort(grep(nam, list.files(dir.nam), value=T, fixed=T)))), integer64 = "numeric")}
-  
-  initiative_dim <<- last_file(dir.nam = 'responses/', nam = 'FY21_initiative_dim')
+  initiative_dim <<- import('responses/initiative_list.csv', integer64 = "numeric")
 
   # update initiative selection options based on selected goal
   observe({ 
@@ -711,14 +708,13 @@ server <- function(input, output, session) {
   
   
   # define 'saveData' function
-  saveData <- function(data1,data2,data3,data4) {
+  saveData <- function(data0,data1,data2,data3,data4) {
     
     # mark time of saving
     time.save <- format(Sys.time(), format="%Y%m%d%H%M%S")
     
     # combine with previous data in responses folder
-    alldata.dim <- rbind(initiative_dim,
-                         data1 %>% mutate(timestamp = time.save))
+    alldata.dim <- data0
     
     data1.combined <- rbind(selectedinitiative_dim,
                             data1 %>% mutate(timestamp = time.save))
@@ -745,7 +741,7 @@ server <- function(input, output, session) {
     
     # Write dim data to central file, to be able to pre-populate based on initiative name changes
     write.csv(x = alldata.dim,
-              file = paste("responses/FY21_initiative_dim_", time.save, ".csv", sep = ""),
+              file = "responses/initiative_list.csv",
               row.names = FALSE, quote = TRUE)
     
     
@@ -790,9 +786,9 @@ server <- function(input, output, session) {
   # when the Save button is clicked, save the form data & provide confirmation pop-up
   observeEvent(input[["save"]], {
     
-    initiative_dim <<- last_file(dir.nam = 'responses/', nam = 'FY21_initiative_dim')
+    initiative_dim <<- import('responses/initiative_list.csv', integer64 = "numeric")
     
-    saveData(formData1(),formData2(),formData3(),formData4())
+    saveData(formData0(),formData1(),formData2(),formData3(),formData4())
     shinyalert("Saved!","You may now close your window.", type = "success")
     
     
