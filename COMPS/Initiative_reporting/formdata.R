@@ -4,6 +4,11 @@
 # sourced in: COMPS/Initiative_reporting_app/app.R
 # 
 
+# initiative list update
+formData0 <- reactive ({
+  initiative_list <- initiative_dim %>% mutate(initiative=ifelse(initiativekey==paste("i", rv$initiativekey, sep = ""), input$initiative, initiative))
+  initiative_list
+})
 
 # initiative dim data
 formData1 <- reactive({
