@@ -647,7 +647,7 @@ Dim_Global_2030_Outcome2_Food_B <-
 
 Fact_Global_2030_Outcome2_Food_B <-
   rbind.data.frame(Fact_Global_2030_Outcome2_Food_B,
-                   data.frame(Year_Key=2011,
+                   data.frame(Year_Key=2030,
                               Practice_Key=practice_key_ref$id[practice_key_ref$practice_name=="Food"],
                               Indicator_Type_Key=Dim_Global_2030_Outcome2_Food_B$Indicator_Type_Key,
                               Practice_Outcome_Key=practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Food" &
