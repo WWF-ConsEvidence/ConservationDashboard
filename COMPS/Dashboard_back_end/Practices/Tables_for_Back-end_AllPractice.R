@@ -67,7 +67,7 @@ Fact_Global_Context_Indicators <-
 
 # ---- 1.3 Export Global Context Files ----
 
-file.name <- paste("2_Oct2019_US/2_FlatDataFiles/ConsDB_Output_2019/Tables_Back-end_produced_", format(Sys.Date(),format="%Y_%m%d"), ".xlsx",sep="")
+file.name <- paste("COMPS/Dashboard_back_end/X_Flat_data_files/Output/Tables_Back-end_produced_", format(Sys.Date(),format="%Y_%m%d"), ".xlsx",sep="")
 
 write.xlsx(Dim_Context_Indicator_Type,file.name,sheetName="Dim_Context_Indicator_Type", row.names=F, showNA=F)
 write.xlsx(Fact_Global_Context_Indicators,file.name,sheetName="Fact_Global_Context_Indicators", append=T, row.names=F, showNA=F)
@@ -89,7 +89,8 @@ Dim_Global_WWF_2030_Indicator_Type <-
                    Dim_Global_2030_Outcome_Forest,
                    Dim_Global_2030_Outcome_FW,
                    Dim_Global_2030_Outcome_Oceans,
-                   Dim_Global_2030_Outcome_Wildlife)
+                   Dim_Global_2030_Outcome_Wildlife) %>%
+  mutate(Panel_Label_Upper = toupper(Panel_Label))
 
 
 # ---- 2.2 Fact_Global_2030_Outcomes ----
@@ -125,7 +126,8 @@ Dim_Initiative <-
                    Dim_Initiative_Forest,
                    Dim_Initiative_FW,
                    Dim_Initiative_Oceans,
-                   Dim_Initiative_Wildlife)
+                   Dim_Initiative_Wildlife) %>%
+  mutate(Initiative_Key = as.character(gsub("i","",Initiative_Key)))
 
 
 # ---- 3.2 Dim_Initiative_Indicator_Type ----
@@ -147,7 +149,8 @@ Fact_Initiative_Indicators <-
                    Fact_Initiative_Indicator_Forest,
                    Fact_Initiative_Indicator_FW,
                    Fact_Initiative_Indicator_Oceans,
-                   Fact_Initiative_Indicator_Wildlife)
+                   Fact_Initiative_Indicator_Wildlife) %>%
+  mutate(Initiative_Key = as.character(gsub("i","",Initiative_Key)))
 
 
 # ---- 3.4 Fact_Initiative_Financials ----
@@ -158,7 +161,8 @@ Fact_Initiative_Financials <-
                    Fact_Initiative_Financials_Forest,
                    Fact_Initiative_Financials_FW,
                    Fact_Initiative_Financials_Oceans,
-                   Fact_Initiative_Financials_Wildlife)
+                   Fact_Initiative_Financials_Wildlife) %>%
+  mutate(Initiative_Key = as.character(gsub("i","",Initiative_Key)))
 
 
 # ---- 3.5 Milestone_Group_Bridge ----
@@ -169,7 +173,9 @@ Milestone_Group_Bridge <-
                    Milestone_Group_Bridge_Forest,
                    Milestone_Group_Bridge_FW,
                    Milestone_Group_Bridge_Oceans,
-                   Milestone_Group_Bridge_Wildlife)
+                   Milestone_Group_Bridge_Wildlife) %>%
+  mutate(Initiative_Key = as.character(gsub("i","",Initiative_Key)))
+
 
 
 # ---- 3.6 Dim_Milestone ----
@@ -183,11 +189,13 @@ Dim_Milestone <-
                    Dim_Milestone_Wildlife)
 
 
+
 # ---- 3.7 Export Initiative Files ----
 
-write.xlsx(Dim_Initiative,file.name,sheetName="Dim_Initiative", append=T, row.names=F, showNA=F)
-write.xlsx(Dim_Initiative_Indicator_Type,file.name,sheetName="Dim_Initiative_Indicator_Type", append=T, row.names=F, showNA=F)
-write.xlsx(Fact_Initiative_Indicators,file.name,sheetName="Fact_Initiative_Indicators", append=T, row.names=F, showNA=F)
-write.xlsx(Fact_Initiative_Financials,file.name,sheetName="Fact_Initiative_Financials", append=T, row.names=F, showNA=F)
-write.xlsx(Milestone_Group_Bridge,file.name,sheetName="Milestone_Group_Bridge", append=T, row.names=F, showNA=F)
-write.xlsx(Dim_Milestone,file.name,sheetName="Dim_Milestone", append=T, row.names=F, showNA=F)
+write.xlsx(Dim_Initiative,file.name,sheetName="Dim_Initiative", append=T, showNA=F)
+write.xlsx(Dim_Initiative_Indicator_Type,file.name,sheetName="Dim_Initiative_Indicator_Type", append=T, showNA=F)
+write.xlsx(Fact_Initiative_Indicators,file.name,sheetName="Fact_Initiative_Indicators", append=T, showNA=F)
+write.xlsx(Fact_Initiative_Financials,file.name,sheetName="Fact_Initiative_Financials", append=T, showNA=F)
+write.xlsx(Milestone_Group_Bridge,file.name,sheetName="Milestone_Group_Bridge", append=T, showNA=F)
+write.xlsx(Dim_Milestone,file.name,sheetName="Dim_Milestone", append=T, showNA=F)
+

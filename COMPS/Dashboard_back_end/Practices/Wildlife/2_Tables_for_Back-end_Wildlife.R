@@ -114,7 +114,7 @@ Dim_Context_Threat_Wildlife_A <-
              Panel="Threat",
              Indicator_Subcategory="Tree Cover Loss",
              Indicator_Unit="M ha per year",
-             Data_Source="Global Forest Watch",
+             Data_Source="Global Wildlife Watch",
              Global_Indicator="Yes",
              US_Indicator="Yes")
 
@@ -156,6 +156,7 @@ Dim_Context_Response_Wildlife_A <-
 
 Fact_Context_Response_Wildlife_A <-
   import(last.file(dir.nam = dir.nam.Forest, nam = 'WDPA_time')) %>%
+  filter(YEAR>1989) %>%
   transmute(Year_Key=YEAR,
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],length(Year_Key)),
             Indicator_Type_Key=rep(Dim_Context_Response_Wildlife_A$Indicator_Type_Key,length(Year_Key)),
@@ -250,6 +251,7 @@ Dim_Global_2030_Outcome1_Wildlife_A <-
 
 Fact_Global_2030_Outcome1_Wildlife_A <- 
   import(last.file(dir.nam = dir.nam.Forest, nam = 'WDPA_time')) %>%
+  filter(YEAR>1989) %>%
   transmute(Year_Key=YEAR,
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],length(Year_Key)),
             Indicator_Type_Key=rep(Dim_Global_2030_Outcome1_Wildlife_A$Indicator_Type_Key, length(Year_Key)),
@@ -598,113 +600,113 @@ Fact_Global_2030_Outcome_Wildlife <-
 
 # ---- 3.1 Load data ----
 
-dim.initiatives.wildlife <- 
-  dim.initiatives %>% subset(Practice=="Wildlife") 
+dim_initiatives_Wildlife <- 
+  dim_initiatives %>% subset(goal=="Wildlife") 
 
-dim.initiative.indicators.wildlife <-
-  dim.initiative.indicators %>% subset(Practice=="Wildlife")
+dim_initiative_indicators_Wildlife <-
+  dim_initiative_indicators %>% subset(goal=="Wildlife")
 
-fact.initiative.indicators.wildlife <-
-  fact.initiative.indicators %>% subset(Practice=="Wildlife")
+fact_initiative_indicators_Wildlife <-
+  fact_initiative_indicators %>% subset(goal=="Wildlife")
 
-dim.initiative.milestones.wildlife <-
-  dim.initiative.milestones %>% subset(Practice=="Wildlife")
+dim_initiative_milestones_Wildlife <-
+  dim_initiative_milestones %>% subset(goal=="Wildlife")
 
-pie.type.wildlife <-
-  pie.type %>% subset(Practice=="Wildlife")
+pie_type_Wildlife <-
+  pie_type %>% subset(goal=="Wildlife")
 
 
 # ---- 3.2 Wildlife-specific Dim_Initiative ----
 
 Dim_Initiative_Wildlife <-
-  dim.initiatives.wildlife %>%
-  transmute(Initiative_Key=Initiative.key,
-            Initiative_Name=Initiative,
-            Initiative_Status=Overall.status,
-            Initiative_Status_Justification=Overall.just,
-            Initiative_Goal=Initiative.statement,
-            Global_Initiative=Global.initiative,
-            US_Initiative=US.initiative,
-            Display_Order=Display.order)
+  dim_initiatives_Wildlife %>%
+  transmute(Initiative_Key=initiativekey,
+            Initiative_Name=initiative,
+            Initiative_Status=initiativestatus,
+            Initiative_Status_Justification=initiativejust,
+            Initiative_Goal=initiativestatement,
+            Global_Initiative=globalinitiative,
+            US_Initiative=usinitiative,
+            Display_Order=displayorder)
 
 
 # ---- 3.3 Wildlife-specific Dim_Initiative_Indicator_Type ----
 
 Dim_Initiative_Indicator_Wildlife <-
-  left_join(dim.initiative.indicators.wildlife,
-            pie.type.wildlife[,c("Initiative.indicator.key","pie.type","amount.achieved","amount.remaining","max.year.value")],
-            by="Initiative.indicator.key") %>%
-  transmute(Indicator_Type_Key=new.key,
-            Indicator_Type=Indicator.type,
-            Indicator_Name=ifelse(!is.na(Indicator.name),as.character(Indicator.name),"FORTHCOMING"),
-            Indicator_Label=ifelse(!is.na(Indicator.label),as.character(Indicator.label),"Not Yet Identified"),
-            Indicator_Subcategory=Subcategory,
-            Indicator_Unit=Units,
-            Data_Source=Source,
-            Indicator_Target=as.numeric(Target),
-            Display_Order=Display.order,
-            Indicator_Statement=Statement,
-            Indicator_Label_Abbr=toupper(Indicator.label.abbr),
-            Subcategory_Abbr=Subcategory.abbr,
+  left_join(dim_initiative_indicators_Wildlife,
+            pie_type_Wildlife[,c("indicatorkey","pie.type","amount.achieved","amount.remaining","max.year.value")],
+            by="indicatorkey") %>%
+  transmute(Indicator_Type_Key=indicatorkey,
+            Indicator_Type=indicatortype,
+            Indicator_Name=ifelse(!is.na(indicatorlabel),as.character(indicatorlabel),"FORTHCOMING"), # we no longer ask for different indicator names and labels. Therefore, this data field is no longer functional
+            Indicator_Label=ifelse(!is.na(indicatorlabel),as.character(indicatorlabel),"Not Yet Identified"),
+            Indicator_Subcategory=subcat,
+            Indicator_Unit=indicatorunits,
+            Data_Source=indicatorsource,
+            Indicator_Target=as.numeric(subcattarget),
+            Display_Order=displayorder,
+            Indicator_Statement=statement,
+            Indicator_Label_Abbr=toupper(indicatorlabelabbr), # MUST MANUALLY CALCULATE!!
+            Subcategory_Abbr=subcatlabelabbr, # MUST MANUALLY CALCULATE!!
             Amount_Achieved=amount.achieved,
             Amount_Remaining=amount.remaining,
             Pie_Type=pie.type,
-            Indicator_Label_Caps=toupper(Indicator_Label),
+            Indicator_Label_Caps=toupper(indicatorlabel),
             Indicator_Latest=max.year.value)
 
 
 # ---- 3.4 Wildlife-specific Fact_Initiative_Indicators ----
 
 Fact_Initiative_Indicator_Wildlife <-
-  left_join(fact.initiative.indicators.wildlife,pie.type.wildlife[,c("Initiative.indicator.key","target.year","Target")],by="Initiative.indicator.key") %>%
-  left_join(dim.initiative.indicators.wildlife[,c("Initiative.indicator.key","Units","new.key")],by="Initiative.indicator.key") %>%
+  left_join(fact_initiative_indicators_Wildlife,pie_type_Wildlife[,c("indicatorkey","target.year","subcattarget")],by="indicatorkey") %>%
+  left_join(dim_initiative_indicators_Wildlife[,c("indicatorkey","indicatorunits")],by="indicatorkey") %>%
   transmute(Year_Key=ifelse(!is.na(Year),Year,9999),
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],length(Year_Key)),
-            Initiative_Key=Initiative.key,
-            Indicator_Type_Key=new.key,
+            Initiative_Key=initiativekey,
+            Indicator_Type_Key=indicatorkey,
             Indicator_Value=Value,
             Indicator_Upper_Value=NA,
             Indicator_Lower_Value=NA,
-            Value_Trend=ifelse(grepl("reduction",Units,ignore.case=T)==T,-(Value),Value),
-            Indicator_Target=ifelse(!is.na(Target) & Year==target.year,Target,NA),
-            Target_Trend=ifelse(grepl("reduction",Units,ignore.case=T)==T,-(Indicator_Target),Indicator_Target))
+            Value_Trend=ifelse(grepl("reduction",indicatorunits,ignore.case=T)==T,-(Value),Value),
+            Indicator_Target=ifelse(!is.na(subcattarget) & Year==target.year,subcattarget,NA),
+            Target_Trend=ifelse(grepl("reduction",indicatorunits,ignore.case=T)==T,-(Indicator_Target),Indicator_Target))
 
 
 # ---- 3.5 Wildlife-specific Fact_Initiative_Financials ----
 
 Fact_Initiative_Financials_Wildlife <-
-  dim.initiatives.wildlife %>%
-  transmute(Date_Key=Date,
+  dim_initiatives_Wildlife %>%
+  transmute(Date_Key=date,
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Wildlife"],length(Date_Key)),
-            Initiative_Key=Initiative.key,
-            Amount_Needed=Funds.needed,
-            Amount_Secured=Funds.secured,
-            Amount_Anticipated=Funds.anticipated,
-            Amount_Remaining=Funds.needed-Funds.secured-Funds.anticipated)
+            Initiative_Key=initiativekey,
+            Amount_Needed=fundsneeded,
+            Amount_Secured=fundssecured,
+            Amount_Anticipated=fundsanticipated,
+            Amount_Remaining=fundsneeded-fundssecured-fundsanticipated)
 
 
 # ---- 3.6 Wildlife-specific Milestone_Group_Bridge ----
 
 Milestone_Group_Bridge_Wildlife <-
-  left_join(dim.initiative.milestones.wildlife, dim.initiatives.wildlife, by=c("Initiative", "Practice")) %>%
-  transmute(Milestone_Key=Milestone.key,
-            Initiative_Key=Initiative.key)
+  left_join(dim_initiative_milestones_Wildlife, dim_initiatives_Wildlife, by=c("initiative", "goal")) %>%
+  transmute(Milestone_Key=milestonekey,
+            Initiative_Key=initiativekey)
 
 
 # ---- 3.7 Wildlife-specific Dim_Milestone ----
 
 Dim_Milestone_Wildlife <-
-  dim.initiative.milestones.wildlife %>%
+  dim_initiative_milestones_Wildlife %>%
   transmute(Milestone_Surrogate_Key="",
-            Milestone_Key=Milestone.key,
-            Milestone_Name=Milestone,
-            Milestone_Target=Target,
-            Milestone_Status=Status,
-            Milestone_Status_Justification=Status.just,
-            Creation_Date=Creation.date,
-            Effective_Start_Date=Effective.start.date,
-            Effective_End_Date=Effective.end.date,
-            Is_Active=Is.active)
+            Milestone_Key=milestonekey,
+            Milestone_Name=milestone,
+            Milestone_Target=target,
+            Milestone_Status=milestonestatus,
+            Milestone_Status_Justification=milestonejust,
+            Creation_Date=milestonecreation,
+            Effective_Start_Date=milestonestart,
+            Effective_End_Date=milestoneend,
+            Is_Active=milestoneactive)
 
 
 

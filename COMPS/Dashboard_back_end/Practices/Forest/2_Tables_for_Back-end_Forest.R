@@ -221,6 +221,7 @@ Dim_Context_Response_Forest_A <-
 
 Fact_Context_Response_Forest_A <-
   import(last.file(dir.nam = dir.nam.Forest, nam = 'WDPA_time')) %>%
+  filter(YEAR>1989) %>%
   transmute(Year_Key=YEAR,
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Forests"],length(Year_Key)),
             Indicator_Type_Key=rep(Dim_Context_Response_Forest_A$Indicator_Type_Key,length(Year_Key)),
@@ -354,7 +355,7 @@ Dim_Global_2030_Outcome2_Forest_A <-
 
 Fact_Global_2030_Outcome2_Forest_A <-
   import(last.file(dir.nam = dir.nam.Forest, nam = 'GFW_treeloss_bydriver')) %>%
-  subset(.,Loss_type=="Commodity Driven Deforestation") %>%
+  subset(.,Loss_type=="Commodity driven deforestation") %>%
   transmute(Year_Key=Year,
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Forests"],length(Year_Key)),
             Indicator_Type_Key=rep(Dim_Global_2030_Outcome2_Forest_A$Indicator_Type_Key, length(Year_Key)),
@@ -566,114 +567,113 @@ Fact_Global_2030_Outcome_Forest <-
 
 # ---- 3.1 Load data ----
 
-dim.initiatives.forests <- 
-  dim.initiatives %>% subset(Practice=="Forests") 
+dim_initiatives_Forest <- 
+  dim_initiatives %>% subset(goal=="Forests") 
 
-dim.initiative.indicators.forests <-
-  dim.initiative.indicators %>% subset(Practice=="Forests")
+dim_initiative_indicators_Forest <-
+  dim_initiative_indicators %>% subset(goal=="Forests")
 
-fact.initiative.indicators.forests <-
-  fact.initiative.indicators %>% subset(Practice=="Forests")
+fact_initiative_indicators_Forest <-
+  fact_initiative_indicators %>% subset(goal=="Forests")
 
-dim.initiative.milestones.forests <-
-  dim.initiative.milestones %>% subset(Practice=="Forests")
+dim_initiative_milestones_Forest <-
+  dim_initiative_milestones %>% subset(goal=="Forests")
 
-pie.type.forests <-
-  pie.type %>% subset(Practice=="Forests")
+pie_type_Forest <-
+  pie_type %>% subset(goal=="Forests")
 
 
 # ---- 3.2 Forest-specific Dim_Initiative ----
 
 Dim_Initiative_Forest <-
-  dim.initiatives.forests %>%
-  transmute(Initiative_Key=Initiative.key,
-            Initiative_Name=Initiative,
-            Initiative_Status=Overall.status,
-            Initiative_Status_Justification=Overall.just,
-            Initiative_Goal=Initiative.statement,
-            Global_Initiative=Global.initiative,
-            US_Initiative=US.initiative,
-            Display_Order=Display.order)
+  dim_initiatives_Forest %>%
+  transmute(Initiative_Key=initiativekey,
+            Initiative_Name=initiative,
+            Initiative_Status=initiativestatus,
+            Initiative_Status_Justification=initiativejust,
+            Initiative_Goal=initiativestatement,
+            Global_Initiative=globalinitiative,
+            US_Initiative=usinitiative,
+            Display_Order=displayorder)
 
 
 # ---- 3.3 Forest-specific Dim_Initiative_Indicator_Type ----
 
 Dim_Initiative_Indicator_Forest <-
-  left_join(dim.initiative.indicators.forests,
-            pie.type.forests[,c("Initiative.indicator.key","pie.type","amount.achieved","amount.remaining","max.year.value")],
-            by="Initiative.indicator.key") %>%
-  transmute(Indicator_Type_Key=new.key,
-            Indicator_Type=Indicator.type,
-            Indicator_Name=ifelse(!is.na(Indicator.name),as.character(Indicator.name),"FORTHCOMING"),
-            Indicator_Label=ifelse(!is.na(Indicator.label),as.character(Indicator.label),"Not Yet Identified"),
-            Indicator_Subcategory=Subcategory,
-            Indicator_Unit=Units,
-            Data_Source=Source,
-            Indicator_Target=as.numeric(Target),
-            Display_Order=Display.order,
-            Indicator_Statement=Statement,
-            Indicator_Label_Abbr=toupper(Indicator.label.abbr),
-            Subcategory_Abbr=Subcategory.abbr,
+  left_join(dim_initiative_indicators_Forest,
+            pie_type_Forest[,c("indicatorkey","pie.type","amount.achieved","amount.remaining","max.year.value")],
+            by="indicatorkey") %>%
+  transmute(Indicator_Type_Key=indicatorkey,
+            Indicator_Type=indicatortype,
+            Indicator_Name=ifelse(!is.na(indicatorlabel),as.character(indicatorlabel),"FORTHCOMING"), # we no longer ask for different indicator names and labels. Therefore, this data field is no longer functional
+            Indicator_Label=ifelse(!is.na(indicatorlabel),as.character(indicatorlabel),"Not Yet Identified"),
+            Indicator_Subcategory=subcat,
+            Indicator_Unit=indicatorunits,
+            Data_Source=indicatorsource,
+            Indicator_Target=as.numeric(subcattarget),
+            Display_Order=displayorder,
+            Indicator_Statement=statement,
+            Indicator_Label_Abbr=toupper(indicatorlabelabbr), # MUST MANUALLY CALCULATE!!
+            Subcategory_Abbr=subcatlabelabbr, # MUST MANUALLY CALCULATE!!
             Amount_Achieved=amount.achieved,
             Amount_Remaining=amount.remaining,
             Pie_Type=pie.type,
-            Indicator_Label_Caps=toupper(Indicator_Label),
+            Indicator_Label_Caps=toupper(indicatorlabel),
             Indicator_Latest=max.year.value)
 
 
 # ---- 3.4 Forest-specific Fact_Initiative_Indicators ----
 
 Fact_Initiative_Indicator_Forest <-
-  left_join(fact.initiative.indicators.forests,pie.type.forests[,c("Initiative.indicator.key","target.year","Target")],by="Initiative.indicator.key") %>%
-  left_join(dim.initiative.indicators.forests[,c("Initiative.indicator.key","Units","new.key")],by="Initiative.indicator.key") %>%
+  left_join(fact_initiative_indicators_Forest,pie_type_Forest[,c("indicatorkey","target.year","subcattarget")],by="indicatorkey") %>%
+  left_join(dim_initiative_indicators_Forest[,c("indicatorkey","indicatorunits")],by="indicatorkey") %>%
   transmute(Year_Key=ifelse(!is.na(Year),Year,9999),
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Forests"],length(Year_Key)),
-            Initiative_Key=Initiative.key,
-            Indicator_Type_Key=new.key,
+            Initiative_Key=initiativekey,
+            Indicator_Type_Key=indicatorkey,
             Indicator_Value=Value,
             Indicator_Upper_Value=NA,
             Indicator_Lower_Value=NA,
-            Value_Trend=ifelse(grepl("reduction",Units,ignore.case=T)==T,-(Value),Value),
-            Indicator_Target=ifelse(!is.na(Target) & Year==target.year,Target,NA),
-            Target_Trend=ifelse(grepl("reduction",Units,ignore.case=T)==T,-(Indicator_Target),Indicator_Target))
+            Value_Trend=ifelse(grepl("reduction",indicatorunits,ignore.case=T)==T,-(Value),Value),
+            Indicator_Target=ifelse(!is.na(subcattarget) & Year==target.year,subcattarget,NA),
+            Target_Trend=ifelse(grepl("reduction",indicatorunits,ignore.case=T)==T,-(Indicator_Target),Indicator_Target))
 
 
 # ---- 3.5 Forest-specific Fact_Initiative_Financials ----
 
 Fact_Initiative_Financials_Forest <-
-  dim.initiatives.forests %>%
-  transmute(Date_Key=Date,
+  dim_initiatives_Forest %>%
+  transmute(Date_Key=date,
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Forests"],length(Date_Key)),
-            Initiative_Key=Initiative.key,
-            Amount_Needed=Funds.needed,
-            Amount_Secured=Funds.secured,
-            Amount_Anticipated=Funds.anticipated,
-            Amount_Remaining=Funds.needed-Funds.secured-Funds.anticipated)
+            Initiative_Key=initiativekey,
+            Amount_Needed=fundsneeded,
+            Amount_Secured=fundssecured,
+            Amount_Anticipated=fundsanticipated,
+            Amount_Remaining=fundsneeded-fundssecured-fundsanticipated)
 
 
 # ---- 3.6 Forest-specific Milestone_Group_Bridge ----
 
 Milestone_Group_Bridge_Forest <-
-  left_join(dim.initiative.milestones.forests, dim.initiatives.forests, by=c("Initiative", "Practice")) %>%
-  transmute(Milestone_Key=Milestone.key,
-            Initiative_Key=Initiative.key)
+  left_join(dim_initiative_milestones_Forest, dim_initiatives_Forest, by=c("initiative", "goal")) %>%
+  transmute(Milestone_Key=milestonekey,
+            Initiative_Key=initiativekey)
 
 
 # ---- 3.7 Forest-specific Dim_Milestone ----
 
 Dim_Milestone_Forest <-
-  dim.initiative.milestones.forests %>%
+  dim_initiative_milestones_Forest %>%
   transmute(Milestone_Surrogate_Key="",
-            Milestone_Key=Milestone.key,
-            Milestone_Name=Milestone,
-            Milestone_Target=Target,
-            Milestone_Status=Status,
-            Milestone_Status_Justification=Status.just,
-            Creation_Date=Creation.date,
-            Effective_Start_Date=Effective.start.date,
-            Effective_End_Date=Effective.end.date,
-            Is_Active=Is.active)
-
+            Milestone_Key=milestonekey,
+            Milestone_Name=milestone,
+            Milestone_Target=target,
+            Milestone_Status=milestonestatus,
+            Milestone_Status_Justification=milestonejust,
+            Creation_Date=milestonecreation,
+            Effective_Start_Date=milestonestart,
+            Effective_End_Date=milestoneend,
+            Is_Active=milestoneactive)
 
 
 
@@ -703,8 +703,8 @@ rm(Dim_Context_State_Forest_A,
    Fact_Global_2030_Outcome3_Forest_A,
    Fact_Global_2030_Outcome3_Forest_B,
    Fact_Global_2030_Outcome3_Forest_C,
-   dim_initiatives_Forests,
-   dim_initiative_indicators_Forests,
-   fact_initiative_indicators_Forests,
-   dim_initiative_milestones_Forests,
-   pie_type_Forests)
+   dim_initiatives_Forest,
+   dim_initiative_indicators_Forest,
+   fact_initiative_indicators_Forest,
+   dim_initiative_milestones_Forest,
+   pie_type_Forest)

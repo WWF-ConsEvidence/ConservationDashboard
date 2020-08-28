@@ -292,7 +292,7 @@ Fact_Global_2030_Outcome1_FW_C <-
   import(last.file(dir.nam = dir.nam.Freshwater, nam = 'Ramsar_sitedata_dl')) %>%
   select(.,c("Designation date","Area (ha)")) %>%
   mutate(Date=as.character(`Designation date`),
-         Year=as.numeric(substr(Date,(nchar(Date)-4)+1,nchar(Date)))) %>%
+         Year=as.numeric(substr(Date, 1, 4))) %>%
   group_by(Year) %>%
   summarise(Area=sum(`Area (ha)`)) %>%
   transmute(Year_Key=Year,
@@ -430,112 +430,113 @@ Fact_Global_2030_Outcome_FW <-
 
 # ---- 3.1 Load data ----
 
-dim.initiatives.fw <- 
-  dim.initiatives %>% subset(Practice=="Freshwater") 
+dim_initiatives_FW <- 
+  dim_initiatives %>% subset(goal=="Freshwater") 
 
-dim.initiative.indicators.fw <-
-  dim.initiative.indicators %>% subset(Practice=="Freshwater")
+dim_initiative_indicators_FW <-
+  dim_initiative_indicators %>% subset(goal=="Freshwater")
 
-fact.initiative.indicators.fw <-
-  fact.initiative.indicators %>% subset(Practice=="Freshwater")
+fact_initiative_indicators_FW <-
+  fact_initiative_indicators %>% subset(goal=="Freshwater")
 
-dim.initiative.milestones.fw <-
-  dim.initiative.milestones %>% subset(Practice=="Freshwater")
+dim_initiative_milestones_FW <-
+  dim_initiative_milestones %>% subset(goal=="Freshwater")
 
-pie.type.fw <-
-  pie.type %>% subset(Practice=="Freshwater")
+pie_type_FW <-
+  pie_type %>% subset(goal=="Freshwater")
 
-# ---- 3.2 Freshwater-specific Dim_Initiative ----
+
+# ---- 3.2 FW-specific Dim_Initiative ----
 
 Dim_Initiative_FW <-
-  dim.initiatives.fw %>%
-  transmute(Initiative_Key=Initiative.key,
-            Initiative_Name=Initiative,
-            Initiative_Status=Overall.status,
-            Initiative_Status_Justification=Overall.just,
-            Initiative_Goal=Initiative.statement,
-            Global_Initiative=Global.initiative,
-            US_Initiative=US.initiative,
-            Display_Order=Display.order)
+  dim_initiatives_FW %>%
+  transmute(Initiative_Key=initiativekey,
+            Initiative_Name=initiative,
+            Initiative_Status=initiativestatus,
+            Initiative_Status_Justification=initiativejust,
+            Initiative_Goal=initiativestatement,
+            Global_Initiative=globalinitiative,
+            US_Initiative=usinitiative,
+            Display_Order=displayorder)
 
 
-# ---- 3.3 Freshwater-specific Dim_Initiative_Indicator_Type ----
+# ---- 3.3 FW-specific Dim_Initiative_Indicator_Type ----
 
 Dim_Initiative_Indicator_FW <-
-  left_join(dim.initiative.indicators.fw,
-            pie.type.fw[,c("Initiative.indicator.key","pie.type","amount.achieved","amount.remaining","max.year.value")],
-            by="Initiative.indicator.key") %>%
-  transmute(Indicator_Type_Key=new.key,
-            Indicator_Type=Indicator.type,
-            Indicator_Name=ifelse(!is.na(Indicator.name),as.character(Indicator.name),"FORTHCOMING"),
-            Indicator_Label=ifelse(!is.na(Indicator.label),as.character(Indicator.label),"Not Yet Identified"),
-            Indicator_Subcategory=Subcategory,
-            Indicator_Unit=Units,
-            Data_Source=Source,
-            Indicator_Target=as.numeric(Target),
-            Display_Order=Display.order,
-            Indicator_Statement=Statement,
-            Indicator_Label_Abbr=toupper(Indicator.label.abbr),
-            Subcategory_Abbr=Subcategory.abbr,
+  left_join(dim_initiative_indicators_FW,
+            pie_type_FW[,c("indicatorkey","pie.type","amount.achieved","amount.remaining","max.year.value")],
+            by="indicatorkey") %>%
+  transmute(Indicator_Type_Key=indicatorkey,
+            Indicator_Type=indicatortype,
+            Indicator_Name=ifelse(!is.na(indicatorlabel),as.character(indicatorlabel),"FORTHCOMING"), # we no longer ask for different indicator names and labels. Therefore, this data field is no longer functional
+            Indicator_Label=ifelse(!is.na(indicatorlabel),as.character(indicatorlabel),"Not Yet Identified"),
+            Indicator_Subcategory=subcat,
+            Indicator_Unit=indicatorunits,
+            Data_Source=indicatorsource,
+            Indicator_Target=as.numeric(subcattarget),
+            Display_Order=displayorder,
+            Indicator_Statement=statement,
+            Indicator_Label_Abbr=toupper(indicatorlabelabbr), # MUST MANUALLY CALCULATE!!
+            Subcategory_Abbr=subcatlabelabbr, # MUST MANUALLY CALCULATE!!
             Amount_Achieved=amount.achieved,
             Amount_Remaining=amount.remaining,
             Pie_Type=pie.type,
-            Indicator_Label_Caps=toupper(Indicator_Label),
+            Indicator_Label_Caps=toupper(indicatorlabel),
             Indicator_Latest=max.year.value)
 
 
-# ---- 3.4 Freshwater-specific Fact_Initiative_Indicators ----
+# ---- 3.4 FW-specific Fact_Initiative_Indicators ----
 
 Fact_Initiative_Indicator_FW <-
-  left_join(fact.initiative.indicators.fw,pie.type.fw[,c("Initiative.indicator.key","target.year","Target")],by="Initiative.indicator.key") %>%
-  left_join(dim.initiative.indicators.fw[,c("Initiative.indicator.key","Units","new.key")],by="Initiative.indicator.key") %>%
+  left_join(fact_initiative_indicators_FW,pie_type_FW[,c("indicatorkey","target.year","subcattarget")],by="indicatorkey") %>%
+  left_join(dim_initiative_indicators_FW[,c("indicatorkey","indicatorunits")],by="indicatorkey") %>%
   transmute(Year_Key=ifelse(!is.na(Year),Year,9999),
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Freshwater"],length(Year_Key)),
-            Initiative_Key=Initiative.key,
-            Indicator_Type_Key=new.key,
+            Initiative_Key=initiativekey,
+            Indicator_Type_Key=indicatorkey,
             Indicator_Value=Value,
             Indicator_Upper_Value=NA,
             Indicator_Lower_Value=NA,
-            Value_Trend=ifelse(grepl("reduction",Units,ignore.case=T)==T,-(Value),Value),
-            Indicator_Target=ifelse(!is.na(Target) & Year==target.year,Target,NA),
-            Target_Trend=ifelse(grepl("reduction",Units,ignore.case=T)==T,-(Indicator_Target),Indicator_Target))
+            Value_Trend=ifelse(grepl("reduction",indicatorunits,ignore.case=T)==T,-(Value),Value),
+            Indicator_Target=ifelse(!is.na(subcattarget) & Year==target.year,subcattarget,NA),
+            Target_Trend=ifelse(grepl("reduction",indicatorunits,ignore.case=T)==T,-(Indicator_Target),Indicator_Target))
 
 
-# ---- 3.5 Freshwater-specific Fact_Initiative_Financials ----
+# ---- 3.5 FW-specific Fact_Initiative_Financials ----
 
 Fact_Initiative_Financials_FW <-
-  dim.initiatives.fw %>%
-  transmute(Date_Key=Date,
+  dim_initiatives_FW %>%
+  transmute(Date_Key=date,
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Freshwater"],length(Date_Key)),
-            Initiative_Key=Initiative.key,
-            Amount_Needed=Funds.needed,
-            Amount_Secured=Funds.secured,
-            Amount_Anticipated=Funds.anticipated,
-            Amount_Remaining=Funds.needed-Funds.secured-Funds.anticipated)
+            Initiative_Key=initiativekey,
+            Amount_Needed=fundsneeded,
+            Amount_Secured=fundssecured,
+            Amount_Anticipated=fundsanticipated,
+            Amount_Remaining=fundsneeded-fundssecured-fundsanticipated)
 
 
-# ---- 3.6 Freshwater-specific Milestone_Group_Bridge ----
+# ---- 3.6 FW-specific Milestone_Group_Bridge ----
 
 Milestone_Group_Bridge_FW <-
-  left_join(dim.initiative.milestones.fw, dim.initiatives.fw, by=c("Initiative", "Practice")) %>%
-  transmute(Milestone_Key=Milestone.key,
-            Initiative_Key=Initiative.key)
+  left_join(dim_initiative_milestones_FW, dim_initiatives_FW, by=c("initiative", "goal")) %>%
+  transmute(Milestone_Key=milestonekey,
+            Initiative_Key=initiativekey)
 
 
-# ---- 3.7 Freshwater-specific Dim_Milestone ----
+# ---- 3.7 FW-specific Dim_Milestone ----
 
 Dim_Milestone_FW <-
-  dim.initiative.milestones.fw %>%
+  dim_initiative_milestones_FW %>%
   transmute(Milestone_Surrogate_Key="",
-            Milestone_Key=Milestone.key,
-            Milestone_Name=Milestone,
-            Milestone_Target=Target,
-            Milestone_Status=Status,
-            Milestone_Status_Justification=Status.just,
-            Creation_Date=Creation.date,
-            Effective_Start_Date=Effective.start.date,
-            Effective_End_Date=Effective.end.date,
-            Is_Active=Is.active)
+            Milestone_Key=milestonekey,
+            Milestone_Name=milestone,
+            Milestone_Target=target,
+            Milestone_Status=milestonestatus,
+            Milestone_Status_Justification=milestonejust,
+            Creation_Date=milestonecreation,
+            Effective_Start_Date=milestonestart,
+            Effective_End_Date=milestoneend,
+            Is_Active=milestoneactive)
 
 
 

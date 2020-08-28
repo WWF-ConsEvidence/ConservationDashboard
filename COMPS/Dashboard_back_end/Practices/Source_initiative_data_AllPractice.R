@@ -56,7 +56,7 @@ last.file <- function(dir.nam,nam){
   paste0(dir.nam,last(sort(grep(nam,list.files(dir.nam), value=T))))}
 
 
-# define directory name for each goal/Practice team extenal data files
+# define directory name for each goal/Practice team external data files
 dir.nam.CEP <- 'COMPS/Dashboard_back_end/x_Flat_data_files/Input/ClimateEnergy/'
 dir.nam.Food <- 'COMPS/Dashboard_back_end/x_Flat_data_files/Input/Food/'
 dir.nam.Forest <- 'COMPS/Dashboard_back_end/x_Flat_data_files/Input/Forest/'
@@ -75,33 +75,40 @@ practice_outcome_key_ref <- import('COMPS/Dashboard_back_end/x_Flat_data_files/I
 
 # ---- 1.2 Initiative data ----
 
-latest_folder <- suppressWarnings(paste('COMPS/Dashboard_back_end/x_Flat_data_files/Input/x_Reporting',
+latest_folder <- suppressWarnings(paste('COMPS/Dashboard_back_end/x_Flat_data_files/Input/x_Reporting/',
                                       max(as.numeric(list.files('COMPS/Dashboard_back_end/x_Flat_data_files/Input/x_Reporting')), na.rm=T), 
                                       sep = ""))
 
 dim_initiatives <- 
   import(paste(latest_folder,"Initiative_dim.csv", sep = "/")) %>% 
   group_by(initiativekey) %>%
-  slice(which.max(timestamp))
+  slice(which.max(timestamp)) %>%
+  ungroup() %>%
+  mutate(date = substr(as.numeric(timestamp), 1, 8))
+
 
 
 dim_initiative_indicators <-
   import(paste(latest_folder,"Init_indicator_dim.csv", sep = "/")) %>%
-  group_by(initiativekey) %>%
-  slice(which.max(timestamp))
+  filter(!is.na(indicatorlabel) & indicatorlabel!="") %>%
+  group_by(initiative, displayorder) %>%
+  mutate(subcatnum = row_number(),
+         num.na.subcat = length(subcat[is.na(subcat) | subcat==""])) %>%
+  ungroup() %>%
+  filter(num.na.subcat==0 | (num.na.subcat%in%c(2,3) & subcatnum==1) | (num.na.subcat==1 & subcatnum%in%c(1,2)))
 
 
 fact_initiative_indicators <-
   import(paste(latest_folder,"Init_indicator_fact.csv", sep = "/")) %>%
-  left_join(.,dim_initiatives[,c("initiativekey","goal","initiative")], by="initiative") %>% 
-  group_by(initiativekey) %>%
-  slice(which.max(timestamp))
+  left_join(.,dim_initiatives[,c("goal","initiative")], by="initiative") %>% 
+  left_join(.,dim_initiative_indicators[,c("indicatorkey","statement")], by="indicatorkey") %>%
+  filter(!is.na(statement))
+# NOTE: use indicator labels and subcat labels from init_indicator_dim. To remain consistent, when making manual changes.
 
 dim_initiative_milestones <-
   import(paste(latest_folder,"Milestones.csv", sep = "/")) %>% 
-  left_join(.,dim_initiatives[,c("initiativekey","initiative")], by="initiative") %>% 
-  group_by(initiativekey) %>%
-  slice(which.max(timestamp))
+  left_join(.,dim_initiatives[,c("initiativekey","initiative")], by="initiative") %>%
+  mutate(target = gsub("m","",target))
 
 
 #
@@ -111,9 +118,12 @@ dim_initiative_milestones <-
 #
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #
+
+
 left_join(fact_initiative_indicators,dim_initiative_indicators[,c("indicatorkey","subcattarget")],by="indicatorkey") %>% group_by(indicatorkey) %>%
   summarise(subcattarget=unique(subcattarget),
             target.year=max(Year))
+
 
 # ---- 2.1 Calculate pie.type info ---- 
 

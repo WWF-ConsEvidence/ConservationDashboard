@@ -306,7 +306,7 @@ Fact_Context_Response_Food_A <-
   transmute(Year_Key=Year,
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Food"],length(Year_Key)),
             Indicator_Type_Key=rep(Dim_Context_Response_Food_A$Indicator_Type_Key,length(Year_Key)),
-            Indicator_Value=Agriculture..MtCO2e./1000,
+            Indicator_Value=`Agriculture (MtCO2e)`/1000,
             Indicator_Upper_Value=NA,
             Indicator_Lower_Value=NA,
             Value_First_Last=ifelse(Year_Key==max(Year_Key) | Year_Key==min(Year_Key),Indicator_Value,NA))
@@ -336,7 +336,7 @@ Fact_Context_Response_Food_B <-
   transmute(Year_Key=Year,
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Food"],length(Year_Key)),
             Indicator_Type_Key=rep(Dim_Context_Response_Food_B$Indicator_Type_Key,length(Year_Key)),
-            Indicator_Value=Annual.kcal/(Agriculture..MtCO2e.*1000000),
+            Indicator_Value=Annual.kcal/(`Agriculture (MtCO2e)`*1000000),
             Indicator_Upper_Value=NA,
             Indicator_Lower_Value=NA,
             Value_First_Last=ifelse(Year_Key==max(Year_Key) | Year_Key==min(Year_Key),Indicator_Value,NA))
@@ -491,7 +491,7 @@ Dim_Global_2030_Outcome1_Food_C <-
 
 Fact_Global_2030_Outcome1_Food_C <-
   import(last.file(dir.nam = dir.nam.Forest, nam = 'GFW_treeloss_bydriver')) %>%
-  subset(.,Loss_type=="Commodity Driven Deforestation") %>%
+  subset(.,Loss_type=="Commodity driven deforestation") %>%
   transmute(Year_Key=Year,
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Food"],length(Year_Key)),
             Indicator_Type_Key=rep(Dim_Global_2030_Outcome1_Food_C$Indicator_Type_Key, length(Year_Key)),
@@ -770,8 +770,8 @@ Dim_Initiative_Indicator_Food <-
             Indicator_Target=as.numeric(subcattarget),
             Display_Order=displayorder,
             Indicator_Statement=statement,
-            Indicator_Label_Abbr=toupper(Indicator.label.abbr), #!!
-            Subcategory_Abbr=Subcategory.abbr, #!!
+            Indicator_Label_Abbr=toupper(indicatorlabelabbr), # MUST MANUALLY CALCULATE!!
+            Subcategory_Abbr=subcatlabelabbr, # MUST MANUALLY CALCULATE!!
             Amount_Achieved=amount.achieved,
             Amount_Remaining=amount.remaining,
             Pie_Type=pie.type,
@@ -792,7 +792,7 @@ Fact_Initiative_Indicator_Food <-
             Indicator_Upper_Value=NA,
             Indicator_Lower_Value=NA,
             Value_Trend=ifelse(grepl("reduction",indicatorunits,ignore.case=T)==T,-(Value),Value),
-            Indicator_Target=ifelse(!is.na(subcattarget) & Year==target.year,Target,NA),
+            Indicator_Target=ifelse(!is.na(subcattarget) & Year==target.year,subcattarget,NA),
             Target_Trend=ifelse(grepl("reduction",indicatorunits,ignore.case=T)==T,-(Indicator_Target),Indicator_Target))
 
 
@@ -800,7 +800,7 @@ Fact_Initiative_Indicator_Food <-
 
 Fact_Initiative_Financials_Food <-
   dim_initiatives_Food %>%
-  transmute(Date_Key=Date,
+  transmute(Date_Key=date,
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Food"],length(Date_Key)),
             Initiative_Key=initiativekey,
             Amount_Needed=fundsneeded,

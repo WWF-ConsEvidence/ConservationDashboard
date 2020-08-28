@@ -79,7 +79,7 @@ Dim_Context_State_CEP_A <-
 # ---- 1.2 Context - Threat ----
 
 EIA_fossil_fuel <- 
-  import(last.file(dir.nam = dir.nam.CEP, nam = 'US_EIA_fossil_fuel_consump_dl'),
+  import(last.file(dir.nam = dir.nam.CEP, nam = 'US_EIA_fossil_fuel_dl'),
                             sheet='Data') %>%
   subset(.,Geography=="World") %>%
   melt(.,id.vars=c("Primary_Energy","Geography","Units"),
@@ -106,7 +106,7 @@ Dim_Context_Threat_CEP_A <-
 
 Fact_Context_Threat_CEP_A <-
   EIA_fossil_fuel %>%
-  transmute(Year_Key=as.numeric(substr(Year,2,5)),
+  transmute(Year_Key=as.character(Year),
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Climate & Energy"],length(Year_Key)),
             Indicator_Type_Key=rep(Dim_Context_Threat_CEP_A$Indicator_Type_Key,length(Year_Key)),
             Indicator_Value=Coal/Total_energy, 
@@ -130,7 +130,7 @@ Dim_Context_Threat_CEP_B <-
 
 Fact_Context_Threat_CEP_B <-
   EIA_fossil_fuel %>%
-  transmute(Year_Key=as.numeric(substr(Year,2,5)),
+  transmute(Year_Key=as.character(Year),
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Climate & Energy"],length(Year_Key)),
             Indicator_Type_Key=rep(Dim_Context_Threat_CEP_B$Indicator_Type_Key,length(Year_Key)),
             Indicator_Value=Gas/Total_energy, 
@@ -154,7 +154,7 @@ Dim_Context_Threat_CEP_C <-
 
 Fact_Context_Threat_CEP_C <-
   EIA_fossil_fuel %>%
-  transmute(Year_Key=as.numeric(substr(Year,2,5)),
+  transmute(Year_Key=as.character(Year),
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Climate & Energy"],length(Year_Key)),
             Indicator_Type_Key=rep(Dim_Context_Threat_CEP_C$Indicator_Type_Key,length(Year_Key)),
             Indicator_Value=Oil/Total_energy, 
@@ -333,7 +333,7 @@ Fact_Global_2030_Outcome1_CEP_A <-
             Indicator_Type_Key=rep(Dim_Global_2030_Outcome1_CEP_A$Indicator_Type_Key, length(Year_Key)),
             Practice_Outcome_Key=rep(practice_outcome_key_ref$id[practice_outcome_key_ref$practice_name=="Climate & Energy" &
                                                                    grepl("Mitigation",practice_outcome_key_ref$practice_outcome)], length(Year_Key)),
-            Indicator_Value=Total.GHG.Emissions.Including.Land.Use.Change.and.Forestry..MtCO.e../1000,
+            Indicator_Value=`Total GHG Emissions Including Land-Use Change and Forestry (MtCO?e?)`/1000,
             Indicator_Upper_Value=NA,
             Indicator_Lower_Value=NA,
             Indicator_Target=NA)
@@ -366,7 +366,8 @@ Fact_Global_2030_Outcome1_CEP_A <-
 
 # ---- 2.2 CEP Outcome 2 - ENERGY ----
 
-sdg.7.energy <- import(last.file(dir.nam = dir.nam.CEP, nam = 'SDG_7_energy'))
+sdg.7.energy <- import(last.file(dir.nam = dir.nam.CEP, nam = 'SDG_7_energy')) %>%
+  filter(GeoAreaName=="World")
 
 # -- RENEWABLE ENERGY
 
@@ -489,7 +490,7 @@ Dim_Global_2030_Outcome2_CEP_C <-
 
 Fact_Global_2030_Outcome2_CEP_C <-
   sdg.7.energy[grepl("Electricity",sdg.7.energy$SeriesDescription,ignore.case=T)==T &
-                 sdg.7.energy$X.Location.=="ALLAREA",] %>%
+                 sdg.7.energy$`[Location]`=="ALLAREA",] %>%
   transmute(Year_Key=TimePeriod,
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Climate & Energy"],length(Year_Key)),
             Indicator_Type_Key=rep(Dim_Global_2030_Outcome2_CEP_C$Indicator_Type_Key, length(Year_Key)),
@@ -538,7 +539,7 @@ Dim_Global_2030_Outcome2_CEP_D <-
              US_Indicator="Yes")
 
 Fact_Global_2030_Outcome2_CEP_D <-
-  import(last.file(dir.nam = dir.nam.CEP, nam = 'CoalPlantTracker_pipeline'),sheet='Data') %>%
+  import(last.file(dir.nam = dir.nam.CEP, nam = 'CoalPlantTracker'),sheet='Data') %>%
   subset(.,Pipeline=="All Pipeline") %>%
   transmute(Year_Key=Year,
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Climate & Energy"],length(Year_Key)),
@@ -589,7 +590,7 @@ Dim_Global_2030_Outcome3_CEP_A <-
              US_Indicator="Yes")
 
 Fact_Global_2030_Outcome3_CEP_A <-
-  import(last.file(dir.nam = dir.nam.CEP, nam = 'NAPCentral_countrylists'),sheet='Sheet1') %>%
+  import(last.file(dir.nam = dir.nam.CEP, nam = 'NAPCentral'),sheet='Sheet1') %>%
   group_by(Year) %>%
   summarise(NumCountries=length(Country)) %>%
   transmute(Year_Key=Year,
@@ -699,8 +700,8 @@ Dim_Initiative_Indicator_CEP <-
             Indicator_Target=as.numeric(subcattarget),
             Display_Order=displayorder,
             Indicator_Statement=statement,
-            Indicator_Label_Abbr=toupper(Indicator.label.abbr), # MUST MANUALLY CALCULATE!!
-            Subcategory_Abbr=Subcategory.abbr, # MUST MANUALLY CALCULATE!!
+            Indicator_Label_Abbr=toupper(indicatorlabelabbr), # MUST MANUALLY CALCULATE!!
+            Subcategory_Abbr=subcatlabelabbr, # MUST MANUALLY CALCULATE!!
             Amount_Achieved=amount.achieved,
             Amount_Remaining=amount.remaining,
             Pie_Type=pie.type,
@@ -721,7 +722,7 @@ Fact_Initiative_Indicator_CEP <-
             Indicator_Upper_Value=NA,
             Indicator_Lower_Value=NA,
             Value_Trend=ifelse(grepl("reduction",indicatorunits,ignore.case=T)==T,-(Value),Value),
-            Indicator_Target=ifelse(!is.na(subcattarget) & Year==target.year,Target,NA),
+            Indicator_Target=ifelse(!is.na(subcattarget) & Year==target.year,subcattarget,NA),
             Target_Trend=ifelse(grepl("reduction",indicatorunits,ignore.case=T)==T,-(Indicator_Target),Indicator_Target))
 
 
@@ -729,7 +730,7 @@ Fact_Initiative_Indicator_CEP <-
 
 Fact_Initiative_Financials_CEP <-
   dim_initiatives_CEP %>%
-  transmute(Date_Key=Date,
+  transmute(Date_Key=date,
             Practice_Key=rep(practice_key_ref$id[practice_key_ref$practice_name=="Climate & Energy"],length(Date_Key)),
             Initiative_Key=initiativekey,
             Amount_Needed=fundsneeded,
