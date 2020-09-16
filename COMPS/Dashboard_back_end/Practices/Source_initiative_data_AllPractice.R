@@ -87,7 +87,6 @@ dim_initiatives <-
   mutate(date = substr(as.numeric(timestamp), 1, 8))
 
 
-
 dim_initiative_indicators <-
   import(paste(latest_folder,"Init_indicator_dim.csv", sep = "/")) %>%
   filter(!is.na(indicatorlabel) & indicatorlabel!="") %>%
@@ -101,9 +100,24 @@ dim_initiative_indicators <-
 fact_initiative_indicators <-
   import(paste(latest_folder,"Init_indicator_fact.csv", sep = "/")) %>%
   left_join(.,dim_initiatives[,c("goal","initiative")], by="initiative") %>% 
-  left_join(.,dim_initiative_indicators[,c("indicatorkey","statement")], by="indicatorkey") %>%
-  filter(!is.na(statement))
-# NOTE: use indicator labels and subcat labels from init_indicator_dim. To remain consistent, when making manual changes.
+  left_join(.,dim_initiative_indicators[,c("indicatorkey","statement", "subcattarget")], by="indicatorkey") %>%
+  group_by(indicatorkey) %>%
+  mutate(targetyear=max(Year),
+         lengthdata=length(Value[!is.na(Value)]),
+         is.targetyear=ifelse(Year==targetyear,"yes","no"),
+         # below, we identify rows that need to be removed, to ensure the proper visualization in Tableau:
+         # the rows identified in remove.data1 contain the target year, blank value, and there is no target identified 
+         # (when no target is identified, there is no need to have a blank placeholder row for target year - it messes up the centering of the data on the Tableau plots)
+         remove.data1=ifelse(is.targetyear=="yes" & !is.na(is.targetyear) & is.na(subcattarget), "yes", "no"),
+         # the rows identified in remove.data2 have a blank year/value, but otherwise have data - we need to maintain a dummy row for those
+         # indicators that do not have data yet, but we do not need the extra row of an NA year/value when we already have other data
+         # (this is likely an artifact from initiative reporting app input)
+         remove.data2=ifelse(is.na(Year) & lengthdata>0, "yes", "no")) %>%
+  ungroup() %>%
+  filter(!is.na(statement) & remove.data1=="no" & remove.data2=="no") %>%
+  select(-subcattarget,-targetyear,-lengthdata,-is.targetyear,-remove.data1,-remove.data2)
+
+
 
 dim_initiative_milestones <-
   import(paste(latest_folder,"Milestones.csv", sep = "/")) %>% 
@@ -119,10 +133,6 @@ dim_initiative_milestones <-
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #
 
-
-left_join(fact_initiative_indicators,dim_initiative_indicators[,c("indicatorkey","subcattarget")],by="indicatorkey") %>% group_by(indicatorkey) %>%
-  summarise(subcattarget=unique(subcattarget),
-            target.year=max(Year))
 
 
 # ---- 2.1 Calculate pie.type info ---- 
@@ -151,7 +161,7 @@ pie_type <-
                                 ifelse(has.data=="No" & is.na(subcattarget), "No Data - No Target",
                                        ifelse(has.data=="Yes" & !is.na(subcattarget) & good.bad.trend=="Good", "Yes Data - Yes Target - Good Trend",
                                               ifelse(has.data=="Yes" & !is.na(subcattarget) & good.bad.trend=="Bad", "Yes Data - Yes Target - Bad Trend", NA))))),
-         amount.achieved=ifelse(max.year.value==0 & (is.na(subcattarget) | subcattarget==0), 1,
+         amount.achieved=ifelse((max.year.value==0 & (is.na(subcattarget) | subcattarget==0)) | (max.year.value==subcattarget & !is.na(subcattarget)), 1,
                                 ifelse(max.year.value==0 & !is.na(subcattarget) & subcattarget!=0, 0,
                                   ifelse(initiativekey=="i0027" & pie.type=="Yes Data - Yes Target - Good Trend", max.year.value/subcattarget, #THIS IS SPECIFICALLY FOR TIGERS INITIATIVE -- wanted pies to reflect starting value of 0, but our data do not include baseline data, nor data from when indicator was 0
                                     ifelse((pie.type=="Yes Data - Yes Target - Good Trend" |
